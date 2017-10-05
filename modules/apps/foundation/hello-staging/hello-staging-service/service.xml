@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.0.0//EN"
+		"http://www.liferay.com/dtd/liferay-service-builder_7_0_0.dtd">
+
+<service-builder package-path="com.liferay.hello.staging">
+	<namespace>SampleLAR</namespace>
+	<!--<entity data-source="sampleDataSource" local-service="true" name="Foo" remote-service="false" session-factory="sampleSessionFactory" table="foo" tx-manager="sampleTransactionManager uuid="true"">-->
+	<entity local-service="true" name="Booking" remote-service="false" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="bookingId" primary="true" type="long" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="bookingNumber" type="String" />
+		<column name="lastPublishDate" type="Date" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="bookingNumber" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="GroupId" return-type="Collection">
+			<finder-column name="groupId" />
+		</finder>
+		<finder name="GroupIdAndBookingId" return-type="Booking">
+			<finder-column name="groupId" />
+			<finder-column name="bookingId" />
+		</finder>
+	</entity>
+	<entity local-service="true" name="Room" remote-service="false" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="roomId" primary="true" type="long" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="bookingId" type="long" />
+		<column name="roomNumber" type="String" />
+		<column name="lastPublishDate" type="Date" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="roomNumber" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="GroupIdAndBookingId" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="bookingId" />
+		</finder>
+		<finder name="GroupIdAndRoomNumber" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="roomNumber" />
+		</finder>
+		<finder name="GroupIdAndBookingIdAndRoomNumber" return-type="Room">
+			<finder-column name="groupId" />
+			<finder-column name="bookingId" />
+			<finder-column name="roomNumber" />
+		</finder>
+	</entity>
+	<exceptions>
+		<exception>AlreadyUsedRoomNumber</exception>
+		<exception>EmptyBookingNumber</exception>
+		<exception>EmptyRoomNumber</exception>
+	</exceptions>
+</service-builder>

@@ -1,0 +1,10 @@
+Bundle-Name: Liferay Hello Staging API
+Bundle-SymbolicName: com.liferay.hello.staging.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.hello.staging.constants,\
+	com.liferay.hello.staging.exception,\
+	com.liferay.hello.staging.model,\
+	com.liferay.hello.staging.service,\
+	com.liferay.hello.staging.service.persistence
+-includeresource: META-INF/service.xml=../hello-staging-service/service.xml

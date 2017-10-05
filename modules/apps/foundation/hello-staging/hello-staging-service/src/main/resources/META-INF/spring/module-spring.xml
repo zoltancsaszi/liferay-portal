@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean class="com.liferay.hello.staging.service.impl.BookingLocalServiceImpl" id="com.liferay.hello.staging.service.BookingLocalService" />
+	<bean class="com.liferay.hello.staging.service.persistence.impl.BookingPersistenceImpl" id="com.liferay.hello.staging.service.persistence.BookingPersistence" parent="basePersistence" />
+	<bean class="com.liferay.hello.staging.service.impl.RoomLocalServiceImpl" id="com.liferay.hello.staging.service.RoomLocalService" />
+	<bean class="com.liferay.hello.staging.service.persistence.impl.RoomPersistenceImpl" id="com.liferay.hello.staging.service.persistence.RoomPersistence" parent="basePersistence" />
+</beans>

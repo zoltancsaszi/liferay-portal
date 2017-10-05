@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.liferay.hello.staging.model.Booking">
+		<field name="uuid" type="String" />
+		<field name="bookingId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="bookingNumber" type="String" />
+		<field name="lastPublishDate" type="Date" />
+	</model>
+	<model name="com.liferay.hello.staging.model.Room">
+		<field name="uuid" type="String" />
+		<field name="roomId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="bookingId" type="long" />
+		<field name="roomNumber" type="String" />
+		<field name="lastPublishDate" type="Date" />
+	</model>
+</model-hints>
