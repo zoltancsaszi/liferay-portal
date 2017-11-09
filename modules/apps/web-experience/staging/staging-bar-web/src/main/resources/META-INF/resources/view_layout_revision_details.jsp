@@ -1,4 +1,6 @@
-<%--
+<%@ page import="com.liferay.portal.kernel.model.WorkflowInstanceLink" %>
+<%@ page
+	import="com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalServiceUtil" %><%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -37,6 +39,13 @@ if (workflowEnabled) {
 	hasWorkflowTask = StagingUtil.hasWorkflowTask(user.getUserId(), layoutRevision);
 }
 
+WorkflowInstanceLink workflowInstanceLink = WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(
+		layoutRevision.getCompanyId(), layoutRevision.getGroupId(),
+		LayoutRevision.class.getName(),
+		layoutRevision.getLayoutRevisionId());
+
+boolean hasWorkflowInstanceLink = workflowInstanceLink != null;
+
 String taglibHelpMessage = null;
 
 String layoutSetBranchName = HtmlUtil.escape(layoutSetBranchDisplayContext.getLayoutSetBranchDisplayName(layoutSetBranch));
@@ -44,7 +53,7 @@ String layoutSetBranchName = HtmlUtil.escape(layoutSetBranchDisplayContext.getLa
 if (layoutRevision.isHead()) {
 	taglibHelpMessage = LanguageUtil.format(request, "this-version-will-be-published-when-x-is-published-to-live", layoutSetBranchName, false);
 }
-else if (hasWorkflowTask) {
+else if (workflowEnabled && hasWorkflowTask) {
 	taglibHelpMessage = "you-are-currently-reviewing-this-page.-you-can-make-changes-and-send-them-to-the-next-step-in-the-workflow-when-ready";
 }
 else {
@@ -95,7 +104,7 @@ else {
 							);
 						</aui:script>
 					</c:when>
-					<c:when test="<%= !workflowEnabled && !layoutRevision.isIncomplete() %>">
+					<c:when test="<%= !workflowEnabled && !layoutRevision.isIncomplete() && !hasWorkflowTask && !hasWorkflowInstanceLink %>">
 						<span class="staging-bar-control-toggle">
 							<aui:input id="readyToggle" label="<%= StringPool.BLANK %>" labelOff="ready-for-publication" labelOn="ready-for-publication" name="readyToggle" onChange='<%= liferayPortletResponse.getNamespace() + "submitLayoutRevision('" + publishURL + "')" %>' type="toggle-switch" value="<%= false %>" />
 						</span>
@@ -148,7 +157,7 @@ else {
 				</c:otherwise>
 			</c:choose>
 
-			<c:if test="<%= hasWorkflowTask %>">
+			<c:if test="<%= workflowEnabled && hasWorkflowTask %>">
 
 				<%
 				PortletURL portletURL = PortalUtil.getControlPanelPortletURL(request, PortletKeys.MY_WORKFLOW_TASK, PortletRequest.RENDER_PHASE);
@@ -255,7 +264,17 @@ else {
 			</ul>
 		</div>
 	</li>
-
+	<c:if test="<%= !workflowEnabled && !layoutRevision.isIncomplete() && (hasWorkflowTask || hasWorkflowInstanceLink) %>">
+		<li>
+			<div class="row-fluid">
+				<div class="col-md-12">
+					<div class="alert alert-info">
+						<liferay-ui:message key="there-is-a-publication-workflow-in-process" />
+					</div>
+				</div>
+			</div>
+		</li>
+	</c:if>
 <portlet:renderURL var="markAsReadyForPublicationURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 	<portlet:param name="mvcPath" value="/view_layout_revision_details.jsp" />
 </portlet:renderURL>
