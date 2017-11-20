@@ -94,20 +94,6 @@ public abstract class BasePortletDataHandlerTestCase {
 	}
 
 	@Test
-	public void testDeletionSystemEventStagedModelTypes() throws Exception {
-		Assert.assertArrayEquals(
-			getDeletionSystemEventStagedModelTypes(),
-			portletDataHandler.getDeletionSystemEventStagedModelTypes());
-	}
-
-	@Test
-	public void testDeletionSystemEventStagedModelTypes() throws Exception {
-		Assert.assertArrayEquals(
-			getDeletionSystemEventStagedModelTypes(),
-			portletDataHandler.getDeletionSystemEventStagedModelTypes());
-	}
-
-	@Test
 	public void testDeleteData() throws Exception {
 		initContext();
 
@@ -495,7 +481,7 @@ public abstract class BasePortletDataHandlerTestCase {
 		ManifestSummary manifestSummary) {
 
 		for (String manifestSummaryKey :
-			manifestSummary.getManifestSummaryKeys()) {
+				manifestSummary.getManifestSummaryKeys()) {
 
 			Assert.assertFalse(
 				manifestSummaryKey.endsWith(
