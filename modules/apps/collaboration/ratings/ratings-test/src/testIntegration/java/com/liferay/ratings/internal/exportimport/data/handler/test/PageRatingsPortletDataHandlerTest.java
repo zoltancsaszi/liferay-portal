@@ -77,6 +77,11 @@ public class PageRatingsPortletDataHandlerTest
 	}
 
 	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(RatingsEntry.class)};
+	}
+
+	@Override
 	protected String getPortletId() {
 		return PageRatingsPortletKeys.PAGE_RATINGS;
 	}
