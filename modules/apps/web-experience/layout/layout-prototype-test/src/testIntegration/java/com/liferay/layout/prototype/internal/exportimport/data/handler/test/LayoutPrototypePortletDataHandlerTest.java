@@ -16,7 +16,9 @@ package com.liferay.layout.prototype.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.prototype.constants.LayoutPrototypePortletKeys;
+import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -56,6 +58,13 @@ public class LayoutPrototypePortletDataHandlerTest
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.PORTAL;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(LayoutPrototype.class)
+		};
 	}
 
 	@Override
