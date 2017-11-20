@@ -25,6 +25,8 @@ import com.liferay.message.boards.kernel.model.MBThread;
 import com.liferay.message.boards.kernel.service.MBCategoryLocalServiceUtil;
 import com.liferay.message.boards.kernel.service.MBCategoryServiceUtil;
 import com.liferay.message.boards.kernel.service.MBMessageLocalServiceUtil;
+import com.liferay.message.boards.model.MBBan;
+import com.liferay.message.boards.model.MBThreadFlag;
 import com.liferay.message.boards.service.MBBanLocalServiceUtil;
 import com.liferay.message.boards.service.MBThreadFlagLocalServiceUtil;
 import com.liferay.message.boards.web.constants.MBPortletKeys;
@@ -172,6 +174,17 @@ public class MBPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.SITE;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(MBBan.class),
+			new StagedModelType(MBCategory.class),
+			new StagedModelType(MBMessage.class),
+			new StagedModelType(MBThread.class),
+			new StagedModelType(MBThreadFlag.class)
+		};
 	}
 
 	@Override
