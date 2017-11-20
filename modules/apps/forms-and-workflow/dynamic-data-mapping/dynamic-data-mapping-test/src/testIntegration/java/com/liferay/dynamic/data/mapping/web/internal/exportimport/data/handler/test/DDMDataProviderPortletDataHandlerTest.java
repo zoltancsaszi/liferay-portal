@@ -12,15 +12,22 @@
  * details.
  */
 
-package com.liferay.blogs.internal.exportimport.data.handler.test;
+package com.liferay.dynamic.data.mapping.web.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.blogs.constants.BlogsPortletKeys;
+import com.liferay.dynamic.data.mapping.data.provider.web.internal.constant.DDMDataProviderPortletKeys;
+import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
@@ -28,8 +35,15 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Sync
-public class BlogsPortletDataHandlerTest
+public class DDMDataProviderPortletDataHandlerTest
 	extends BasePortletDataHandlerTestCase {
+
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
 	@Override
@@ -47,8 +61,15 @@ public class BlogsPortletDataHandlerTest
 	}
 
 	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMDataProviderInstance.class)
+		};
+	}
+
+	@Override
 	protected String getPortletId() {
-		return BlogsPortletKeys.BLOGS;
+		return DDMDataProviderPortletKeys.DYNAMIC_DATA_MAPPING_DATA_PROVIDER;
 	}
 
 	@Override

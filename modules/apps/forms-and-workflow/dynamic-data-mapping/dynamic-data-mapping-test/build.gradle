@@ -34,6 +34,7 @@ dependencies {
 	testCompile group: "xerces", name: "xercesImpl", version: "2.11.0"
 	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-api")
 	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-data-provider")
+	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-data-provider-web")
 	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-form-evaluator")
 	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-form-field-type")
 	testCompile project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-io")
