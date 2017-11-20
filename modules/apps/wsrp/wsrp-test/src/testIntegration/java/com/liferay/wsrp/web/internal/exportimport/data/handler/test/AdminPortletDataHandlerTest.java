@@ -16,10 +16,14 @@ package com.liferay.wsrp.web.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.wsrp.constants.WSRPPortletKeys;
+import com.liferay.wsrp.model.WSRPConsumer;
+import com.liferay.wsrp.model.WSRPConsumerPortlet;
+import com.liferay.wsrp.model.WSRPProducer;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -44,6 +48,15 @@ public class AdminPortletDataHandlerTest
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.PORTAL;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(WSRPConsumer.class),
+			new StagedModelType(WSRPConsumerPortlet.class),
+			new StagedModelType(WSRPProducer.class)
+		};
 	}
 
 	@Override
