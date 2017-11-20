@@ -70,6 +70,11 @@ public class RolesAdminPortletDataHandlerTest
 	}
 
 	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(Role.class)};
+	}
+
+	@Override
 	protected String getPortletId() {
 		return RolesAdminPortletKeys.ROLES_ADMIN;
 	}
