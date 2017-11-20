@@ -20,9 +20,11 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.exportimport.data.handler.JournalPortletDataHandler;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
@@ -190,6 +192,18 @@ public class JournalPortletDataHandlerTest
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.SITE;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMStructure.class, JournalArticle.class),
+			new StagedModelType(DDMTemplate.class, DDMStructure.class),
+			new StagedModelType(JournalArticle.class),
+			new StagedModelType(JournalArticle.class, DDMStructure.class),
+			new StagedModelType(JournalFeed.class),
+			new StagedModelType(JournalFolder.class)
+		};
 	}
 
 	@Override
