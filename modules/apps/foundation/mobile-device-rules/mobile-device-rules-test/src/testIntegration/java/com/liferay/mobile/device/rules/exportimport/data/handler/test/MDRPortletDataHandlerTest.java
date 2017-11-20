@@ -16,8 +16,11 @@ package com.liferay.mobile.device.rules.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.mobile.device.rules.constants.MDRPortletKeys;
 import com.liferay.mobile.device.rules.exportimport.data.handler.MDRPortletDataHandler;
+import com.liferay.mobile.device.rules.model.MDRAction;
+import com.liferay.mobile.device.rules.model.MDRRule;
 import com.liferay.mobile.device.rules.model.MDRRuleGroup;
 import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
 import com.liferay.mobile.device.rules.util.test.MDRTestUtil;
@@ -82,6 +85,16 @@ public class MDRPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.SITE;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(MDRAction.class, Layout.class),
+			new StagedModelType(MDRRule.class),
+			new StagedModelType(MDRRuleGroup.class),
+			new StagedModelType(MDRRuleGroupInstance.class, Layout.class)
+		};
 	}
 
 	@Override
