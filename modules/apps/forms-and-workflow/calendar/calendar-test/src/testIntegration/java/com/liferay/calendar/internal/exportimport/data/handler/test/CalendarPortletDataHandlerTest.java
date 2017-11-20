@@ -16,7 +16,12 @@ package com.liferay.calendar.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.calendar.constants.CalendarPortletKeys;
+import com.liferay.calendar.model.Calendar;
+import com.liferay.calendar.model.CalendarBooking;
+import com.liferay.calendar.model.CalendarNotificationTemplate;
+import com.liferay.calendar.model.CalendarResource;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -56,6 +61,16 @@ public class CalendarPortletDataHandlerTest
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.SITE;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(Calendar.class),
+			new StagedModelType(CalendarBooking.class),
+			new StagedModelType(CalendarNotificationTemplate.class),
+			new StagedModelType(CalendarResource.class)
+		};
 	}
 
 	@Override
