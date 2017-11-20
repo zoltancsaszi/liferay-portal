@@ -16,6 +16,7 @@ package com.liferay.users.admin.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -53,6 +54,11 @@ public class UsersAdminPortletDataHandlerTest
 	@Override
 	protected DataLevel getDataLevel() {
 		return DataLevel.PORTAL;
+	}
+
+	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(Organization.class)};
 	}
 
 	@Override
