@@ -58,14 +58,19 @@ public class LayoutPrototypePortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(LayoutPrototype.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(LayoutPrototype.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "page-templates", true, true, null,
