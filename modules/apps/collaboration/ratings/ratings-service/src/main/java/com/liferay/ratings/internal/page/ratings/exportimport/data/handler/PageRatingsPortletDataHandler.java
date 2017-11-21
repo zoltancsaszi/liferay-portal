@@ -64,6 +64,11 @@ public class PageRatingsPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(RatingsEntry.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -71,8 +76,6 @@ public class PageRatingsPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataAlwaysStaged(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(RatingsEntry.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "ratings-entries", true, false, null,
