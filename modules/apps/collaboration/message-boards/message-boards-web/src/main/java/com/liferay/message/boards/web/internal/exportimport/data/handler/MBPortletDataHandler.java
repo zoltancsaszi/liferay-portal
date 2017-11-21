@@ -76,6 +76,17 @@ public class MBPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(MBBan.class),
+			new StagedModelType(MBCategory.class),
+			new StagedModelType(MBMessage.class),
+			new StagedModelType(MBThread.class),
+			new StagedModelType(MBThreadFlag.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -87,12 +98,6 @@ public class MBPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(MBBan.class),
-			new StagedModelType(MBCategory.class),
-			new StagedModelType(MBMessage.class),
-			new StagedModelType(MBThread.class),
-			new StagedModelType(MBThreadFlag.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "categories", true, false, null,
