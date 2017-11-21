@@ -58,6 +58,13 @@ public class PasswordPolicyPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(PasswordPolicy.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -69,8 +76,6 @@ public class PasswordPolicyPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(PasswordPolicy.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "password-policies", true, true, null,
