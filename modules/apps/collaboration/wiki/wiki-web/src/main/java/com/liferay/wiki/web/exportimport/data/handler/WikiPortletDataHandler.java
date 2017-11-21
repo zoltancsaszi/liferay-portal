@@ -67,6 +67,14 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(WikiNode.class),
+			new StagedModelType(WikiPage.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -96,9 +104,6 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataPortletPreferences("hiddenNodes, visibleNodes");
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(WikiNode.class),
-			new StagedModelType(WikiPage.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "wiki-nodes", false, true, null,
