@@ -59,6 +59,11 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(BlogsEntry.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -70,8 +75,6 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(BlogsEntry.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "entries", true, false,
