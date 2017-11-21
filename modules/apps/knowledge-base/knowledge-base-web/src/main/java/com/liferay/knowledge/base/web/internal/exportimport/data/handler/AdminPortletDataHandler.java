@@ -64,10 +64,6 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "2.0.0";
 
 	public AdminPortletDataHandler() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(KBArticle.class),
-			new StagedModelType(KBComment.class),
-			new StagedModelType(KBTemplate.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "kb-articles", true, true, null,
@@ -87,6 +83,15 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 	@Override
 	public DataLevel getDataLevel() {
 		return DataLevel.SITE;
+	}
+
+	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(KBArticle.class),
+			new StagedModelType(KBComment.class),
+			new StagedModelType(KBTemplate.class)
+		};
 	}
 
 	@Override
