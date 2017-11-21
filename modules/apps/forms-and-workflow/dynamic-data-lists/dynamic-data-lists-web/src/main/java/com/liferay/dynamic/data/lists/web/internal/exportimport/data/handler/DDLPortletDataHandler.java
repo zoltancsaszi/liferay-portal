@@ -59,6 +59,14 @@ public class DDLPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDLRecord.class),
+			new StagedModelType(DDLRecordSet.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -66,9 +74,6 @@ public class DDLPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataLocalized(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DDLRecord.class),
-			new StagedModelType(DDLRecordSet.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "record-sets", true, false, null,
