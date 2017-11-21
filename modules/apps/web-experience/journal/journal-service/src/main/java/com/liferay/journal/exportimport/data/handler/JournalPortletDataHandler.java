@@ -108,6 +108,18 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.1.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMStructure.class, JournalArticle.class),
+			new StagedModelType(DDMTemplate.class, DDMStructure.class),
+			new StagedModelType(JournalArticle.class),
+			new StagedModelType(JournalArticle.class, DDMStructure.class),
+			new StagedModelType(JournalFeed.class),
+			new StagedModelType(JournalFolder.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -137,13 +149,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataLocalized(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DDMStructure.class, JournalArticle.class),
-			new StagedModelType(DDMTemplate.class, DDMStructure.class),
-			new StagedModelType(JournalArticle.class),
-			new StagedModelType(JournalArticle.class, DDMStructure.class),
-			new StagedModelType(JournalFeed.class),
-			new StagedModelType(JournalFolder.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "web-content", true, false,
