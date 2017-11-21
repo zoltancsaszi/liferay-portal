@@ -52,6 +52,11 @@ public class AssetTagsPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(AssetTag.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -59,9 +64,6 @@ public class AssetTagsPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataAlwaysStaged(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(AssetTag.class));
-
 		PortletDataHandlerBoolean tagsPortletDataHandlerBoolean =
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "tags", true, false, null, AssetTag.class.getName());
