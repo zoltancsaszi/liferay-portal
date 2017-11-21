@@ -62,6 +62,14 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(BookmarksEntry.class),
+			new StagedModelType(BookmarksFolder.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -75,9 +83,6 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataPortletPreferences("rootFolderId");
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(BookmarksEntry.class),
-			new StagedModelType(BookmarksFolder.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "entries", true, false, null,
