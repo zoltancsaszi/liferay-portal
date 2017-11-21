@@ -93,6 +93,19 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DLFileEntryType.class),
+			new StagedModelType(DLFileShortcut.class),
+			new StagedModelType(DLFileEntryConstants.getClassName()),
+			new StagedModelType(DLFolderConstants.getClassName()),
+			new StagedModelType(
+				Repository.class.getName(),
+				StagedModelType.REFERRER_CLASS_NAME_ALL)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -106,14 +119,6 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 	protected void activate() {
 		setDataLocalized(true);
 		setDataPortletPreferences("rootFolderId");
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DLFileEntryType.class),
-			new StagedModelType(DLFileShortcut.class),
-			new StagedModelType(DLFileEntryConstants.getClassName()),
-			new StagedModelType(DLFolderConstants.getClassName()),
-			new StagedModelType(
-				Repository.class.getName(),
-				StagedModelType.REFERRER_CLASS_NAME_ALL));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "repositories", true, false, null,
