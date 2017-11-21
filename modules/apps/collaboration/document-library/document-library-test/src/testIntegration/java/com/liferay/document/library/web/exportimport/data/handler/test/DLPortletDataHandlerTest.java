@@ -24,6 +24,7 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLTrashServiceUtil;
@@ -36,6 +37,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -63,6 +65,8 @@ import com.liferay.portlet.PortletPreferencesImpl;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -265,6 +269,22 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 	@Override
 	protected String getPortletId() {
 		return DLPortletKeys.DOCUMENT_LIBRARY;
+	}
+
+	@Override
+	protected List<StagedModel> getStagedModels() {
+		List<StagedModel> stagedModels = new ArrayList<>();
+
+		stagedModels.addAll(
+			DLFolderLocalServiceUtil.getFolders(
+				portletDataContext.getGroupId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+		stagedModels.addAll(
+			DLFileEntryLocalServiceUtil.getFileEntries(
+				portletDataContext.getGroupId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+		return stagedModels;
 	}
 
 	@Override
