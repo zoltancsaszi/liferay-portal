@@ -46,10 +46,6 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 	public static final String NAMESPACE = "wsrp";
 
 	public AdminPortletDataHandler() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(WSRPConsumer.class),
-			new StagedModelType(WSRPConsumerPortlet.class),
-			new StagedModelType(WSRPProducer.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(NAMESPACE, "wsrp-producers", false),
 			new PortletDataHandlerBoolean(
@@ -71,6 +67,15 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 	@Override
 	public DataLevel getDataLevel() {
 		return DataLevel.PORTAL;
+	}
+
+	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(WSRPConsumer.class),
+			new StagedModelType(WSRPConsumerPortlet.class),
+			new StagedModelType(WSRPProducer.class)
+		};
 	}
 
 	@Override
