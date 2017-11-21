@@ -54,6 +54,14 @@ public class AssetCategoryPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(AssetCategory.class),
+			new StagedModelType(AssetVocabulary.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -61,9 +69,6 @@ public class AssetCategoryPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataAlwaysStaged(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(AssetCategory.class),
-			new StagedModelType(AssetVocabulary.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "categories", true, false, null,
