@@ -62,14 +62,19 @@ public class DDMDataProviderPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMDataProviderInstance.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DDMDataProviderInstance.class));
 	}
 
 	@Override
