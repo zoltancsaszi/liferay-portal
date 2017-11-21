@@ -63,17 +63,22 @@ public class MDRPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(MDRAction.class, Layout.class),
+			new StagedModelType(MDRRule.class),
+			new StagedModelType(MDRRuleGroup.class),
+			new StagedModelType(MDRRuleGroupInstance.class, Layout.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(MDRAction.class, Layout.class),
-			new StagedModelType(MDRRule.class),
-			new StagedModelType(MDRRuleGroup.class),
-			new StagedModelType(MDRRuleGroupInstance.class, Layout.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "rules", true, false, null, MDRRule.class.getName()),
