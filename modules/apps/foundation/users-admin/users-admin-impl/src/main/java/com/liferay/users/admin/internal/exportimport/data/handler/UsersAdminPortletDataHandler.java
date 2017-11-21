@@ -54,14 +54,17 @@ public class UsersAdminPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(Organization.class)};
+	}
+
+	@Override
 	public boolean isSupportsDataStrategyCopyAsNew() {
 		return false;
 	}
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(Organization.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "organizations", true, true, null,
