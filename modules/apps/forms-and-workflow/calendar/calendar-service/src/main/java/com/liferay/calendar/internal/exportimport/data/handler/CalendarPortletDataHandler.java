@@ -66,6 +66,16 @@ public class CalendarPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(Calendar.class),
+			new StagedModelType(CalendarBooking.class),
+			new StagedModelType(CalendarNotificationTemplate.class),
+			new StagedModelType(CalendarResource.class)
+		};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -73,11 +83,6 @@ public class CalendarPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataLocalized(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(Calendar.class),
-			new StagedModelType(CalendarBooking.class),
-			new StagedModelType(CalendarNotificationTemplate.class),
-			new StagedModelType(CalendarResource.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "calendars", true, false, null,
