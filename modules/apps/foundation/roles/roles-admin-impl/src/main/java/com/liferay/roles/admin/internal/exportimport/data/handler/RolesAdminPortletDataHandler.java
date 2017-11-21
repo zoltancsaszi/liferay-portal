@@ -69,6 +69,11 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(Role.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -80,7 +85,6 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(new StagedModelType(Role.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "roles", true, true,
