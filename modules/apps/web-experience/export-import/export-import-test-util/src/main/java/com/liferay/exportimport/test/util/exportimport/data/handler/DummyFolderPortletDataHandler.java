@@ -50,6 +50,11 @@ public class DummyFolderPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(DummyFolder.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -62,8 +67,6 @@ public class DummyFolderPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DummyFolder.class));
 		setRank(120);
 	}
 
