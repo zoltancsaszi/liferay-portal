@@ -58,6 +58,11 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.0.0";
 
 	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {new StagedModelType(PollsQuestion.class)};
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -65,8 +70,6 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataLocalized(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(PollsQuestion.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "questions", true, false,
