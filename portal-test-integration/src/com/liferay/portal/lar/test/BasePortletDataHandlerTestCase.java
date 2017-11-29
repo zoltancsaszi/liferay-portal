@@ -94,20 +94,6 @@ public abstract class BasePortletDataHandlerTestCase {
 	}
 
 	@Test
-	public void testDeletionSystemEventStagedModelTypes() throws Exception {
-		Assert.assertArrayEquals(
-			getDeletionSystemEventStagedModelTypes(),
-			portletDataHandler.getDeletionSystemEventStagedModelTypes());
-	}
-
-	@Test
-	public void testGetDataPortletPreferences() {
-		Assert.assertArrayEquals(
-			getDataPortletPreferences(),
-			portletDataHandler.getDataPortletPreferences());
-	}
-
-	@Test
 	public void testDeleteData() throws Exception {
 		initContext();
 
@@ -229,6 +215,13 @@ public abstract class BasePortletDataHandlerTestCase {
 		}
 
 		Assert.assertEquals(exportedUuidSet, importedUuidSet);
+	}
+
+	@Test
+	public void testGetDataPortletPreferences() {
+		Assert.assertArrayEquals(
+			getDataPortletPreferences(),
+			portletDataHandler.getDataPortletPreferences());
 	}
 
 	@Test
