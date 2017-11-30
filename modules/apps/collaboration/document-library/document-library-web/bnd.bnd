@@ -8,6 +8,8 @@ Export-Package:\
 	com.liferay.document.library.web.social,\
 	com.liferay.document.library.web.webdav
 Import-Package:\
+	com.liferay.exportimport.exception.handler; version="[2.2.0,3.0.0)",\
+	\
 	org.apache.xerces.parsers,\
 	\
 	*

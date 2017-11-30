@@ -28,8 +28,10 @@ import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLFileShortcutLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.web.constants.DLPortletKeys;
-import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.exception.handler.ExceptionHandlerHelper;
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
@@ -37,6 +39,8 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerControlHelper;
+import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -49,6 +53,9 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
@@ -57,6 +64,8 @@ import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.LiferayRepositoryDefiner;
 import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepositoryDefiner;
@@ -68,7 +77,6 @@ import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -86,11 +94,129 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = PortletDataHandler.class
 )
-public class DLPortletDataHandler extends BasePortletDataHandler {
+public class DLPortletDataHandler implements PortletDataHandler {
 
 	public static final String NAMESPACE = "document_library";
 
 	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public PortletPreferences addDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = 0;
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Adding default data to portlet " + portletId);
+
+			startTime = System.currentTimeMillis();
+		}
+
+		try {
+			return doAddDefaultData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (PortletDataException pde) {
+			throw pde;
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
+		finally {
+			if (_log.isInfoEnabled()) {
+				long duration = System.currentTimeMillis() - startTime;
+
+				_log.info(
+					"Added default data to portlet in " +
+						Time.getDuration(duration));
+			}
+		}
+	}
+
+	@Override
+	public PortletPreferences deleteData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = 0;
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Deleting portlet " + portletId);
+
+			startTime = System.currentTimeMillis();
+		}
+
+		try {
+			return doDeleteData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.DELETE_PORTLET_DATA, portletId);
+		}
+		finally {
+			if (_log.isInfoEnabled()) {
+				long duration = System.currentTimeMillis() - startTime;
+
+				_log.info("Deleted portlet in " + Time.getDuration(duration));
+			}
+		}
+	}
+
+	@Override
+	public String exportData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = 0;
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Exporting portlet " + portletId);
+
+			startTime = System.currentTimeMillis();
+		}
+
+		Element rootElement = null;
+
+		try {
+			rootElement = portletDataContext.getExportDataRootElement();
+
+			portletDataContext.addDeletionSystemEventStagedModelTypes(
+				getDeletionSystemEventStagedModelTypes());
+
+			for (PortletDataHandlerControl portletDataHandlerControl :
+					getExportControls()) {
+
+				_portletDataHandlerHelper.addUncheckedModelAdditionCount(
+					portletDataContext, portletDataHandlerControl);
+			}
+
+			return doExportData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.EXPORT_PORTLET_DATA, portletId);
+		}
+		finally {
+			portletDataContext.setExportDataRootElement(rootElement);
+
+			if (_log.isInfoEnabled()) {
+				long duration = System.currentTimeMillis() - startTime;
+
+				_log.info("Exported portlet in " + Time.getDuration(duration));
+			}
+		}
+	}
+
+	@Override
+	public String[] getDataPortletPreferences() {
+		return new String[] {"rootFolderId"};
+	}
 
 	@Override
 	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
@@ -106,20 +232,30 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
-	public String getSchemaVersion() {
-		return SCHEMA_VERSION;
+	public PortletDataHandlerControl[] getExportConfigurationControls(
+			long companyId, long groupId, Portlet portlet,
+			boolean privateLayout)
+		throws Exception {
+
+		return _portletDataHandlerControlHelper.getExportConfigurationControls(
+			companyId, groupId, portlet, isDisplayPortlet(),
+			getExportControls(), -1, privateLayout);
 	}
 
 	@Override
-	public String getServiceName() {
-		return DLConstants.SERVICE_NAME;
+	public PortletDataHandlerControl[] getExportConfigurationControls(
+			long companyId, long groupId, Portlet portlet, long plid,
+			boolean privateLayout)
+		throws Exception {
+
+		return _portletDataHandlerControlHelper.getExportConfigurationControls(
+			companyId, groupId, portlet, isDisplayPortlet(),
+			getExportControls(), plid, privateLayout);
 	}
 
-	@Activate
-	protected void activate() {
-		setDataLocalized(true);
-		setDataPortletPreferences("rootFolderId");
-		setExportControls(
+	@Override
+	public PortletDataHandlerControl[] getExportControls() {
+		return new PortletDataHandlerControl[] {
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "repositories", true, false, null,
 				Repository.class.getName(),
@@ -139,12 +275,193 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				DLFileEntryType.class.getName()),
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "shortcuts", true, false, null,
-				DLFileShortcutConstants.getClassName()));
-		setPublishToLiveByDefault(PropsValues.DL_PUBLISH_TO_LIVE_BY_DEFAULT);
-		setRank(90);
+				DLFileShortcutConstants.getClassName())
+		};
 	}
 
 	@Override
+	public long getExportModelCount(ManifestSummary manifestSummary) {
+		return _portletDataHandlerHelper.getExportModelCount(
+			manifestSummary, getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportConfigurationControls(
+		Portlet portlet, ManifestSummary manifestSummary) {
+
+		return _portletDataHandlerControlHelper.getImportConfigurationControls(
+			portlet, manifestSummary, isDisplayPortlet(), getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportConfigurationControls(
+		String[] configurationPortletOptions) {
+
+		return _portletDataHandlerControlHelper.getImportConfigurationControls(
+			configurationPortletOptions, isDisplayPortlet(),
+			getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportControls() {
+		return getExportControls();
+	}
+
+	/**
+	 * @deprecated As of 1.5.0
+	 */
+	@Deprecated
+	@Override
+	public String getPortletId() {
+		return DLPortletKeys.DOCUMENT_LIBRARY_ADMIN;
+	}
+
+	@Override
+	public int getRank() {
+		return 90;
+	}
+
+	@Override
+	public String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
+
+	@Override
+	public String getServiceName() {
+		return DLConstants.SERVICE_NAME;
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getStagingControls() {
+		return getExportControls();
+	}
+
+	@Override
+	public PortletPreferences importData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences, String data)
+		throws PortletDataException {
+
+		long startTime = 0;
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Importing portlet " + portletId);
+
+			startTime = System.currentTimeMillis();
+		}
+
+		long sourceGroupId = portletDataContext.getSourceGroupId();
+
+		Element rootElement = null;
+
+		try {
+			if (Validator.isXml(data)) {
+				rootElement = portletDataContext.getImportDataRootElement();
+
+				portletDataContext.addImportDataRootElement(data);
+			}
+
+			return doImportData(
+				portletDataContext, portletId, portletPreferences, data);
+		}
+		catch (Exception e) {
+			_log.error(e.getMessage(), e);
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.IMPORT_PORTLET_DATA, portletId);
+		}
+		finally {
+			portletDataContext.setImportDataRootElement(rootElement);
+			portletDataContext.setSourceGroupId(sourceGroupId);
+
+			if (_log.isInfoEnabled()) {
+				long duration = System.currentTimeMillis() - startTime;
+
+				_log.info("Imported portlet in " + Time.getDuration(duration));
+			}
+		}
+	}
+
+	@Override
+	public boolean isDataLocalized() {
+		return true;
+	}
+
+	@Override
+	public boolean isPublishToLiveByDefault() {
+		return PropsValues.DL_PUBLISH_TO_LIVE_BY_DEFAULT;
+	}
+
+	@Override
+	public void prepareManifestSummary(PortletDataContext portletDataContext)
+		throws PortletDataException {
+
+		prepareManifestSummary(portletDataContext, null);
+	}
+
+	@Override
+	public void prepareManifestSummary(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		try {
+			doPrepareManifestSummary(portletDataContext, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.PREPARE_MANIFEST_SUMMARY,
+				portletDataContext.getPortletId());
+		}
+	}
+
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
+	@Override
+	public PortletPreferences processExportPortletPreferences(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		return null;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
+	@Override
+	public PortletPreferences processImportPortletPreferences(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		return null;
+	}
+
+	@Override
+	public void setPortletId(String portletId) {
+	}
+
+	@Override
+	public void setRank(int rank) {
+	}
+
+	@Override
+	public boolean validateSchemaVersion(String schemaVersion) {
+		return _portletDataHandlerHelper.validateSchemaVersion(
+			schemaVersion, getSchemaVersion());
+	}
+
+	protected PortletPreferences doAddDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		return portletPreferences;
+	}
+
 	protected PortletPreferences doDeleteData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -176,7 +493,6 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		return portletPreferences;
 	}
 
-	@Override
 	protected String doExportData(
 			final PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -184,7 +500,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 		portletDataContext.addPortletPermissions(DLPermission.RESOURCE_NAME);
 
-		Element rootElement = addExportDataRootElement(portletDataContext);
+		Element rootElement = portletDataContext.addExportDataRootElement();
 
 		rootElement.addAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
@@ -226,10 +542,9 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			fileShortcutActionableDynamicQuery.performActions();
 		}
 
-		return getExportDataRootElementString(rootElement);
+		return portletDataContext.getExportDataRootElementString();
 	}
 
-	@Override
 	protected PortletPreferences doImportData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
@@ -306,7 +621,6 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		return portletPreferences;
 	}
 
-	@Override
 	protected void doPrepareManifestSummary(
 			final PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
@@ -687,6 +1001,9 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		_repositoryLocalService = repositoryLocalService;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLPortletDataHandler.class);
+
 	private DLAppLocalService _dlAppLocalService;
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
@@ -694,7 +1011,16 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 	private DLFolderLocalService _dlFolderLocalService;
 
 	@Reference
+	private ExceptionHandlerHelper _exceptionHandlerHelper;
+
+	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletDataHandlerControlHelper _portletDataHandlerControlHelper;
+
+	@Reference
+	private PortletDataHandlerHelper _portletDataHandlerHelper;
 
 	private RepositoryLocalService _repositoryLocalService;
 
