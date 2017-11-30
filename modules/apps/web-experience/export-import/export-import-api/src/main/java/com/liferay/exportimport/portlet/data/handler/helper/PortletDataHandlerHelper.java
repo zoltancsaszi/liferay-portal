@@ -16,11 +16,23 @@ package com.liferay.exportimport.portlet.data.handler.helper;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
+
 /**
  * @author Mate Thurzo
  */
 @ProviderType
 public interface PortletDataHandlerHelper {
+
+	public void addUncheckedModelAdditionCount(
+		PortletDataContext portletDataContext,
+		PortletDataHandlerControl portletDataHandlerControl);
+
+	public long getExportModelCount(
+		ManifestSummary manifestSummary,
+		PortletDataHandlerControl[] portletDataHandlerControls);
 
 	public boolean validateSchemaVersion(
 		String schemaVersion, String portletSchemaVersion);

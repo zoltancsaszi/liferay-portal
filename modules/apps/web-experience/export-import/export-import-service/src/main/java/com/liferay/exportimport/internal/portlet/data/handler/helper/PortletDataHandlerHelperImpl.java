@@ -14,9 +14,15 @@
 
 package com.liferay.exportimport.internal.portlet.data.handler.helper;
 
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Objects;
 
@@ -27,6 +33,110 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(immediate = true, service = PortletDataHandlerHelper.class)
 public class PortletDataHandlerHelperImpl implements PortletDataHandlerHelper {
+
+	@Override
+	public void addUncheckedModelAdditionCount(
+		PortletDataContext portletDataContext,
+		PortletDataHandlerControl portletDataHandlerControl) {
+
+		if (!(portletDataHandlerControl instanceof PortletDataHandlerBoolean)) {
+			return;
+		}
+
+		PortletDataHandlerBoolean portletDataHandlerBoolean =
+			(PortletDataHandlerBoolean)portletDataHandlerControl;
+
+		PortletDataHandlerControl[] childPortletDataHandlerControls =
+			portletDataHandlerBoolean.getChildren();
+
+		if (childPortletDataHandlerControls != null) {
+			for (PortletDataHandlerControl childPortletDataHandlerControl :
+					childPortletDataHandlerControls) {
+
+				addUncheckedModelAdditionCount(
+					portletDataContext, childPortletDataHandlerControl);
+			}
+		}
+
+		if (Validator.isNull(portletDataHandlerControl.getClassName())) {
+			return;
+		}
+
+		boolean checkedControl = GetterUtil.getBoolean(
+			portletDataContext.getBooleanParameter(
+				portletDataHandlerControl.getNamespace(),
+				portletDataHandlerControl.getControlName(), false));
+
+		if (!checkedControl) {
+			ManifestSummary manifestSummary =
+				portletDataContext.getManifestSummary();
+
+			StagedModelType stagedModelType = new StagedModelType(
+				portletDataHandlerControl.getClassName(),
+				portletDataHandlerBoolean.getReferrerClassName());
+
+			String manifestSummaryKey = ManifestSummary.getManifestSummaryKey(
+				stagedModelType);
+
+			manifestSummary.addModelAdditionCount(manifestSummaryKey, 0);
+		}
+	}
+
+	@Override
+	public long getExportModelCount(
+		ManifestSummary manifestSummary,
+		PortletDataHandlerControl[] portletDataHandlerControls) {
+
+		long totalModelCount = -1;
+
+		for (PortletDataHandlerControl portletDataHandlerControl :
+				portletDataHandlerControls) {
+
+			StagedModelType stagedModelType = new StagedModelType(
+				portletDataHandlerControl.getClassName(),
+				portletDataHandlerControl.getReferrerClassName());
+
+			long modelAdditionCount = manifestSummary.getModelAdditionCount(
+				stagedModelType);
+
+			if (portletDataHandlerControl instanceof
+					PortletDataHandlerBoolean) {
+
+				PortletDataHandlerBoolean portletDataHandlerBoolean =
+					(PortletDataHandlerBoolean)portletDataHandlerControl;
+
+				PortletDataHandlerControl[] childPortletDataHandlerControls =
+					portletDataHandlerBoolean.getChildren();
+
+				if (childPortletDataHandlerControls != null) {
+					long childModelCount = getExportModelCount(
+						manifestSummary, childPortletDataHandlerControls);
+
+					if (childModelCount != -1) {
+						if (modelAdditionCount == -1) {
+							modelAdditionCount = childModelCount;
+						}
+						else {
+							modelAdditionCount += childModelCount;
+						}
+					}
+				}
+			}
+
+			if (modelAdditionCount == -1) {
+				continue;
+			}
+
+			if (totalModelCount == -1) {
+				totalModelCount = modelAdditionCount;
+			}
+			else {
+				totalModelCount += modelAdditionCount;
+			}
+		}
+
+		return totalModelCount;
+	}
 
 	@Override
 	public boolean validateSchemaVersion(
