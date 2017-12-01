@@ -64,8 +64,6 @@ import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.LiferayRepositoryDefiner;
 import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepositoryDefiner;
@@ -106,13 +104,8 @@ public class DLPortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		long startTime = 0;
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Adding default data to portlet " + portletId);
-
-			startTime = System.currentTimeMillis();
-		}
+		long startTime = _portletDataHandlerHelper.doBeforeAddDefaultData(
+			portletId);
 
 		try {
 			return doAddDefaultData(
@@ -125,13 +118,8 @@ public class DLPortletDataHandler implements PortletDataHandler {
 			throw new PortletDataException(e);
 		}
 		finally {
-			if (_log.isInfoEnabled()) {
-				long duration = System.currentTimeMillis() - startTime;
-
-				_log.info(
-					"Added default data to portlet in " +
-						Time.getDuration(duration));
-			}
+			_portletDataHandlerHelper.doAfterAddDefaultData(
+				portletId, startTime);
 		}
 	}
 
@@ -141,13 +129,7 @@ public class DLPortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		long startTime = 0;
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Deleting portlet " + portletId);
-
-			startTime = System.currentTimeMillis();
-		}
+		long startTime = _portletDataHandlerHelper.doBeforeDelete(portletId);
 
 		try {
 			return doDeleteData(
@@ -158,11 +140,7 @@ public class DLPortletDataHandler implements PortletDataHandler {
 				e, PortletDataException.DELETE_PORTLET_DATA, portletId);
 		}
 		finally {
-			if (_log.isInfoEnabled()) {
-				long duration = System.currentTimeMillis() - startTime;
-
-				_log.info("Deleted portlet in " + Time.getDuration(duration));
-			}
+			_portletDataHandlerHelper.doAfterDelete(portletId, startTime);
 		}
 	}
 
@@ -172,29 +150,14 @@ public class DLPortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		long startTime = 0;
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Exporting portlet " + portletId);
-
-			startTime = System.currentTimeMillis();
-		}
-
 		Element rootElement = null;
 
+		long startTime = _portletDataHandlerHelper.doBeforeExport(
+			portletDataContext, portletId, rootElement,
+			getDeletionSystemEventStagedModelTypes(), getExportControls(),
+			portletPreferences);
+
 		try {
-			rootElement = portletDataContext.getExportDataRootElement();
-
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				getDeletionSystemEventStagedModelTypes());
-
-			for (PortletDataHandlerControl portletDataHandlerControl :
-					getExportControls()) {
-
-				_portletDataHandlerHelper.addUncheckedModelAdditionCount(
-					portletDataContext, portletDataHandlerControl);
-			}
-
 			return doExportData(
 				portletDataContext, portletId, portletPreferences);
 		}
@@ -203,13 +166,8 @@ public class DLPortletDataHandler implements PortletDataHandler {
 				e, PortletDataException.EXPORT_PORTLET_DATA, portletId);
 		}
 		finally {
-			portletDataContext.setExportDataRootElement(rootElement);
-
-			if (_log.isInfoEnabled()) {
-				long duration = System.currentTimeMillis() - startTime;
-
-				_log.info("Exported portlet in " + Time.getDuration(duration));
-			}
+			_portletDataHandlerHelper.doAfterExport(
+				portletDataContext, rootElement, startTime);
 		}
 	}
 
@@ -342,24 +300,12 @@ public class DLPortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences, String data)
 		throws PortletDataException {
 
-		long startTime = 0;
-
-		if (_log.isInfoEnabled()) {
-			_log.info("Importing portlet " + portletId);
-
-			startTime = System.currentTimeMillis();
-		}
-
-		long sourceGroupId = portletDataContext.getSourceGroupId();
-
+		Long startTime = null;
 		Element rootElement = null;
 
 		try {
-			if (Validator.isXml(data)) {
-				rootElement = portletDataContext.getImportDataRootElement();
-
-				portletDataContext.addImportDataRootElement(data);
-			}
+			_portletDataHandlerHelper.doBeforeImport(
+				portletDataContext, portletId, startTime, rootElement, data);
 
 			return doImportData(
 				portletDataContext, portletId, portletPreferences, data);
@@ -370,14 +316,8 @@ public class DLPortletDataHandler implements PortletDataHandler {
 				e, PortletDataException.IMPORT_PORTLET_DATA, portletId);
 		}
 		finally {
-			portletDataContext.setImportDataRootElement(rootElement);
-			portletDataContext.setSourceGroupId(sourceGroupId);
-
-			if (_log.isInfoEnabled()) {
-				long duration = System.currentTimeMillis() - startTime;
-
-				_log.info("Imported portlet in " + Time.getDuration(duration));
-			}
+			_portletDataHandlerHelper.doAfterImport(
+				portletDataContext, rootElement, startTime);
 		}
 	}
 
