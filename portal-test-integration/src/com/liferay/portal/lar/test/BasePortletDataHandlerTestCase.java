@@ -377,13 +377,6 @@ public abstract class BasePortletDataHandlerTestCase {
 	}
 
 	@Test
-	public void testDeletionSystemEventStagedModelTypes() throws Exception {
-		Assert.assertArrayEquals(
-			getDeletionSystemEventStagedModelTypes(),
-			portletDataHandler.getDeletionSystemEventStagedModelTypes());
-	}
-
-	@Test
 	public void testIsDataPortalLevel() {
 		Assert.assertEquals(
 			isDataPortalLevel(), portletDataHandler.isDataPortalLevel());

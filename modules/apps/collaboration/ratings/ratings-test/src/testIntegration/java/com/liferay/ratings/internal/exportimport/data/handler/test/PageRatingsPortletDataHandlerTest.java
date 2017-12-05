@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.ratings.kernel.model.RatingsEntry;
 import com.liferay.ratings.page.ratings.constants.PageRatingsPortletKeys;
 
 import org.junit.Assert;
@@ -62,7 +63,7 @@ public class PageRatingsPortletDataHandlerTest
 		ManifestSummary manifestSummary) {
 
 		for (String manifestSummaryKey :
-			manifestSummary.getManifestSummaryKeys()) {
+				manifestSummary.getManifestSummaryKeys()) {
 
 			Assert.assertTrue(
 				manifestSummaryKey.endsWith(
