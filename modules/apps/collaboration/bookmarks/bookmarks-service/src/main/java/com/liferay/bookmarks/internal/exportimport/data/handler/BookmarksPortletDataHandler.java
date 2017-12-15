@@ -24,16 +24,28 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 
-import java.util.List;
+import java.io.StringReader;
 
 import javax.portlet.PortletPreferences;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -91,6 +103,39 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	protected Element addImportDataRootElement(
+			PortletDataContext portletDataContext, String data)
+		throws DocumentException {
+
+		try {
+			XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+			_xmlStreamReader = xmlInputFactory.createXMLStreamReader(
+				new StringReader(data));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		/*Document document = SAXReaderUtil.read(data);
+
+		Element rootElement = document.getRootElement();
+
+		portletDataContext.setImportDataRootElement(rootElement);
+
+		long groupId = GetterUtil.getLong(
+			rootElement.attributeValue("group-id"));
+
+		if (groupId != 0) {
+			portletDataContext.setSourceGroupId(groupId);
+		}
+
+		return rootElement;*/
+
+		return null;
+	}
+
+	@Override
 	protected PortletPreferences doDeleteData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -116,16 +161,20 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		Element rootElement = addExportDataRootElement(portletDataContext);
+		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+
+		larFile.startWritePortletData(getClass().getSimpleName());
 
 		if (!portletDataContext.getBooleanParameter(NAMESPACE, "entries")) {
-			return getExportDataRootElementString(rootElement);
+			larFile.endWritePortletData();
+
+			return StringPool.BLANK;
 		}
 
 		portletDataContext.addPortletPermissions(
 			BookmarksConstants.RESOURCE_NAME);
 
-		rootElement.addAttribute(
+		larFile.writePortletDataAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
 
 		ExportActionableDynamicQuery folderActionableDynamicQuery =
@@ -140,7 +189,9 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 
 		entryActionableDynamicQuery.performActions();
 
-		return getExportDataRootElementString(rootElement);
+		larFile.endWritePortletData();
+
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -156,25 +207,71 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 		portletDataContext.importPortletPermissions(
 			BookmarksConstants.RESOURCE_NAME);
 
-		Element foldersElement = portletDataContext.getImportDataGroupElement(
-			BookmarksFolder.class);
+		String text = StringPool.BLANK;
 
-		List<Element> folderElements = foldersElement.elements();
+		while (_xmlStreamReader.hasNext()) {
+			_xmlStreamReader.next();
 
-		for (Element folderElement : folderElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, folderElement);
+			int eventType = _xmlStreamReader.getEventType();
+
+			if (eventType == XMLStreamConstants.START_ELEMENT) {
+				if ("staged-model".equals(_xmlStreamReader.getLocalName())) {
+					String path = _xmlStreamReader.getAttributeValue(
+						null, "path");
+
+					StagedModel stagedModel =
+						(StagedModel)portletDataContext.getZipEntryAsObject(path);
+
+					String classNameAttribute =
+						_xmlStreamReader.getAttributeValue(
+							null, "attached-class-name");
+
+					if (Validator.isNotNull(classNameAttribute)) {
+						BeanPropertiesUtil.setProperty(
+							stagedModel, "className", classNameAttribute);
+						BeanPropertiesUtil.setProperty(
+							stagedModel, "classNameId",
+							PortalUtil.getClassNameId(classNameAttribute));
+					}
+
+					StagedModelDataHandlerUtil.importStagedModel(
+						portletDataContext, stagedModel);
+				}
+			}
+
+//			if (_xmlStreamReader.hasName()) {
+//				text = _xmlStreamReader.getLocalName();
+//			}
+
+//			text = _xmlStreamReader.getText();
+
+//			if ("staged-model".equals(_xmlStreamReader.getLocalName())) {
+//				System.out.println( //					_xmlStreamReader.getEventType() +
+//" # " + text);
+//			}
 		}
 
-		Element entriesElement = portletDataContext.getImportDataGroupElement(
-			BookmarksEntry.class);
+//		Element foldersElement = portletDataContext.getImportDataGroupElement(
+//			BookmarksFolder.class);
 
-		List<Element> entryElements = entriesElement.elements();
+//
+//		List<Element> folderElements = foldersElement.elements();
+//
+//		for (Element folderElement : folderElements) {
+//			StagedModelDataHandlerUtil.importStagedModel(
+//				portletDataContext, folderElement);
+//		}
+//
+//		Element entriesElement = portletDataContext.getImportDataGroupElement(
+//			BookmarksEntry.class);
 
-		for (Element entryElement : entryElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, entryElement);
-		}
+//
+//		List<Element> entryElements = entriesElement.elements();
+//
+//		for (Element entryElement : entryElements) {
+//			StagedModelDataHandlerUtil.importStagedModel(
+//				portletDataContext, entryElement);
+//		}
 
 		return null;
 	}
@@ -234,5 +331,7 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 
 	@Reference
 	private PortletDataHandlerHelper _portletDataHandlerHelper;
+
+	private XMLStreamReader _xmlStreamReader;
 
 }
