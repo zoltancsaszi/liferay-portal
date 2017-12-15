@@ -2266,7 +2266,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	 * @deprecated As of 4.0.0
 	 */
 	@Deprecated
-	protected void addAssetLinks(Class<?> clazz, Serializable classPK) {
+	protected void addAssetLinks( Class<?> clazz, Serializable classPK) {
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			clazz.getName(), GetterUtil.getLong(classPK));
 
@@ -2280,6 +2280,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 		for (AssetLink assetLink : assetLinks) {
 			_assetLinkIds.add(assetLink.getLinkId());
 		}
+
+
 	}
 
 	/**
