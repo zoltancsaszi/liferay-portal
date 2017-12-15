@@ -2263,26 +2263,22 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _xStream.toXML(object);
 	}
 
-	protected void addAssetLinks(ClassedModel classedModel, Class<?> clazz, Serializable classPK) {
-//		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-//			clazz.getName(), GetterUtil.getLong(classPK));
+	protected void addAssetLinks(
+		ClassedModel classedModel, Class<?> clazz, Serializable classPK) {
 
-//		if (assetEntry == null) {
-//			return;
-//		}
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			clazz.getName(), GetterUtil.getLong(classPK));
 
-//		List<AssetLink> assetLinks = AssetLinkLocalServiceUtil.getLinks(
-//			assetEntry.getEntryId());
+		if (assetEntry == null) {
+			return;
+		}
 
-//		for (AssetLink assetLink : assetLinks) {
-//			_assetLinkIds.add(assetLink.getLinkId());
-//		}
+		List<AssetLink> assetLinks = AssetLinkLocalServiceUtil.getLinks(
+			assetEntry.getEntryId());
 
-		List<Long> linkIds = AssetLinkLocalServiceUtil.getLinks(
-			ExportImportClassedModelUtil.getClassNameId(classedModel),
-			(long)classPK);
-
-		_assetLinkIds.addAll(linkIds);
+		for (AssetLink assetLink : assetLinks) {
+			_assetLinkIds.add(assetLink.getLinkId());
+		}
 	}
 
 	/**
