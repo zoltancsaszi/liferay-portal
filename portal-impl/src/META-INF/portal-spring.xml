@@ -65,6 +65,7 @@
 	<bean class="com.liferay.portlet.expando.service.impl.ExpandoValueLocalServiceImpl" id="com.liferay.expando.kernel.service.ExpandoValueLocalService" />
 	<bean class="com.liferay.portlet.expando.service.impl.ExpandoValueServiceImpl" id="com.liferay.expando.kernel.service.ExpandoValueService" />
 	<bean class="com.liferay.portlet.expando.service.persistence.impl.ExpandoValuePersistenceImpl" id="com.liferay.expando.kernel.service.persistence.ExpandoValuePersistence" parent="basePersistence" />
+	<bean class="com.liferay.portlet.expando.service.persistence.impl.ExpandoValueFinderImpl" id="com.liferay.expando.kernel.service.persistence.ExpandoValueFinder" parent="basePersistence" />
 	<bean class="com.liferay.portlet.exportimport.service.impl.ExportImportLocalServiceImpl" id="com.liferay.exportimport.kernel.service.ExportImportLocalService" />
 	<bean class="com.liferay.portlet.exportimport.service.impl.ExportImportServiceImpl" id="com.liferay.exportimport.kernel.service.ExportImportService" />
 	<bean class="com.liferay.portlet.exportimport.service.impl.ExportImportConfigurationLocalServiceImpl" id="com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService" />

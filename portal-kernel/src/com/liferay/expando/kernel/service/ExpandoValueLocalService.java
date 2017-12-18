@@ -460,6 +460,10 @@ public interface ExpandoValueLocalService extends BaseLocalService,
 		java.lang.String[] defaultData) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Map<java.lang.String, Serializable> getDataMap(long classNameId,
+		long classPK);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ExpandoValue> getDefaultTableColumnValues(long companyId,
 		long classNameId, java.lang.String columnName, int start, int end);
 

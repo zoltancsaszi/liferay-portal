@@ -751,6 +751,12 @@ public class ExpandoValueLocalServiceWrapper implements ExpandoValueLocalService
 	}
 
 	@Override
+	public java.util.Map<java.lang.String, java.io.Serializable> getDataMap(
+		long classNameId, long classPK) {
+		return _expandoValueLocalService.getDataMap(classNameId, classPK);
+	}
+
+	@Override
 	public java.util.List<com.liferay.expando.kernel.model.ExpandoValue> getDefaultTableColumnValues(
 		long companyId, long classNameId, java.lang.String columnName,
 		int start, int end) {

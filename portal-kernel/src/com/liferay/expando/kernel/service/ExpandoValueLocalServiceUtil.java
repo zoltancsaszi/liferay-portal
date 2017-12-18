@@ -728,6 +728,11 @@ public class ExpandoValueLocalServiceUtil {
 			classPK, defaultData);
 	}
 
+	public static java.util.Map<java.lang.String, java.io.Serializable> getDataMap(
+		long classNameId, long classPK) {
+		return getService().getDataMap(classNameId, classPK);
+	}
+
 	public static java.util.List<com.liferay.expando.kernel.model.ExpandoValue> getDefaultTableColumnValues(
 		long companyId, long classNameId, java.lang.String columnName,
 		int start, int end) {

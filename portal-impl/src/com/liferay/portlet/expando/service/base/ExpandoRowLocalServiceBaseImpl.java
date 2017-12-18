@@ -21,6 +21,7 @@ import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.expando.kernel.service.persistence.ExpandoColumnPersistence;
 import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
 import com.liferay.expando.kernel.service.persistence.ExpandoTablePersistence;
+import com.liferay.expando.kernel.service.persistence.ExpandoValueFinder;
 import com.liferay.expando.kernel.service.persistence.ExpandoValuePersistence;
 
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -467,6 +468,24 @@ public abstract class ExpandoRowLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the expando value finder.
+	 *
+	 * @return the expando value finder
+	 */
+	public ExpandoValueFinder getExpandoValueFinder() {
+		return expandoValueFinder;
+	}
+
+	/**
+	 * Sets the expando value finder.
+	 *
+	 * @param expandoValueFinder the expando value finder
+	 */
+	public void setExpandoValueFinder(ExpandoValueFinder expandoValueFinder) {
+		this.expandoValueFinder = expandoValueFinder;
+	}
+
+	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -665,6 +684,8 @@ public abstract class ExpandoRowLocalServiceBaseImpl
 	protected com.liferay.expando.kernel.service.ExpandoValueLocalService expandoValueLocalService;
 	@BeanReference(type = ExpandoValuePersistence.class)
 	protected ExpandoValuePersistence expandoValuePersistence;
+	@BeanReference(type = ExpandoValueFinder.class)
+	protected ExpandoValueFinder expandoValueFinder;
 	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
