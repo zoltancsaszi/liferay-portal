@@ -126,6 +126,29 @@ public class StagedModelDataHandlerUtil {
 			referenceType);
 	}
 
+	public static <T extends StagedModel, U extends StagedModel> void
+			exportReference(
+				PortletDataContext portletDataContext, T referrerStagedModel,
+				U stagedModel, String referenceType)
+		throws PortletDataException {
+
+		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
+				portletDataContext, stagedModel) ||
+			!ExportImportHelperUtil.isReferenceWithinExportScope(
+				portletDataContext, stagedModel)) {
+
+			portletDataContext.addReferenceElement(
+				referrerStagedModel, null, stagedModel,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+		}
+
+		exportStagedModel(portletDataContext, stagedModel);
+
+		portletDataContext.addReferenceElement(
+			referrerStagedModel, null, stagedModel,
+			referenceType, false);
+	}
+
 	public static <T extends StagedModel, U extends StagedModel> Element
 			exportReferenceStagedModel(
 				PortletDataContext portletDataContext, T referrerStagedModel,
