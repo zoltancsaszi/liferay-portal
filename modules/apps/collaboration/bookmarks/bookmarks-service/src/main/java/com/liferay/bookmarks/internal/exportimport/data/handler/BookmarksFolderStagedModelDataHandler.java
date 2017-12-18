@@ -21,9 +21,10 @@ import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.xml.Element;
 
 import java.util.Map;
 
@@ -64,10 +65,14 @@ public class BookmarksFolderStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
-		Element folderElement = portletDataContext.getExportDataElement(folder);
+		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+
+		larFile.startWriteStagedModel(folder);
 
 		portletDataContext.addClassedModel(
-			folderElement, ExportImportPathUtil.getModelPath(folder), folder);
+			null, ExportImportPathUtil.getModelPath(folder), folder);
+
+		larFile.endWriteStagedModel();
 	}
 
 	@Override

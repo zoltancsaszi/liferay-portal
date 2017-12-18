@@ -129,6 +129,8 @@ public interface PortletDataContext extends Serializable {
 			Element element, String path, ClassedModel classedModel)
 		throws PortalException;
 
+	public void addExportDataElementAttribute(String name, String value);
+
 	public void addLocks(Class<?> clazz, String key) throws PortalException;
 
 	public void addLocks(String className, String key, Lock lock);
@@ -199,6 +201,8 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean addScopedPrimaryKey(Class<?> clazz, String primaryKey);
 
+	public void addStagedModel(StagedModel stagedModel);
+
 	public void addZipEntry(String path, byte[] bytes);
 
 	public void addZipEntry(String path, InputStream is);
@@ -208,6 +212,8 @@ public interface PortletDataContext extends Serializable {
 	public void addZipEntry(String path, String s);
 
 	public void addZipEntry(String name, StringBuilder sb);
+
+	public void addZipPortletDataXml(String path);
 
 	public void cleanUpMissingReferences(ClassedModel classedModel);
 
@@ -223,6 +229,10 @@ public interface PortletDataContext extends Serializable {
 
 	public ServiceContext createServiceContext(
 		String path, ClassedModel classedModel);
+
+	public void endExportDataElement();
+
+	public void endPortletDataXml();
 
 	public Object fromXML(byte[] bytes);
 
@@ -697,6 +707,10 @@ public interface PortletDataContext extends Serializable {
 	public void setZipReader(ZipReader zipReader);
 
 	public void setZipWriter(ZipWriter zipWriter);
+
+	public void startExportDataElement(ClassedModel classedModel);
+
+	public void startPortletDataXml(String className);
 
 	public String toXML(Object object);
 
