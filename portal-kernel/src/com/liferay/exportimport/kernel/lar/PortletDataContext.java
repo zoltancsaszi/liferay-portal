@@ -201,6 +201,8 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean addScopedPrimaryKey(Class<?> clazz, String primaryKey);
 
+	public void addStagedModel(StagedModel stagedModel);
+
 	public void addZipEntry(String path, byte[] bytes);
 
 	public void addZipEntry(String path, InputStream is);

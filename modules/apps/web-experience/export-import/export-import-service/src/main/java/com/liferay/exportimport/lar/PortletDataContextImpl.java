@@ -38,6 +38,8 @@ import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.xstream.XStreamAlias;
 import com.liferay.exportimport.kernel.xstream.XStreamConverter;
 import com.liferay.exportimport.kernel.xstream.XStreamType;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.exportimport.xstream.ConverterAdapter;
 import com.liferay.exportimport.xstream.XStreamStagedModelTypeHierarchyPermission;
 import com.liferay.message.boards.kernel.model.MBMessage;
@@ -128,10 +130,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import jodd.bean.BeanUtil;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+
+import jodd.bean.BeanUtil;
 
 /**
  * <p>
@@ -162,98 +164,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		_lockManager = lockManager;
-	}
-
-	private XMLStreamWriter _xmlStreamWriter;
-	private File _portletDataXml;
-
-	@Override
-	public void addZipPortletDataXml(String path) {
-		try {
-			addZipEntry(path, FileUtil.getBytes(_portletDataXml));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void endExportDataElement() {
-		try {
-			_xmlStreamWriter.writeEndElement();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void startExportDataElement(ClassedModel classedModel) {
-		try {
-			_xmlStreamWriter.writeStartElement("staged-model");
-
-			if (classedModel instanceof StagedGroupedModel) {
-				StagedGroupedModel stagedGroupedModel =
-					(StagedGroupedModel) classedModel;
-
-				_xmlStreamWriter.writeAttribute(
-					"group-id",
-					String.valueOf(stagedGroupedModel.getGroupId()));
-				_xmlStreamWriter.writeAttribute(
-					"uuid", stagedGroupedModel.getUuid());
-			}
-			else if (classedModel instanceof StagedModel) {
-				StagedModel stagedModel = (StagedModel) classedModel;
-
-				_xmlStreamWriter.writeAttribute("uuid", stagedModel.getUuid());
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void addExportDataElementAttribute(String name, String value) {
-		try {
-			_xmlStreamWriter.writeAttribute(name, value);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void startPortletDataXml(String className) {
-		try {
-			XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-
-			_portletDataXml = FileUtil.createTempFile();
-
-			_xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(
-				new FileWriter(_portletDataXml));
-
-			_xmlStreamWriter.writeStartDocument();
-			_xmlStreamWriter.writeStartElement(className);
-			_xmlStreamWriter.writeAttribute(
-				"group-id", String.valueOf(getScopeGroupId()));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void endPortletDataXml() {
-		try {
-			_xmlStreamWriter.writeEndElement();
-
-			_xmlStreamWriter.flush();
-			_xmlStreamWriter.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -356,71 +266,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		addZipEntry(path, classedModel);
 	}
 
-	private boolean isMissingEntity(ClassedModel classedModel) {
-		long classNameId = ExportImportClassedModelUtil.getClassNameId(
-			classedModel);
-		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
-
-		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
-
-		if (classPKMap == null) {
-			return false;
-		}
-
-		Boolean missing = classPKMap.get(classPK);
-
-		if (missing == null) {
-			return false;
-		}
-		else {
-			return missing;
-		}
-	}
-
-	private boolean containsEntityMap(ClassedModel classedModel) {
-		long classNameId = ExportImportClassedModelUtil.getClassNameId(
-			classedModel);
-		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
-
-		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
-
-		if (classPKMap == null) {
-			return false;
-		}
-
-		Boolean missing = classPKMap.get(classPK);
-
-		if (missing == null) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	private void updateEntityMap(ClassedModel classedModel, boolean missing) {
-		long classNameId = ExportImportClassedModelUtil.getClassNameId(
-			classedModel);
-		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
-
-		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
-
-		if (classPKMap == null) {
-			classPKMap = new HashMap<>();
-		}
-
-		if (classPKMap.containsKey(classPK)) {
-			boolean previousMissing = classPKMap.get(classPK);
-
-			classPKMap.put(classPK, previousMissing | missing);
-		}
-		else {
-			classPKMap.put(classPK, missing);
-		}
-
-		_entities.put(classNameId, classPKMap);
-	}
-
 	/**
 	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportComments(
@@ -472,6 +317,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 		Element element, String path, ClassedModel classedModel) {
 
 		addExpando(element, path, classedModel, classedModel.getModelClass());
+	}
+
+	@Override
+	public void addExportDataElementAttribute(String name, String value) {
+		try {
+			_xmlStreamWriter.writeAttribute(name, value);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -676,6 +531,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 //			if (containsEntityMap(classedModel)) {
 //				return referenceElement;
 //			}
+
 			if (_references.contains(referenceKey)) {
 				return referenceElement;
 			}
@@ -712,6 +568,46 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return value;
+	}
+
+	@Override
+	public void addStagedModel(StagedModel stagedModel) {
+		String path = ExportImportPathUtil.getModelPath(stagedModel);
+
+		_larFile.writeStagedModelAttribute("path", path);
+
+		_populateClassNameAttribute(stagedModel);
+
+		if (!hasPrimaryKey(String.class, path)) {
+			if (stagedModel instanceof AuditedModel) {
+				AuditedModel auditedModel = (AuditedModel)stagedModel;
+
+				auditedModel.setUserUuid(auditedModel.getUserUuid());
+			}
+
+			if (isResourceMain(stagedModel)) {
+				Serializable classPK =
+					ExportImportClassedModelUtil.getPrimaryKeyObj(stagedModel);
+
+//				addAssetLinks(clazz, classPK);
+
+				long classNameId = ExportImportClassedModelUtil.getClassNameId(
+					stagedModel);
+
+				_addAssetEntryPriority(
+					classNameId, GetterUtil.getLong(classPK));
+
+//				addExpando(element, path, classedModel, clazz);
+//				addLocks(clazz, String.valueOf(classPK));
+//				addPermissions(clazz, classPK);
+			}
+
+//			updateEntityMap(classedModel, false);
+
+			_references.add(getReferenceKey(stagedModel));
+		}
+
+		addZipEntry(path, stagedModel);
 	}
 
 	@Override
@@ -779,6 +675,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void addZipPortletDataXml(String path) {
+		try {
+			addZipEntry(path, FileUtil.getBytes(_portletDataXml));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void cleanUpMissingReferences(ClassedModel classedModel) {
 		String referenceKey = getReferenceKey(classedModel);
 
@@ -833,6 +739,29 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		return createServiceContext(
 			null, path, classedModel, classedModel.getModelClass());
+	}
+
+	@Override
+	public void endExportDataElement() {
+		try {
+			_xmlStreamWriter.writeEndElement();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void endPortletDataXml() {
+		try {
+			_xmlStreamWriter.writeEndElement();
+
+			_xmlStreamWriter.flush();
+			_xmlStreamWriter.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -2258,6 +2187,52 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void startExportDataElement(ClassedModel classedModel) {
+		try {
+			_xmlStreamWriter.writeStartElement("staged-model");
+
+			if (classedModel instanceof StagedGroupedModel) {
+				StagedGroupedModel stagedGroupedModel =
+					(StagedGroupedModel)classedModel;
+
+				_xmlStreamWriter.writeAttribute(
+					"group-id",
+					String.valueOf(stagedGroupedModel.getGroupId()));
+				_xmlStreamWriter.writeAttribute(
+					"uuid", stagedGroupedModel.getUuid());
+			}
+			else if (classedModel instanceof StagedModel) {
+				StagedModel stagedModel = (StagedModel)classedModel;
+
+				_xmlStreamWriter.writeAttribute("uuid", stagedModel.getUuid());
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void startPortletDataXml(String className) {
+		try {
+			XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+
+			_portletDataXml = FileUtil.createTempFile();
+
+			_xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(
+				new FileWriter(_portletDataXml));
+
+			_xmlStreamWriter.writeStartDocument();
+			_xmlStreamWriter.writeStartElement(className);
+			_xmlStreamWriter.writeAttribute(
+				"group-id", String.valueOf(getScopeGroupId()));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public String toXML(Object object) {
 		return _xStream.toXML(object);
 	}
@@ -2863,6 +2838,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 //		return String.valueOf(classNameId).concat(StringPool.POUND).concat(
 //			String.valueOf(classPK));
+
 		return getReferenceKey(
 			ExportImportClassedModelUtil.getClassName(classedModel),
 			String.valueOf(classedModel.getPrimaryKeyObj()));
@@ -3029,6 +3005,103 @@ public class PortletDataContextImpl implements PortletDataContext {
 			"asset-entry-priority", String.valueOf(assetEntryPriority));
 	}
 
+	private void _addAssetEntryPriority(long classNameId, long classPK) {
+		double assetEntryPriority = AssetEntryLocalServiceUtil.getEntryPriority(
+			classNameId, classPK);
+
+		_larFile.writeStagedModelAttribute(
+			"asset-entry-priority", String.valueOf(assetEntryPriority));
+	}
+
+	private void _populateClassNameAttribute(StagedModel stagedModel) {
+		String attachedClassName = null;
+
+		if (stagedModel instanceof AttachedModel) {
+			AttachedModel attachedModel = (AttachedModel)stagedModel;
+
+			attachedClassName = attachedModel.getClassName();
+		}
+		else if (BeanUtil.hasProperty(stagedModel, "className")) {
+			attachedClassName = BeanPropertiesUtil.getStringSilent(
+				stagedModel, "className");
+		}
+
+		if (Validator.isNotNull(attachedClassName)) {
+			try {
+				_larFile.writeStagedModelAttribute(
+					"attached-class-name", attachedClassName);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private boolean containsEntityMap(ClassedModel classedModel) {
+		long classNameId = ExportImportClassedModelUtil.getClassNameId(
+			classedModel);
+		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
+
+		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
+
+		if (classPKMap == null) {
+			return false;
+		}
+
+		Boolean missing = classPKMap.get(classPK);
+
+		if (missing == null) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	private boolean isMissingEntity(ClassedModel classedModel) {
+		long classNameId = ExportImportClassedModelUtil.getClassNameId(
+			classedModel);
+		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
+
+		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
+
+		if (classPKMap == null) {
+			return false;
+		}
+
+		Boolean missing = classPKMap.get(classPK);
+
+		if (missing == null) {
+			return false;
+		}
+		else {
+			return missing;
+		}
+	}
+
+	private void updateEntityMap(ClassedModel classedModel, boolean missing) {
+		long classNameId = ExportImportClassedModelUtil.getClassNameId(
+			classedModel);
+		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
+
+		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
+
+		if (classPKMap == null) {
+			classPKMap = new HashMap<>();
+		}
+
+		if (classPKMap.containsKey(classPK)) {
+			boolean previousMissing = classPKMap.get(classPK);
+
+			classPKMap.put(classPK, previousMissing | missing);
+		}
+		else {
+			classPKMap.put(classPK, missing);
+		}
+
+		_entities.put(classNameId, classPKMap);
+	}
+
 	private static final Class<?>[] _XSTREAM_DEFAULT_ALLOWED_TYPES = {
 		boolean[].class, byte[].class, Date.class, Date[].class, double[].class,
 		float[].class, int[].class, Locale.class, long[].class, Number.class,
@@ -3042,10 +3115,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private static transient XStream _xStream;
 	private static Set<XStreamConfigurator> _xStreamConfigurators;
 
-
-	private transient LARFile _larFile = LARFileUtil.getLARFile(this);
-
-	private transient Map<Long, Map<Long, Boolean>> _entities = new HashMap<>();
 	private final Map<String, long[]> _assetCategoryIdsMap = new HashMap<>();
 	private final Set<Long> _assetLinkIds = new HashSet<>();
 	private final Map<String, String[]> _assetTagNamesMap = new HashMap<>();
@@ -3055,12 +3124,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private final Set<StagedModelType> _deletionSystemEventModelTypes =
 		new HashSet<>();
 	private Date _endDate;
+	private transient Map<Long, Map<Long, Boolean>> _entities = new HashMap<>();
 	private final Map<String, List<ExpandoColumn>> _expandoColumnsMap =
 		new HashMap<>();
 	private transient Element _exportDataRootElement;
 	private String _exportImportProcessId;
 	private long _groupId;
 	private transient Element _importDataRootElement;
+	private transient LARFile _larFile = LARFileUtil.getLARFile(this);
 	private transient long[] _layoutIds;
 	private String _layoutSetPrototypeUuid;
 	private final transient LockManager _lockManager;
@@ -3076,6 +3147,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private final Map<String, List<KeyValuePair>> _permissionsMap =
 		new HashMap<>();
 	private long _plid;
+	private File _portletDataXml;
 	private String _portletId;
 	private final Set<String> _primaryKeys = new HashSet<>();
 	private boolean _privateLayout;
@@ -3093,6 +3165,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private String _type;
 	private transient UserIdStrategy _userIdStrategy;
 	private long _userPersonalSiteGroupId;
+	private XMLStreamWriter _xmlStreamWriter;
 	private transient ZipReader _zipReader;
 	private transient ZipWriter _zipWriter;
 
