@@ -1223,6 +1223,22 @@ public class ExpandoValueLocalServiceImpl
 	}
 
 	@Override
+	public Map<String, Serializable> getDataMap(long classNameId, long classPK){
+		Map<String, Serializable> expandoMap = new HashMap<>();
+
+		List<String> results = expandoValueFinder.getExpandoData(classNameId, classPK);
+
+		for(String result : results) {
+			String[] keyValuePair = result.split("%%");
+			if(keyValuePair.length >= 2){
+				expandoMap.put(keyValuePair[0], keyValuePair[1]);
+			}
+		}
+
+		return expandoMap;
+	}
+
+	@Override
 	public double getData(
 			long companyId, String className, String tableName,
 			String columnName, long classPK, double defaultData)

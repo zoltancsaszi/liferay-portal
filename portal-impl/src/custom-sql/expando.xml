@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<custom-sql>
+	<sql id="com.liferay.expando.kernel.service.persistence.ExpandoValueFinder.findByClassPk">
+		<![CDATA[
+			SELECT
+				CONCAT(ExpandoColumn.name, CONCAT('%%', ExpandoValue.data_)) as columnValue
+			FROM
+				ExpandoRow
+			INNER JOIN
+				ExpandoTable ON 
+				ExpandoTable.tableId = ExpandoRow.tableId
+			INNER JOIN
+				ExpandoValue ON 
+				ExpandoRow.rowId_ = ExpandoValue.rowId_
+			INNER JOIN
+				ExpandoColumn ON 
+				ExpandoValue.columnId = ExpandoColumn.columnId
+			WHERE
+				(ExpandoTable.classNameId = ?) AND
+				(ExpandoRow.classPK = ?)
+	]]>
+	</sql>
+</custom-sql>

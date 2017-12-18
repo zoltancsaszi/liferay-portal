@@ -24,6 +24,7 @@ import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
 import com.liferay.exportimport.internal.util.ExportImportPermissionUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportClassedModelUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
@@ -2164,8 +2165,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return;
 		}
 
-		Map<String, Serializable> expandoBridgeAttributes =
-			expandoBridge.getAttributes();
+//		Map<String, Serializable> expandoBridgeAttributes =
+//			expandoBridge.getAttributes();
+		Map<String, Serializable> expandoBridgeAttributes = ExpandoValueLocalServiceUtil.getDataMap(PortalUtil.getClassNameId(classedModel.getModelClassName()), GetterUtil.getLong(classedModel.getPrimaryKeyObj()));
 
 		if (!expandoBridgeAttributes.isEmpty()) {
 			String expandoPath = ExportImportPathUtil.getExpandoPath(path);
