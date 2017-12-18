@@ -595,7 +595,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 		List<RatingsEntry> ratingsEntries =
 			RatingsEntryLocalServiceUtil.getEntries(
-				ExportImportClassedModelUtil.getClassName(stagedModel),
+				ExportImportClassedModelUtil.getClassNameId(stagedModel),
 				ExportImportClassedModelUtil.getClassPK(stagedModel));
 
 		if (ratingsEntries.isEmpty()) {

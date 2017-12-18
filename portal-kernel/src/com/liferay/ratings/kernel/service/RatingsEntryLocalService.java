@@ -199,6 +199,9 @@ public interface RatingsEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<RatingsEntry> getEntries(long classNameId, long classPK);
+
 	/**
 	* @deprecated As of 7.0.0, with no direct replacement
 	*/

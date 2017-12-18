@@ -139,6 +139,12 @@ public class RatingsEntryLocalServiceImpl
 	}
 
 	@Override
+	public List<RatingsEntry> getEntries(long classNameId, long classPK) {
+
+		return ratingsEntryPersistence.findByC_C(classNameId, classPK);
+	}
+
+	@Override
 	public List<RatingsEntry> getEntries(String className, long classPK) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 

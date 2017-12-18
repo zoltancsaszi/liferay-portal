@@ -213,6 +213,11 @@ public class RatingsEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static java.util.List<com.liferay.ratings.kernel.model.RatingsEntry> getEntries(
+		long classNameId, long classPK) {
+		return getService().getEntries(classNameId, classPK);
+	}
+
 	/**
 	* @deprecated As of 7.0.0, with no direct replacement
 	*/

@@ -224,6 +224,12 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 		return _ratingsEntryLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public java.util.List<com.liferay.ratings.kernel.model.RatingsEntry> getEntries(
+		long classNameId, long classPK) {
+		return _ratingsEntryLocalService.getEntries(classNameId, classPK);
+	}
+
 	/**
 	* @deprecated As of 7.0.0, with no direct replacement
 	*/
