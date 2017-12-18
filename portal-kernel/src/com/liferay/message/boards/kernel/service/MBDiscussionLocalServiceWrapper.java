@@ -210,6 +210,12 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 
 	@Override
 	public com.liferay.message.boards.kernel.model.MBDiscussion fetchDiscussion(
+		long classNameId, long classPK) {
+		return _mbDiscussionLocalService.fetchDiscussion(classNameId, classPK);
+	}
+
+	@Override
+	public com.liferay.message.boards.kernel.model.MBDiscussion fetchDiscussion(
 		java.lang.String className, long classPK) {
 		return _mbDiscussionLocalService.fetchDiscussion(className, classPK);
 	}

@@ -54,7 +54,7 @@ public class MBDiscussionStagingHandler implements DiscussionStagingHandler {
 
 		MBDiscussion mbDiscussion =
 			MBDiscussionLocalServiceUtil.fetchDiscussion(
-				ExportImportClassedModelUtil.getClassName(stagedModel),
+				ExportImportClassedModelUtil.getClassNameId(stagedModel),
 				ExportImportClassedModelUtil.getClassPK(stagedModel));
 
 		if (mbDiscussion == null) {

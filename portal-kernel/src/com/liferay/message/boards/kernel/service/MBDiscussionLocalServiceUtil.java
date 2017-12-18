@@ -203,6 +203,11 @@ public class MBDiscussionLocalServiceUtil {
 	}
 
 	public static com.liferay.message.boards.kernel.model.MBDiscussion fetchDiscussion(
+		long classNameId, long classPK) {
+		return getService().fetchDiscussion(classNameId, classPK);
+	}
+
+	public static com.liferay.message.boards.kernel.model.MBDiscussion fetchDiscussion(
 		java.lang.String className, long classPK) {
 		return getService().fetchDiscussion(className, classPK);
 	}
