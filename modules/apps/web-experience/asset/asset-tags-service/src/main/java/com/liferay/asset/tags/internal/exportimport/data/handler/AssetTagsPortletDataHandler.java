@@ -23,8 +23,11 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -107,14 +110,20 @@ public class AssetTagsPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		Element rootElement = addExportDataRootElement(portletDataContext);
+		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
 
-		rootElement.addAttribute(
-			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
+		Class<?> clazz = getClass();
+
+		larFile.startWritePortletData(clazz.getSimpleName());
 
 		if (!portletDataContext.getBooleanParameter(NAMESPACE, "tags")) {
-			return getExportDataRootElementString(rootElement);
+			larFile.endWritePortletData();
+
+			return StringPool.BLANK;
 		}
+
+		larFile.writePortletDataAttribute(
+			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			_assetTagLocalService.getExportActionableDynamicQuery(
@@ -122,7 +131,9 @@ public class AssetTagsPortletDataHandler extends BasePortletDataHandler {
 
 		actionableDynamicQuery.performActions();
 
-		return getExportDataRootElementString(rootElement);
+		larFile.endWritePortletData();
+
+		return StringPool.BLANK;
 	}
 
 	@Override
