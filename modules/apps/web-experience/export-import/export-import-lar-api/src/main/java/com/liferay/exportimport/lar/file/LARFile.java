@@ -32,6 +32,8 @@ public interface LARFile {
 
 	public void endWritePortletData();
 
+	public void endWriteReference();
+
 	public void endWriteStagedModel();
 
 	public StagedModel getNextStagedModel();
@@ -62,9 +64,13 @@ public interface LARFile {
 
 	public void startWritePortletData(String name);
 
+	public void startWriteReference();
+
 	public void startWriteStagedModel(StagedModel stagedModel);
 
 	public void writePortletDataAttribute(String name, String value);
+
+	public void writePropertyElement(String userUuid, String key, String value);
 
 	public void writeReferenceStagedModel(
 		StagedModel referrerStagedModel, StagedModel stagedModel,

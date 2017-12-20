@@ -251,7 +251,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 				_addAssetLinks(classNameId, GetterUtil.getLong(classPK));
 				_addAssetPriority(
-					element, classNameId, GetterUtil.getLong(classPK));
+					classNameId, GetterUtil.getLong(classPK));
 
 //				addExpando(element, path, classedModel, clazz);
 //				addLocks(clazz, String.valueOf(classPK));
@@ -327,6 +327,23 @@ public class PortletDataContextImpl implements PortletDataContext {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void addExportReference(
+		StagedModel referrerStagedModel, StagedModel stagedModel,
+		String referenceType, boolean missing) {
+
+		Set<ReferenceDTO> references = _referenceMap.get(referrerStagedModel);
+
+		if (references == null) {
+			references = new HashSet<>();
+
+			_referenceMap.put(referrerStagedModel, references);
+		}
+
+		references.add(
+			new ReferenceDTO(
+				referrerStagedModel, stagedModel, referenceType, missing));
 	}
 
 	@Override
@@ -475,6 +492,28 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void addRatingsEntries(
 		String className, long classPK, List<RatingsEntry> ratingsEntries) {
+	}
+
+	@Override
+	public void addReference(
+		StagedModel referrerStagedModel, StagedModel stagedModel,
+		String referenceType, boolean missing) {
+
+		String referenceKey = getReferenceKey(stagedModel);
+
+		_larFile.startWriteReference();
+		_larFile.writeReferenceStagedModel(
+			referrerStagedModel, stagedModel, referenceType, missing);
+
+		if (missing) {
+			if (!_missingReferences.contains(referenceKey)) {
+				_missingReferences.add(referenceKey);
+			}
+		}
+		else {
+			_references.add(referenceKey);
+			cleanUpMissingReferences(stagedModel);
+		}
 	}
 
 	/**
@@ -1048,6 +1087,18 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public String getExportImportProcessId() {
 		return _exportImportProcessId;
+	}
+
+	public Set<ReferenceDTO> getExportReference(
+		StagedModel referrerStagedModel) {
+
+		Set<ReferenceDTO> references = _referenceMap.get(referrerStagedModel);
+
+		if (references == null) {
+			return new HashSet<>();
+		}
+
+		return references;
 	}
 
 	@Override
@@ -2005,6 +2056,19 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void putNotUniquePerLayout(String dataKey) {
 		_notUniquePerLayout.add(dataKey);
+	}
+
+	public Set<ReferenceDTO> removeExportReference(
+		StagedModel referrerStagedModel) {
+
+		Set<ReferenceDTO> references = _referenceMap.remove(
+			referrerStagedModel);
+
+		if (references == null) {
+			return new HashSet<>();
+		}
+
+		return references;
 	}
 
 	@Override
@@ -3013,6 +3077,48 @@ public class PortletDataContextImpl implements PortletDataContext {
 			"asset-entry-priority", String.valueOf(assetEntryPriority));
 	}
 
+	private boolean _containsEntityMap(ClassedModel classedModel) {
+		long classNameId = ExportImportClassedModelUtil.getClassNameId(
+			classedModel);
+		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
+
+		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
+
+		if (classPKMap == null) {
+			return false;
+		}
+
+		Boolean missing = classPKMap.get(classPK);
+
+		if (missing == null) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	private boolean _isMissingEntity(ClassedModel classedModel) {
+		long classNameId = ExportImportClassedModelUtil.getClassNameId(
+			classedModel);
+		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
+
+		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
+
+		if (classPKMap == null) {
+			return false;
+		}
+
+		Boolean missing = classPKMap.get(classPK);
+
+		if (missing == null) {
+			return false;
+		}
+		else {
+			return missing;
+		}
+	}
+
 	private void _populateClassNameAttribute(StagedModel stagedModel) {
 		String attachedClassName = null;
 
@@ -3037,49 +3143,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 	}
 
-	private boolean containsEntityMap(ClassedModel classedModel) {
-		long classNameId = ExportImportClassedModelUtil.getClassNameId(
-			classedModel);
-		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
-
-		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
-
-		if (classPKMap == null) {
-			return false;
-		}
-
-		Boolean missing = classPKMap.get(classPK);
-
-		if (missing == null) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	private boolean isMissingEntity(ClassedModel classedModel) {
-		long classNameId = ExportImportClassedModelUtil.getClassNameId(
-			classedModel);
-		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
-
-		Map<Long, Boolean> classPKMap = _entities.get(classNameId);
-
-		if (classPKMap == null) {
-			return false;
-		}
-
-		Boolean missing = classPKMap.get(classPK);
-
-		if (missing == null) {
-			return false;
-		}
-		else {
-			return missing;
-		}
-	}
-
-	private void updateEntityMap(ClassedModel classedModel, boolean missing) {
+	private void _updateEntityMap(ClassedModel classedModel, boolean missing) {
 		long classNameId = ExportImportClassedModelUtil.getClassNameId(
 			classedModel);
 		long classPK = ExportImportClassedModelUtil.getClassPK(classedModel);
@@ -3151,6 +3215,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private String _portletId;
 	private final Set<String> _primaryKeys = new HashSet<>();
 	private boolean _privateLayout;
+	private transient Map<StagedModel, Set<ReferenceDTO>> _referenceMap =
+		new HashMap<>();
 	private final Set<String> _references = new HashSet<>();
 	private String _rootPortletId;
 	private final Set<String> _scopedPrimaryKeys = new HashSet<>();

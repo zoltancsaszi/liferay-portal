@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.plugin.Version;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringPool;
@@ -31,8 +30,6 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -40,9 +37,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.portlet.PortletPreferences;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Brian Wing Shun Chan
@@ -552,31 +546,15 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	protected Element addExportDataRootElement(
 		PortletDataContext portletDataContext) {
 
-		try {
-			XMLOutputFactory output = XMLOutputFactory.newInstance();
+		Document document = SAXReaderUtil.createDocument();
 
-			File portletDataXml = FileUtil.createTempFile();
+		Class<?> clazz = getClass();
 
-			XMLStreamWriter writer = output.createXMLStreamWriter(
-				new FileWriter(portletDataXml));
+		Element rootElement = document.addElement(clazz.getSimpleName());
 
-			writer.writeStartDocument();
+		portletDataContext.setExportDataRootElement(rootElement);
 
-			Class<?> clazz = getClass();
-
-			writer.writeStartElement(clazz.getSimpleName());
-			writer.writeAttribute(
-				"group-id",
-				String.valueOf(portletDataContext.getScopeGroupId()));
-
-			portletDataContext.setExportDataRootElement(
-				SAXReaderUtil.createElement("dummy-root"));
-
-			return SAXReaderUtil.createElement("dummy");
-		}
-		catch (Exception e) {
-			return SAXReaderUtil.createElement("dummy");
-		}
+		return rootElement;
 	}
 
 	protected Element addImportDataRootElement(

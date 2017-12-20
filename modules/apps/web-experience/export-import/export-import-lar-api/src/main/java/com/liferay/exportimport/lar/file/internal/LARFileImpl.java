@@ -80,26 +80,22 @@ public class LARFileImpl implements LARFile {
 		}
 	}
 
-	private void closeReferenceXMLWriter() {
-		if (_referenceXmlStreamWriter == null) {
-			return;
-		}
+	@Override
+	public void endWriteReference() {
+		if (_isWriteEventCompleted(_REFERENCE_START)) {
+			try {
+				_xmlStreamWriter.writeEndElement();
 
-		try {
-			_referenceXmlStreamWriter.writeEndDocument();
+				//closeReferenceXMLWriter();
 
-			_referenceXmlStreamWriter.flush();
+				_writeEventCompleted(_REFERENCE_END);
+				_writeEventReset(_REFERENCE_START);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 
-			_referenceXmlStreamWriter.close();
-
-			_referenceXmlStreamWriter = null;
-
-			_referenceOutputStream.flush();
-			_referenceOutputStream.close();
-		}
-		catch (Exception e) {
-			_log.error(
-				"Error during closing reference xml writer: ", e);
+				_writeEventReset(_REFERENCE_END);
+			}
 		}
 	}
 
@@ -107,9 +103,9 @@ public class LARFileImpl implements LARFile {
 	public void endWriteStagedModel() {
 		if (_isWriteEventCompleted(_STAGED_MODEL_START)) {
 			try {
-				_xmlStreamWriter.writeEndElement();
+				endWriteReference();
 
-				closeReferenceXMLWriter();
+				_xmlStreamWriter.writeEndElement();
 
 				_writeEventCompleted(_STAGED_MODEL_END);
 				_writeEventReset(_STAGED_MODEL_START);
@@ -202,10 +198,35 @@ public class LARFileImpl implements LARFile {
 	}
 
 	@Override
+	public void startWriteReference() {
+		if (!_isWriteEventCompleted(_STAGED_MODEL_START)) {
+			return;
+		}
+
+		if (!_isWriteEventCompleted(_REFERENCE_START)) {
+			try {
+				_xmlStreamWriter.writeStartElement("references");
+
+				_writeEventCompleted(_REFERENCE_START);
+				_writeEventReset(_REFERENCE_END);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+
+				_writeEventReset(_REFERENCE_START);
+			}
+		}
+	}
+
+	@Override
 	public void startWriteStagedModel(StagedModel stagedModel) {
 		if (!_isWriteEventCompleted(_PORTLET_DATA_START)) {
 			return;
 		}
+//		if(_isWriteEventCompleted(_STAGED_MODEL_START)){
+//			_stagedModelQueue.add(stagedModel);
+//			return;
+//		}
 
 		try {
 			_xmlStreamWriter.writeStartElement("staged-model");
@@ -243,32 +264,48 @@ public class LARFileImpl implements LARFile {
 	}
 
 	@Override
+	public void writePropertyElement(
+		String userUuid, String key, String value) {
+
+		endWriteReference();
+
+		try {
+			_xmlStreamWriter.writeStartElement("property");
+			_xmlStreamWriter.writeAttribute("userUuid", userUuid);
+			_xmlStreamWriter.writeAttribute("key", key);
+			_xmlStreamWriter.writeAttribute("value", value);
+			_xmlStreamWriter.writeEndElement();
+		}
+		catch (Exception e) {
+			_log.error(e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public void writeReferenceStagedModel(
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
 
-		if (_referenceXmlStreamWriter == null) {
-			_initReferenceXmlStreamWriter(referrerStagedModel);
+		if (!_isWriteEventCompleted(_REFERENCE_START)) {
+			return;
 		}
 
 		try {
-			_referenceXmlStreamWriter.writeStartElement("reference");
+			_xmlStreamWriter.writeStartElement("reference");
 
 			String className = ExportImportClassedModelUtil.getClassName(
 				stagedModel);
 
-			_referenceXmlStreamWriter.writeAttribute("class-name", className);
+			_xmlStreamWriter.writeAttribute("class-name", className);
 
-			_referenceXmlStreamWriter.writeAttribute(
+			_xmlStreamWriter.writeAttribute(
 				"class-pk", String.valueOf(stagedModel.getPrimaryKeyObj()));
-
-			_populateClassNameAttribute(stagedModel);
 
 			if (stagedModel instanceof StagedGroupedModel) {
 				StagedGroupedModel stagedGroupedModel =
 					(StagedGroupedModel)stagedModel;
 
-				_referenceXmlStreamWriter.writeAttribute(
+				_xmlStreamWriter.writeAttribute(
 					"group-id",
 					String.valueOf(stagedGroupedModel.getGroupId()));
 
@@ -286,7 +323,7 @@ public class LARFileImpl implements LARFile {
 						liveGroupId = group.getGroupId();
 					}
 
-					_referenceXmlStreamWriter.writeAttribute(
+					_xmlStreamWriter.writeAttribute(
 						"live-group-id", String.valueOf(liveGroupId));
 
 					if (group.isLayout()) {
@@ -295,43 +332,41 @@ public class LARFileImpl implements LARFile {
 								LayoutLocalServiceUtil.getLayout(
 									group.getClassPK());
 
-							_referenceXmlStreamWriter.writeAttribute(
+							_xmlStreamWriter.writeAttribute(
 								"scope-layout-uuid", scopeLayout.getUuid());
 						}
 						catch (NoSuchLayoutException nsle) {
-							nsle.printStackTrace();
+							_log.error(nsle.getMessage(), nsle);
 						}
 					}
 				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
+
+				_xmlStreamWriter.writeAttribute("type", referenceType);
+
+				_xmlStreamWriter.writeAttribute("uuid", stagedModel.getUuid());
+				_xmlStreamWriter.writeAttribute(
+					"company-id", String.valueOf(stagedModel.getCompanyId()));
+
+				Map<String, String> referenceAttributes =
+					StagedModelDataHandlerUtil.getReferenceAttributes(
+						_portletDataContext, stagedModel);
+
+				for (Map.Entry<String, String> referenceAttribute :
+						referenceAttributes.entrySet()) {
+
+					_xmlStreamWriter.writeAttribute(
+						referenceAttribute.getKey(),
+						referenceAttribute.getValue());
+				}
 			}
 
-			/*if (Validator.isNotNull(binPath)) {
-				referenceElement.addAttribute("path", binPath);
-			}*/
-
-			_referenceXmlStreamWriter.writeAttribute("type", referenceType);
-
-			_referenceXmlStreamWriter.writeAttribute(
-				"uuid", stagedModel.getUuid());
-			_referenceXmlStreamWriter.writeAttribute(
-				"company-id", String.valueOf(stagedModel.getCompanyId()));
-
-			Map<String, String> referenceAttributes =
-				StagedModelDataHandlerUtil.getReferenceAttributes(
-					_portletDataContext, stagedModel);
-
-			for (Map.Entry<String, String> referenceAttribute :
-					referenceAttributes.entrySet()) {
-
-				_referenceXmlStreamWriter.writeAttribute(
-					referenceAttribute.getKey(), referenceAttribute.getValue());
-			}
+			_xmlStreamWriter.writeEndElement();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.error(e.getMessage(), e);
 		}
 	}
 
@@ -344,6 +379,28 @@ public class LARFileImpl implements LARFile {
 			catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void _closeReferenceXMLWriter() {
+		if (_referenceXmlStreamWriter == null) {
+			return;
+		}
+
+		try {
+			_referenceXmlStreamWriter.writeEndDocument();
+
+			_referenceXmlStreamWriter.flush();
+
+			_referenceXmlStreamWriter.close();
+
+			_referenceXmlStreamWriter = null;
+
+			_referenceOutputStream.flush();
+			_referenceOutputStream.close();
+		}
+		catch (Exception e) {
+			_log.error("Error during closing reference xml writer: ", e);
 		}
 	}
 
@@ -410,17 +467,21 @@ public class LARFileImpl implements LARFile {
 
 	private static final int _PORTLET_DATA_START = 0;
 
+	private static final int _REFERENCE_END = 5;
+
+	private static final int _REFERENCE_START = 4;
+
 	private static final int _STAGED_MODEL_END = 3;
 
 	private static final int _STAGED_MODEL_START = 2;
 
 	private static final Log _log = LogFactoryUtil.getLog(LARFileImpl.class);
 
-	private final PortletDataContext _portletDataContext;
-	private XMLStreamWriter _referenceXmlStreamWriter;
-	private boolean[] _writeEventArray = new boolean[4];
-	private XMLStreamWriter _xmlStreamWriter;
 	private OutputStream _outputStream;
+	private final PortletDataContext _portletDataContext;
 	private OutputStream _referenceOutputStream;
+	private XMLStreamWriter _referenceXmlStreamWriter;
+	private boolean[] _writeEventArray = new boolean[6];
+	private XMLStreamWriter _xmlStreamWriter;
 
 }

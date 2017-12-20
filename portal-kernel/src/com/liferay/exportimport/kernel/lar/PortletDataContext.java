@@ -131,6 +131,10 @@ public interface PortletDataContext extends Serializable {
 
 	public void addExportDataElementAttribute(String name, String value);
 
+	public void addExportReference(
+		StagedModel referrerStagedModel, StagedModel stagedModel,
+		String referenceType, boolean missing);
+
 	public void addLocks(Class<?> clazz, String key) throws PortalException;
 
 	public void addLocks(String className, String key, Lock lock);
@@ -175,6 +179,10 @@ public interface PortletDataContext extends Serializable {
 	@Deprecated
 	public void addRatingsEntries(
 		String className, long classPK, List<RatingsEntry> ratingsEntries);
+
+	public void addReference(
+		StagedModel referrerClassedModel, StagedModel classedModel,
+		String referenceType, boolean missing);
 
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement
@@ -335,6 +343,9 @@ public interface PortletDataContext extends Serializable {
 	public Element getExportDataRootElement();
 
 	public String getExportImportProcessId();
+
+	public Set<ReferenceDTO> getExportReference(
+		StagedModel referrerStagedModel);
 
 	public long getGroupId();
 
@@ -636,6 +647,9 @@ public interface PortletDataContext extends Serializable {
 
 	public void putNotUniquePerLayout(String dataKey);
 
+	public Set<ReferenceDTO> removeExportReference(
+		StagedModel referrerStagedModel);
+
 	public void setClassLoader(ClassLoader classLoader);
 
 	public void setCompanyGroupId(long companyGroupId);
@@ -713,5 +727,40 @@ public interface PortletDataContext extends Serializable {
 	public void startPortletDataXml(String className);
 
 	public String toXML(Object object);
+
+	public class ReferenceDTO {
+
+		public ReferenceDTO(
+			StagedModel referrerStagedModel, StagedModel stagedModel,
+			String referenceType, boolean missing) {
+
+			_referrerStagedModel = referrerStagedModel;
+			_stagedModel = stagedModel;
+			_referenceType = referenceType;
+			_missing = missing;
+		}
+
+		public String getReferenceType() {
+			return _referenceType;
+		}
+
+		public StagedModel getReferrerStagedModel() {
+			return _referrerStagedModel;
+		}
+
+		public StagedModel getStagedModel() {
+			return _stagedModel;
+		}
+
+		public boolean isMissing() {
+			return _missing;
+		}
+
+		private final boolean _missing;
+		private final String _referenceType;
+		private final StagedModel _referrerStagedModel;
+		private final StagedModel _stagedModel;
+
+	}
 
 }
