@@ -60,7 +60,7 @@ public class BookmarksEntryStagedModelDataHandler
 		if (entry.getFolderId() !=
 				BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 				portletDataContext, entry, entry.getFolder(),
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
@@ -70,6 +70,14 @@ public class BookmarksEntryStagedModelDataHandler
 		larFile.startWriteStagedModel(entry);
 
 		portletDataContext.addStagedModel(entry);
+
+		for (PortletDataContext.ReferenceDTO reference :
+				portletDataContext.removeExportReference(entry)) {
+
+			portletDataContext.addReference(
+				reference.getReferrerStagedModel(), reference.getStagedModel(),
+				reference.getReferenceType(), reference.isMissing());
+		}
 
 		larFile.endWriteStagedModel();
 	}
