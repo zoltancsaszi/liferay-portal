@@ -21,6 +21,8 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -120,29 +122,27 @@ public class AssetVocabularyStagedModelDataHandler
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary)
 		throws Exception {
 
+		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+
+		larFile.startWriteStagedModel(vocabulary);
+
+		portletDataContext.addStagedModel(vocabulary);
+
 		Locale locale = _portal.getSiteDefaultLocale(
 			portletDataContext.getScopeGroupId());
 
-		Element vocabularyElement = portletDataContext.getExportDataElement(
-			vocabulary);
-
-		String vocabularyPath = ExportImportPathUtil.getModelPath(vocabulary);
-
-		vocabularyElement.addAttribute("path", vocabularyPath);
-
 		vocabulary.setUserUuid(vocabulary.getUserUuid());
 
-		exportSettingsMetadata(
-			portletDataContext, vocabulary, vocabularyElement, locale);
+		exportSettingsMetadata(portletDataContext, vocabulary, larFile, locale);
 
-		portletDataContext.addReferenceElement(
-			vocabulary, vocabularyElement, vocabulary,
+		portletDataContext.addReference(
+			vocabulary, vocabulary,
 			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
 
 		portletDataContext.addPermissions(
 			AssetVocabulary.class, vocabulary.getVocabularyId());
 
-		portletDataContext.addZipEntry(vocabularyPath, vocabulary);
+		larFile.endWriteStagedModel();
 	}
 
 	@Override
@@ -224,13 +224,13 @@ public class AssetVocabularyStagedModelDataHandler
 
 	protected void exportSettingsMetadata(
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary,
-			Element vocabularyElement, Locale locale)
+			LARFile larFile, Locale locale)
 		throws PortalException {
 
 		String settingsMetadataPath = ExportImportPathUtil.getModelPath(
 			vocabulary, _SETTINGS_METADATA + ".json");
 
-		vocabularyElement.addAttribute(
+		larFile.writeStagedModelAttribute(
 			_SETTINGS_METADATA, settingsMetadataPath);
 
 		AssetVocabularySettingsExportHelper

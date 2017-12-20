@@ -22,11 +22,12 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
-import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -128,7 +129,7 @@ public class AssetCategoryStagedModelDataHandler
 				_assetCategoryLocalService.fetchAssetCategory(
 					category.getParentCategoryId());
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 				portletDataContext, category, parentCategory,
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
@@ -137,13 +138,28 @@ public class AssetCategoryStagedModelDataHandler
 				_assetVocabularyLocalService.fetchAssetVocabulary(
 					category.getVocabularyId());
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 				portletDataContext, category, vocabulary,
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
-		Element categoryElement = portletDataContext.getExportDataElement(
-			category);
+		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+
+		larFile.startWriteStagedModel(category);
+
+		portletDataContext.addStagedModel(category);
+
+		portletDataContext.addReference(
+			category, category, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+			false);
+
+		for (PortletDataContext.ReferenceDTO reference :
+				portletDataContext.removeExportReference(category)) {
+
+			portletDataContext.addReference(
+				reference.getReferrerStagedModel(), reference.getStagedModel(),
+				reference.getReferenceType(), reference.isMissing());
+		}
 
 		category.setUserUuid(category.getUserUuid());
 
@@ -152,26 +168,15 @@ public class AssetCategoryStagedModelDataHandler
 				category.getCategoryId());
 
 		for (AssetCategoryProperty categoryProperty : categoryProperties) {
-			Element propertyElement = categoryElement.addElement("property");
-
-			propertyElement.addAttribute(
-				"userUuid", categoryProperty.getUserUuid());
-			propertyElement.addAttribute("key", categoryProperty.getKey());
-			propertyElement.addAttribute("value", categoryProperty.getValue());
+			larFile.writePropertyElement(
+				categoryProperty.getUserUuid(), categoryProperty.getKey(),
+				categoryProperty.getValue());
 		}
-
-		String categoryPath = ExportImportPathUtil.getModelPath(category);
-
-		categoryElement.addAttribute("path", categoryPath);
-
-		portletDataContext.addReferenceElement(
-			category, categoryElement, category,
-			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
 
 		portletDataContext.addPermissions(
 			AssetCategory.class, category.getCategoryId());
 
-		portletDataContext.addZipEntry(categoryPath, category);
+		larFile.endWriteStagedModel();
 	}
 
 	@Override
