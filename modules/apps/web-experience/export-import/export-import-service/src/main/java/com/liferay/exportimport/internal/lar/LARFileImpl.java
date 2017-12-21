@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.exportimport.lar.file.internal;
+package com.liferay.exportimport.internal.lar;
 
 import com.liferay.exportimport.kernel.lar.ExportImportClassedModelUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.exportimport.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.log.Log;

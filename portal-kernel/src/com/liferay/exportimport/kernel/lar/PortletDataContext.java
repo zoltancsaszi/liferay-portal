@@ -184,6 +184,10 @@ public interface PortletDataContext extends Serializable {
 		StagedModel referrerClassedModel, StagedModel classedModel,
 		String referenceType, boolean missing);
 
+	public void addReference(
+		StagedModel referrerClassedModel, StagedModel classedModel,
+		String referenceType, boolean missing, Map<String, String> properties);
+
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
@@ -732,12 +736,13 @@ public interface PortletDataContext extends Serializable {
 
 		public ReferenceDTO(
 			StagedModel referrerStagedModel, StagedModel stagedModel,
-			String referenceType, boolean missing) {
+			String referenceType, boolean missing, Map<String, String> properties) {
 
 			_referrerStagedModel = referrerStagedModel;
 			_stagedModel = stagedModel;
 			_referenceType = referenceType;
 			_missing = missing;
+			_properties = properties;
 		}
 
 		public String getReferenceType() {
@@ -756,10 +761,15 @@ public interface PortletDataContext extends Serializable {
 			return _missing;
 		}
 
+		public Map<String, String> getProperties(){
+			return _properties;
+		}
+
 		private final boolean _missing;
 		private final String _referenceType;
 		private final StagedModel _referrerStagedModel;
 		private final StagedModel _stagedModel;
+		private final Map<String, String> _properties;
 
 	}
 

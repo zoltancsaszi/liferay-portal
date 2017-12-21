@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.exportimport.lar.file;
+package com.liferay.exportimport.kernel.lar.file;
 
 import com.liferay.portal.kernel.model.StagedModel;
 
@@ -80,6 +80,7 @@ public interface LARFile {
 
 	public void writeReferenceAttribute(String name, String value);
 
-	public void writeStructureFieldsElement(String ddmFormValuesPath, String structureUuid);
+	public void writeStructureFieldsElement(
+		String ddmFormValuesPath, String structureUuid);
 
 }

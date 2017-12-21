@@ -35,11 +35,11 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.lar.UserIdStrategy;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.exportimport.kernel.xstream.XStreamAlias;
 import com.liferay.exportimport.kernel.xstream.XStreamConverter;
 import com.liferay.exportimport.kernel.xstream.XStreamType;
-import com.liferay.exportimport.lar.file.LARFile;
-import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.exportimport.xstream.ConverterAdapter;
 import com.liferay.exportimport.xstream.XStreamStagedModelTypeHierarchyPermission;
 import com.liferay.message.boards.kernel.model.MBMessage;
@@ -332,6 +332,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public void addExportReference(
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
+		addExportReference(referrerStagedModel, stagedModel, referenceType, missing, null);
+	}
+
+	public void addExportReference(
+		StagedModel referrerStagedModel, StagedModel stagedModel,
+		String referenceType, boolean missing, Map<String, String> properties) {
 
 		Set<ReferenceDTO> references = _referenceMap.get(referrerStagedModel);
 
@@ -343,7 +349,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		references.add(
 			new ReferenceDTO(
-				referrerStagedModel, stagedModel, referenceType, missing));
+				referrerStagedModel, stagedModel, referenceType, missing, properties));
 	}
 
 	@Override
@@ -499,11 +505,25 @@ public class PortletDataContextImpl implements PortletDataContext {
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
 
+		addReference(referrerStagedModel, stagedModel, referenceType, missing, null);
+	}
+
+	@Override
+	public void addReference(
+		StagedModel referrerStagedModel, StagedModel stagedModel,
+		String referenceType, boolean missing, Map<String, String> properties) {
+
 		String referenceKey = getReferenceKey(stagedModel);
 
 		_larFile.startWriteReference();
 		_larFile.writeReferenceStagedModel(
 			referrerStagedModel, stagedModel, referenceType, missing);
+
+		if(properties != null) {
+			for (Map.Entry<String, String> property : properties.entrySet()){
+				_larFile.writeReferenceAttribute(property.getKey(), property.getValue());
+			}
+		}
 
 		if (missing) {
 			if (!_missingReferences.contains(referenceKey)) {
@@ -3195,7 +3215,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private String _exportImportProcessId;
 	private long _groupId;
 	private transient Element _importDataRootElement;
-	private transient LARFile _larFile = LARFileUtil.getLARFile(this);
+	private transient LARFile _larFile = LARFileFactoryUtil.getLARFile(this);
 	private transient long[] _layoutIds;
 	private String _layoutSetPrototypeUuid;
 	private final transient LockManager _lockManager;
