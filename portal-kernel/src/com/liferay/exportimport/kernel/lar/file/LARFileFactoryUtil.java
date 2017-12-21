@@ -14,9 +14,9 @@
 
 package com.liferay.exportimport.kernel.lar.file;
 
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 /**
  * @author Mate Thurzo
@@ -36,11 +36,11 @@ public class LARFileFactoryUtil {
 	}
 
 	private static final ThreadLocal<LARFile> _larFile =
-		new CentralizedThreadLocal<>(LARFileFactoryUtil.class + "._larFile", null);
-
+		new CentralizedThreadLocal<>(
+			LARFileFactoryUtil.class + "._larFile", null);
 	private static volatile LARFileFactory _larFileFactory =
 		ServiceProxyFactory.newServiceTrackedInstance(
-			LARFileFactory.class,
-			LARFileFactoryUtil.class,
-			"_larFileFactory", false);
+			LARFileFactory.class, LARFileFactoryUtil.class, "_larFileFactory",
+			false);
+
 }

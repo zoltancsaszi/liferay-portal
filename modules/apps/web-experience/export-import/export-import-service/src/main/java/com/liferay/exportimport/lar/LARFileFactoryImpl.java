@@ -15,10 +15,12 @@
 package com.liferay.exportimport.lar;
 
 import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.exportimport.internal.lar.LARFileImpl;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.file.LARFile;
 import com.liferay.exportimport.kernel.lar.file.LARFileFactory;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -26,11 +28,12 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(immediate = true)
 @ProviderType
-public class LARFileFactoryImpl implements LARFileFactory{
+public class LARFileFactoryImpl implements LARFileFactory {
 
 	public LARFile getLARFile(PortletDataContext portletDataContext) {
 		LARFile larFile = new LARFileImpl(portletDataContext);
 
 		return larFile;
 	}
+
 }

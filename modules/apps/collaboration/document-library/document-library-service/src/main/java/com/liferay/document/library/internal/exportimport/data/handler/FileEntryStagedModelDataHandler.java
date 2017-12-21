@@ -44,6 +44,8 @@ import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -221,21 +223,15 @@ public class FileEntryStagedModelDataHandler
 			PortletDataContext portletDataContext, FileEntry fileEntry)
 		throws Exception {
 
-		Element fileEntryElement = portletDataContext.getExportDataElement(
-			fileEntry);
-
 		String fileEntryPath = ExportImportPathUtil.getModelPath(fileEntry);
 
 		if (!fileEntry.isDefaultRepository()) {
 			Repository repository = _repositoryLocalService.getRepository(
 				fileEntry.getRepositoryId());
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 				portletDataContext, fileEntry, repository,
 				PortletDataContext.REFERENCE_TYPE_STRONG);
-
-			portletDataContext.addClassedModel(
-				fileEntryElement, fileEntryPath, fileEntry);
 
 			long portletRepositoryClassNameId = _portal.getClassNameId(
 				PortletRepository.class.getName());
@@ -248,16 +244,23 @@ public class FileEntryStagedModelDataHandler
 		if (fileEntry.getFolderId() !=
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 				portletDataContext, fileEntry, fileEntry.getFolder(),
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
 
-		fileEntryElement.addAttribute("fileVersionUuid", fileVersion.getUuid());
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
-		fileEntryElement.addAttribute("version", fileEntry.getVersion());
+		larFile.startWriteStagedModel(fileEntry);
+
+		portletDataContext.addStagedModel(fileEntry);
+
+		larFile.writeStagedModelAttribute(
+			"fileVersionUuid", fileVersion.getUuid());
+
+		larFile.writeStagedModelAttribute("version", fileEntry.getVersion());
 
 		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)fileEntry;
 
@@ -279,8 +282,6 @@ public class FileEntryStagedModelDataHandler
 			}
 
 			if (is == null) {
-				fileEntryElement.detach();
-
 				return;
 			}
 
@@ -290,7 +291,7 @@ public class FileEntryStagedModelDataHandler
 
 				portletDataContext.addZipEntry(binPath, is);
 
-				fileEntryElement.addAttribute("bin-path", binPath);
+				larFile.writeStagedModelAttribute("bin-path", binPath);
 			}
 			finally {
 				try {
@@ -306,14 +307,14 @@ public class FileEntryStagedModelDataHandler
 				_serviceTrackerList) {
 
 			dlPluggableContentDataHandler.exportContent(
-				portletDataContext, fileEntryElement, fileEntry);
+				portletDataContext, null, fileEntry);
 		}
 
-		exportMetaData(portletDataContext, fileEntryElement, fileEntry);
+		portletDataContext.addReferences(fileEntry);
 
-		portletDataContext.addClassedModel(
-			fileEntryElement, fileEntryPath, liferayFileEntry,
-			DLFileEntry.class);
+		exportMetaData(portletDataContext, fileEntry);
+
+		larFile.endWriteStagedModel();
 	}
 
 	@Override
@@ -666,7 +667,7 @@ public class FileEntryStagedModelDataHandler
 
 	protected void exportDDMFormValues(
 			PortletDataContext portletDataContext, DDMStructure ddmStructure,
-			FileEntry fileEntry, Element fileEntryElement)
+			FileEntry fileEntry)
 		throws Exception {
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
@@ -679,16 +680,21 @@ public class FileEntryStagedModelDataHandler
 			return;
 		}
 
-		Element structureFields = fileEntryElement.addElement(
-			"structure-fields");
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
+
+//		Element structureFields = fileEntryElement.addElement(
+//			"structure-fields");
 
 		String ddmFormValuesPath = ExportImportPathUtil.getModelPath(
 			ddmStructure,
 			String.valueOf(dlFileEntryMetadata.getDDMStorageId()));
 
-		structureFields.addAttribute("ddm-form-values-path", ddmFormValuesPath);
+//		structureFields.addAttribute("ddm-form-values-path", ddmFormValuesPath);
+//
+//		structureFields.addAttribute("structureUuid", ddmStructure.getUuid());
 
-		structureFields.addAttribute("structureUuid", ddmStructure.getUuid());
+		larFile.writeStructureFieldsElement(
+			ddmFormValuesPath, ddmStructure.getUuid());
 
 		com.liferay.dynamic.data.mapping.storage.DDMFormValues ddmFormValues =
 			_storageEngine.getDDMFormValues(
@@ -705,8 +711,7 @@ public class FileEntryStagedModelDataHandler
 	}
 
 	protected void exportMetaData(
-			PortletDataContext portletDataContext, Element fileEntryElement,
-			FileEntry fileEntry)
+			PortletDataContext portletDataContext, FileEntry fileEntry)
 		throws Exception {
 
 		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)fileEntry;
@@ -722,15 +727,14 @@ public class FileEntryStagedModelDataHandler
 			return;
 		}
 
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
+		StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 			portletDataContext, fileEntry, dlFileEntryType,
 			PortletDataContext.REFERENCE_TYPE_STRONG);
 
 		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
 
 		for (DDMStructure ddmStructure : ddmStructures) {
-			exportDDMFormValues(
-				portletDataContext, ddmStructure, fileEntry, fileEntryElement);
+			exportDDMFormValues(portletDataContext, ddmStructure, fileEntry);
 		}
 	}
 

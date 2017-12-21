@@ -176,16 +176,20 @@ public class StagedModelDataHandlerUtil {
 
 	public static <T extends StagedModel, U extends StagedModel> void
 	exportReferenceStagedModelStream(
-		PortletDataContext portletDataContext, T referrerStagedModel,
-		U stagedModel, String referenceType)
+			PortletDataContext portletDataContext, T referrerStagedModel,
+			U stagedModel, String referenceType)
 		throws PortletDataException {
-		exportReferenceStagedModelStream(portletDataContext, referrerStagedModel, stagedModel,referenceType, null);
+
+		exportReferenceStagedModelStream(
+			portletDataContext, referrerStagedModel, stagedModel, referenceType,
+			null);
 	}
 
 	public static <T extends StagedModel, U extends StagedModel> void
 			exportReferenceStagedModelStream(
 				PortletDataContext portletDataContext, T referrerStagedModel,
-				U stagedModel, String referenceType, Map<String, String> properties)
+				U stagedModel, String referenceType,
+				Map<String, String> properties)
 		throws PortletDataException {
 
 		if (!ExportImportHelperUtil.isAlwaysIncludeReference(

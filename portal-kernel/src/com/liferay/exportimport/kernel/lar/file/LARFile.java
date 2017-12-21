@@ -72,13 +72,13 @@ public interface LARFile {
 
 	public void writePropertyElement(String userUuid, String key, String value);
 
+	public void writeReferenceAttribute(String name, String value);
+
 	public void writeReferenceStagedModel(
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing);
 
 	public void writeStagedModelAttribute(String name, String value);
-
-	public void writeReferenceAttribute(String name, String value);
 
 	public void writeStructureFieldsElement(
 		String ddmFormValuesPath, String structureUuid);

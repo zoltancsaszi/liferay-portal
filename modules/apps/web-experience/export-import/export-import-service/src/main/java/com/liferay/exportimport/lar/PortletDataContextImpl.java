@@ -250,8 +250,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 					classedModel);
 
 				_addAssetLinks(classNameId, GetterUtil.getLong(classPK));
-				_addAssetPriority(
-					classNameId, GetterUtil.getLong(classPK));
+				_addAssetPriority(element, classNameId, GetterUtil.getLong(classPK));
 
 //				addExpando(element, path, classedModel, clazz);
 //				addLocks(clazz, String.valueOf(classPK));
@@ -332,7 +331,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public void addExportReference(
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
-		addExportReference(referrerStagedModel, stagedModel, referenceType, missing, null);
+
+		addExportReference(
+			referrerStagedModel, stagedModel, referenceType, missing, null);
 	}
 
 	public void addExportReference(
@@ -349,7 +350,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		references.add(
 			new ReferenceDTO(
-				referrerStagedModel, stagedModel, referenceType, missing, properties));
+				referrerStagedModel, stagedModel, referenceType, missing,
+				properties));
 	}
 
 	@Override
@@ -505,7 +507,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
 
-		addReference(referrerStagedModel, stagedModel, referenceType, missing, null);
+		addReference(
+			referrerStagedModel, stagedModel, referenceType, missing, null);
 	}
 
 	@Override
@@ -519,9 +522,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_larFile.writeReferenceStagedModel(
 			referrerStagedModel, stagedModel, referenceType, missing);
 
-		if(properties != null) {
-			for (Map.Entry<String, String> property : properties.entrySet()){
-				_larFile.writeReferenceAttribute(property.getKey(), property.getValue());
+		if (properties != null) {
+			for (Map.Entry<String, String> property : properties.entrySet()) {
+				_larFile.writeReferenceAttribute(
+					property.getKey(), property.getValue());
 			}
 		}
 
@@ -616,6 +620,19 @@ public class PortletDataContextImpl implements PortletDataContext {
 //		updateEntityMap(classedModel, missing);
 
 		return referenceElement;
+	}
+
+	@Override
+	public void addReferences(StagedModel stagedModel) {
+		for (PortletDataContext.ReferenceDTO reference :
+				removeExportReference(stagedModel)) {
+
+			addReference(
+				reference.getReferrerStagedModel(), reference.getStagedModel(),
+				reference.getReferenceType(), reference.isMissing());
+		}
+
+		_larFile.endWriteReference();
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.kernel.lar.file.LARFile;
 import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
@@ -122,6 +123,10 @@ public class AssetVocabularyStagedModelDataHandler
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary)
 		throws Exception {
 
+		StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+			portletDataContext, vocabulary, vocabulary,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+
 		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
 		larFile.startWriteStagedModel(vocabulary);
@@ -135,12 +140,10 @@ public class AssetVocabularyStagedModelDataHandler
 
 		exportSettingsMetadata(portletDataContext, vocabulary, larFile, locale);
 
-		portletDataContext.addReference(
-			vocabulary, vocabulary,
-			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
-
 		portletDataContext.addPermissions(
 			AssetVocabulary.class, vocabulary.getVocabularyId());
+
+		portletDataContext.addReferences(vocabulary);
 
 		larFile.endWriteStagedModel();
 	}

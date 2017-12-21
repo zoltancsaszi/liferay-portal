@@ -143,23 +143,17 @@ public class AssetCategoryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
+		StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+			portletDataContext, category, category,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+
 		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
 		larFile.startWriteStagedModel(category);
 
 		portletDataContext.addStagedModel(category);
 
-		portletDataContext.addReference(
-			category, category, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-			false);
-
-		for (PortletDataContext.ReferenceDTO reference :
-				portletDataContext.removeExportReference(category)) {
-
-			portletDataContext.addReference(
-				reference.getReferrerStagedModel(), reference.getStagedModel(),
-				reference.getReferenceType(), reference.isMissing());
-		}
+		portletDataContext.addReferences(category);
 
 		category.setUserUuid(category.getUserUuid());
 

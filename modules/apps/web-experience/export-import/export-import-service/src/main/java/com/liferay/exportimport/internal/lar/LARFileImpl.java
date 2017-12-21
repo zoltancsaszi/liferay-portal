@@ -103,8 +103,6 @@ public class LARFileImpl implements LARFile {
 	public void endWriteStagedModel() {
 		if (_isWriteEventCompleted(_STAGED_MODEL_START)) {
 			try {
-				endWriteReference();
-
 				_xmlStreamWriter.writeEndElement();
 
 				_writeEventCompleted(_STAGED_MODEL_END);
@@ -282,6 +280,18 @@ public class LARFileImpl implements LARFile {
 	}
 
 	@Override
+	public void writeReferenceAttribute(String name, String value) {
+		if (_isWriteEventCompleted(_REFERENCE_START)) {
+			try {
+				_xmlStreamWriter.writeAttribute(name, value);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
 	public void writeReferenceStagedModel(
 		StagedModel referrerStagedModel, StagedModel stagedModel,
 		String referenceType, boolean missing) {
@@ -371,8 +381,8 @@ public class LARFileImpl implements LARFile {
 	}
 
 	@Override
-	public void writeReferenceAttribute(String name, String value) {
-		if (_isWriteEventCompleted(_REFERENCE_START)) {
+	public void writeStagedModelAttribute(String name, String value) {
+		if (_isWriteEventCompleted(_STAGED_MODEL_START)) {
 			try {
 				_xmlStreamWriter.writeAttribute(name, value);
 			}
@@ -386,25 +396,16 @@ public class LARFileImpl implements LARFile {
 	public void writeStructureFieldsElement(
 		String ddmFormValuesPath, String structureUuid) {
 
-		try{
-			_xmlStreamWriter.writeStartElement("structure-fields");
-			_xmlStreamWriter.writeAttribute("ddmFormValuesPath", ddmFormValuesPath);
-			_xmlStreamWriter.writeAttribute("structureUuid", structureUuid);
-			_xmlStreamWriter.writeEndElement();
-
-		} catch (Exception e) {
-			_log.error(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void writeStagedModelAttribute(String name, String value) {
 		if (_isWriteEventCompleted(_STAGED_MODEL_START)) {
 			try {
-				_xmlStreamWriter.writeAttribute(name, value);
+				_xmlStreamWriter.writeStartElement("structure-fields");
+				_xmlStreamWriter.writeAttribute(
+					"ddmFormValuesPath", ddmFormValuesPath);
+				_xmlStreamWriter.writeAttribute("structureUuid", structureUuid);
+				_xmlStreamWriter.writeEndElement();
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				_log.error(e.getMessage(), e);
 			}
 		}
 	}

@@ -34,7 +34,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -163,7 +163,9 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 
 		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
-		larFile.startWritePortletData(getClass().getSimpleName());
+		Class<?> clazz = getClass();
+
+		larFile.startWritePortletData(clazz.getSimpleName());
 
 		if (!portletDataContext.getBooleanParameter(NAMESPACE, "entries")) {
 			larFile.endWritePortletData();
@@ -220,7 +222,8 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 						null, "path");
 
 					StagedModel stagedModel =
-						(StagedModel)portletDataContext.getZipEntryAsObject(path);
+						(StagedModel)portletDataContext.getZipEntryAsObject(
+							path);
 
 					String classNameAttribute =
 						_xmlStreamReader.getAttributeValue(
@@ -231,47 +234,14 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 							stagedModel, "className", classNameAttribute);
 						BeanPropertiesUtil.setProperty(
 							stagedModel, "classNameId",
-							PortalUtil.getClassNameId(classNameAttribute));
+							_portal.getClassNameId(classNameAttribute));
 					}
 
 					StagedModelDataHandlerUtil.importStagedModel(
 						portletDataContext, stagedModel);
 				}
 			}
-
-//			if (_xmlStreamReader.hasName()) {
-//				text = _xmlStreamReader.getLocalName();
-//			}
-
-//			text = _xmlStreamReader.getText();
-
-//			if ("staged-model".equals(_xmlStreamReader.getLocalName())) {
-//				System.out.println( //					_xmlStreamReader.getEventType() +
-//" # " + text);
-//			}
 		}
-
-//		Element foldersElement = portletDataContext.getImportDataGroupElement(
-//			BookmarksFolder.class);
-
-//
-//		List<Element> folderElements = foldersElement.elements();
-//
-//		for (Element folderElement : folderElements) {
-//			StagedModelDataHandlerUtil.importStagedModel(
-//				portletDataContext, folderElement);
-//		}
-//
-//		Element entriesElement = portletDataContext.getImportDataGroupElement(
-//			BookmarksEntry.class);
-
-//
-//		List<Element> entryElements = entriesElement.elements();
-//
-//		for (Element entryElement : entryElements) {
-//			StagedModelDataHandlerUtil.importStagedModel(
-//				portletDataContext, entryElement);
-//		}
 
 		return null;
 	}
@@ -328,6 +298,9 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 		_bookmarksEntryStagedModelRepository;
 	private StagedModelRepository<BookmarksFolder>
 		_bookmarksFolderStagedModelRepository;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private PortletDataHandlerHelper _portletDataHandlerHelper;

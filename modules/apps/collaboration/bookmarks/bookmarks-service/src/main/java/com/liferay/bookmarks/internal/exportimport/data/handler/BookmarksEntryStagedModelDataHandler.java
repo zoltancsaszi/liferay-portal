@@ -71,13 +71,7 @@ public class BookmarksEntryStagedModelDataHandler
 
 		portletDataContext.addStagedModel(entry);
 
-		for (PortletDataContext.ReferenceDTO reference :
-				portletDataContext.removeExportReference(entry)) {
-
-			portletDataContext.addReference(
-				reference.getReferrerStagedModel(), reference.getStagedModel(),
-				reference.getReferenceType(), reference.isMissing());
-		}
+		portletDataContext.addReferences(entry);
 
 		larFile.endWriteStagedModel();
 	}

@@ -211,6 +211,8 @@ public interface PortletDataContext extends Serializable {
 		ClassedModel classedModel, String className, String binPath,
 		String referenceType, boolean missing);
 
+	public void addReferences(StagedModel stagedModel);
+
 	public boolean addScopedPrimaryKey(Class<?> clazz, String primaryKey);
 
 	public void addStagedModel(StagedModel stagedModel);
@@ -736,13 +738,18 @@ public interface PortletDataContext extends Serializable {
 
 		public ReferenceDTO(
 			StagedModel referrerStagedModel, StagedModel stagedModel,
-			String referenceType, boolean missing, Map<String, String> properties) {
+			String referenceType, boolean missing,
+			Map<String, String> properties) {
 
 			_referrerStagedModel = referrerStagedModel;
 			_stagedModel = stagedModel;
 			_referenceType = referenceType;
 			_missing = missing;
 			_properties = properties;
+		}
+
+		public Map<String, String> getProperties() {
+			return _properties;
 		}
 
 		public String getReferenceType() {
@@ -761,15 +768,11 @@ public interface PortletDataContext extends Serializable {
 			return _missing;
 		}
 
-		public Map<String, String> getProperties(){
-			return _properties;
-		}
-
 		private final boolean _missing;
+		private final Map<String, String> _properties;
 		private final String _referenceType;
 		private final StagedModel _referrerStagedModel;
 		private final StagedModel _stagedModel;
-		private final Map<String, String> _properties;
 
 	}
 
