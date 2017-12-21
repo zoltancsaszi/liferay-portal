@@ -23,8 +23,8 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.exportimport.lar.file.LARFile;
-import com.liferay.exportimport.lar.file.LARFileUtil;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.StringPool;
@@ -110,7 +110,7 @@ public class AssetTagsPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
 		Class<?> clazz = getClass();
 

@@ -19,9 +19,9 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
-import com.liferay.exportimport.lar.file.LARFile;
-import com.liferay.exportimport.lar.file.LARFileUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -112,7 +112,7 @@ public class AssetTagStagedModelDataHandler
 			PortletDataContext portletDataContext, AssetTag assetTag)
 		throws Exception {
 
-		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
 		larFile.startWriteStagedModel(assetTag);
 
