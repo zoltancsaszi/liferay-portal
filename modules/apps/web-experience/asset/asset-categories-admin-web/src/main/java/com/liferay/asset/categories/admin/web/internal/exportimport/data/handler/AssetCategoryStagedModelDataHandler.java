@@ -26,8 +26,8 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
-import com.liferay.exportimport.lar.file.LARFile;
-import com.liferay.exportimport.lar.file.LARFileUtil;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -143,7 +143,7 @@ public class AssetCategoryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
-		LARFile larFile = LARFileUtil.getLARFile(portletDataContext);
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
 
 		larFile.startWriteStagedModel(category);
 
