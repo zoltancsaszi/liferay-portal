@@ -27,6 +27,8 @@ import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -65,27 +67,46 @@ public class DDMFormInstanceStagedModelDataHandler
 
 		DDMStructure ddmStructure = formInstance.getStructure();
 
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, formInstance, ddmStructure,
-			PortletDataContext.REFERENCE_TYPE_STRONG);
-
-		List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
-
-		Element formInstanceElement = portletDataContext.getExportDataElement(
-			formInstance);
-
-		for (DDMTemplate ddmTemplate : ddmTemplates) {
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, formInstance, ddmTemplate,
+		if (portletDataContext.isStreamProcessSupport()) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+				portletDataContext, formInstance, ddmStructure,
 				PortletDataContext.REFERENCE_TYPE_STRONG);
+
+			List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
+
+			for (DDMTemplate ddmTemplate : ddmTemplates) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+					portletDataContext, formInstance, ddmTemplate,
+					PortletDataContext.REFERENCE_TYPE_STRONG);
+			}
+
+			exportFormInstanceSettings(portletDataContext, formInstance);
+
+			portletDataContext.addStagedModel(formInstance);
 		}
+		else {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, formInstance, ddmStructure,
+				PortletDataContext.REFERENCE_TYPE_STRONG);
 
-		exportFormInstanceSettings(
-			portletDataContext, formInstance, formInstanceElement);
+			List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
 
-		portletDataContext.addClassedModel(
-			formInstanceElement,
-			ExportImportPathUtil.getModelPath(formInstance), formInstance);
+			Element formInstanceElement =
+				portletDataContext.getExportDataElement(formInstance);
+
+			for (DDMTemplate ddmTemplate : ddmTemplates) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, formInstance, ddmTemplate,
+					PortletDataContext.REFERENCE_TYPE_STRONG);
+			}
+
+			exportFormInstanceSettings(
+				portletDataContext, formInstance, formInstanceElement);
+
+			portletDataContext.addClassedModel(
+				formInstanceElement,
+				ExportImportPathUtil.getModelPath(formInstance), formInstance);
+		}
 	}
 
 	@Override
@@ -153,6 +174,21 @@ public class DDMFormInstanceStagedModelDataHandler
 
 		portletDataContext.importClassedModel(
 			formInstance, importedFormInstance);
+	}
+
+	protected void exportFormInstanceSettings(
+		PortletDataContext portletDataContext, DDMFormInstance formInstance) {
+
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
+
+		String settingsDDMFormValuesPath = ExportImportPathUtil.getModelPath(
+			formInstance, "settings-ddm-form-values.json");
+
+		larFile.writeStagedModelAttribute(
+			"settings-ddm-form-values-path", settingsDDMFormValuesPath);
+
+		portletDataContext.addZipEntry(
+			settingsDDMFormValuesPath, formInstance.getSettings());
 	}
 
 	protected void exportFormInstanceSettings(

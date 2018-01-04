@@ -235,18 +235,34 @@ public class DDMFormValuesExportImportContentProcessor
 				FileEntry fileEntry =
 					_dlAppService.getFileEntryByUuidAndGroupId(uuid, groupId);
 
-				if (_exportReferencedContent) {
-					StagedModelDataHandlerUtil.exportReferenceStagedModel(
-						_portletDataContext, _stagedModel, fileEntry,
-						_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
+				if (_portletDataContext.isStreamProcessSupport()) {
+					if (_exportReferencedContent) {
+						StagedModelDataHandlerUtil.
+							exportReferenceStagedModelStream(
+								_portletDataContext, _stagedModel, fileEntry,
+								_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
+					}
+					else {
+						_portletDataContext.addReference(
+							_stagedModel, fileEntry,
+							PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+					}
 				}
 				else {
-					Element entityElement =
-						_portletDataContext.getExportDataElement(_stagedModel);
+					if (_exportReferencedContent) {
+						StagedModelDataHandlerUtil.exportReferenceStagedModel(
+							_portletDataContext, _stagedModel, fileEntry,
+							_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
+					}
+					else {
+						Element entityElement =
+							_portletDataContext.getExportDataElement(
+								_stagedModel);
 
-					_portletDataContext.addReferenceElement(
-						_stagedModel, entityElement, fileEntry,
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+						_portletDataContext.addReferenceElement(
+							_stagedModel, entityElement, fileEntry,
+							PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+					}
 				}
 			}
 		}
@@ -378,12 +394,19 @@ public class DDMFormValuesExportImportContentProcessor
 				Layout layout = _layoutLocalService.getLayout(
 					groupId, privateLayout, layoutId);
 
-				Element entityElement =
-					_portletDataContext.getExportDataElement(_stagedModel);
+				if (_portletDataContext.isStreamProcessSupport()) {
+					_portletDataContext.addReference(
+						_stagedModel, layout,
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+				}
+				else {
+					Element entityElement =
+						_portletDataContext.getExportDataElement(_stagedModel);
 
-				_portletDataContext.addReferenceElement(
-					_stagedModel, entityElement, layout,
-					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+					_portletDataContext.addReferenceElement(
+						_stagedModel, entityElement, layout,
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+				}
 			}
 		}
 

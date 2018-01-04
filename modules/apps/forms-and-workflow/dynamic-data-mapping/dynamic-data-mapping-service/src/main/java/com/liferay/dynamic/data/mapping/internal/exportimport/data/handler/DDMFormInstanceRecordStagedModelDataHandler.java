@@ -29,6 +29,8 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.file.LARFile;
+import com.liferay.exportimport.kernel.lar.file.LARFileFactoryUtil;
 import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -67,16 +69,29 @@ public class DDMFormInstanceRecordStagedModelDataHandler
 			PortletDataContext portletDataContext, DDMFormInstanceRecord record)
 		throws Exception {
 
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, record, record.getFormInstance(),
-			PortletDataContext.REFERENCE_TYPE_STRONG);
+		if (portletDataContext.isStreamProcessSupport()) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+				portletDataContext, record, record.getFormInstance(),
+				PortletDataContext.REFERENCE_TYPE_STRONG);
 
-		Element recordElement = portletDataContext.getExportDataElement(record);
+			exportDDMFormValues(portletDataContext, record);
 
-		exportDDMFormValues(portletDataContext, record, recordElement);
+			portletDataContext.addStagedModel(record);
+		}
+		else {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, record, record.getFormInstance(),
+				PortletDataContext.REFERENCE_TYPE_STRONG);
 
-		portletDataContext.addClassedModel(
-			recordElement, ExportImportPathUtil.getModelPath(record), record);
+			Element recordElement = portletDataContext.getExportDataElement(
+				record);
+
+			exportDDMFormValues(portletDataContext, record, recordElement);
+
+			portletDataContext.addClassedModel(
+				recordElement, ExportImportPathUtil.getModelPath(record),
+				record);
+		}
 	}
 
 	@Override
@@ -141,6 +156,31 @@ public class DDMFormInstanceRecordStagedModelDataHandler
 		}
 
 		portletDataContext.importClassedModel(record, importedRecord);
+	}
+
+	protected void exportDDMFormValues(
+			PortletDataContext portletDataContext, DDMFormInstanceRecord record)
+		throws Exception {
+
+		LARFile larFile = LARFileFactoryUtil.getLARFile(portletDataContext);
+
+		String ddmFormValuesPath = ExportImportPathUtil.getModelPath(
+			record, "ddm-form-values.json");
+
+		larFile.writeStagedModelAttribute(
+			"ddm-form-values-path", ddmFormValuesPath);
+
+		DDMFormValues ddmFormValues = _storageEngine.getDDMFormValues(
+			record.getStorageId());
+
+		ddmFormValues =
+			_ddmFormValuesExportImportContentProcessor.
+				replaceExportContentReferences(
+					portletDataContext, record, ddmFormValues, true, false);
+
+		portletDataContext.addZipEntry(
+			ddmFormValuesPath,
+			_ddmFormValuesJSONSerializer.serialize(ddmFormValues));
 	}
 
 	protected void exportDDMFormValues(
