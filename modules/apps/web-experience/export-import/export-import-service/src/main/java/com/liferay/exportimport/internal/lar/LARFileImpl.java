@@ -73,6 +73,8 @@ public class LARFileImpl implements LARFile {
 
 				_outputStream.flush();
 				_outputStream.close();
+
+				_portletDataContext.setStreamProcessSupport(false);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -187,6 +189,8 @@ public class LARFileImpl implements LARFile {
 			_xmlStreamWriter.writeStartElement(name);
 
 			_writeEventCompleted(_PORTLET_DATA_START);
+
+			_portletDataContext.setStreamProcessSupport(true);
 		}
 		catch (Exception e) {
 			_writeEventReset(_PORTLET_DATA_START);
@@ -197,9 +201,9 @@ public class LARFileImpl implements LARFile {
 
 	@Override
 	public void startWriteReference() {
-		if (!_isWriteEventCompleted(_STAGED_MODEL_START)) {
-			return;
-		}
+//		if (!_isWriteEventCompleted(_STAGED_MODEL_START)) {
+//			return;
+//		}
 
 		if (!_isWriteEventCompleted(_REFERENCE_START)) {
 			try {

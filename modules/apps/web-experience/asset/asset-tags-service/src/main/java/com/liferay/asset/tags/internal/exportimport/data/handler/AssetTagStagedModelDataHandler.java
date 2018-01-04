@@ -118,6 +118,7 @@ public class AssetTagStagedModelDataHandler
 
 		portletDataContext.addStagedModel(assetTag);
 
+		portletDataContext.addReferences(assetTag);
 		larFile.endWriteStagedModel();
 	}
 

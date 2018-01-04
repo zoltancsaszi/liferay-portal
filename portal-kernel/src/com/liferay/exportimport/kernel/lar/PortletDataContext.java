@@ -649,6 +649,8 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean isStagedModelCounted(StagedModel stagedModel);
 
+	public boolean isStreamProcessSupport();
+
 	public boolean isWithinDateRange(Date modifiedDate);
 
 	public void putNotUniquePerLayout(String dataKey);
@@ -717,6 +719,8 @@ public interface PortletDataContext extends Serializable {
 		long sourceUserPersonalSiteGroupId);
 
 	public void setStartDate(Date startDate);
+
+	public void setStreamProcessSupport(boolean streamProcessSupport);
 
 	public void setType(String type);
 

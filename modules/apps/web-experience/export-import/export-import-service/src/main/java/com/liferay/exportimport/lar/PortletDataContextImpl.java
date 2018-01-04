@@ -250,7 +250,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 					classedModel);
 
 				_addAssetLinks(classNameId, GetterUtil.getLong(classPK));
-				_addAssetPriority(element, classNameId, GetterUtil.getLong(classPK));
+				_addAssetPriority(
+					element, classNameId, GetterUtil.getLong(classPK));
 
 //				addExpando(element, path, classedModel, clazz);
 //				addLocks(clazz, String.valueOf(classPK));
@@ -2072,6 +2073,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 			ExportImportClassedModelUtil.getPrimaryKeyObj(stagedModel));
 	}
 
+	@Override
+	public boolean isStreamProcessSupport() {
+		return _streamProcessSupport;
+	}
+
 	/**
 	 * @see #addDateRangeCriteria(DynamicQuery, String)
 	 */
@@ -2263,6 +2269,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void setStreamProcessSupport(boolean streamProcessSupport) {
+		_streamProcessSupport = streamProcessSupport;
+	}
+
+	@Override
 	public void setType(String type) {
 		_type = type;
 	}
@@ -2342,7 +2353,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	 * @deprecated As of 4.0.0
 	 */
 	@Deprecated
-	protected void addAssetLinks( Class<?> clazz, Serializable classPK) {
+	protected void addAssetLinks(Class<?> clazz, Serializable classPK) {
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			clazz.getName(), GetterUtil.getLong(classPK));
 
@@ -2356,8 +2367,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		for (AssetLink assetLink : assetLinks) {
 			_assetLinkIds.add(assetLink.getLinkId());
 		}
-
-
 	}
 
 	/**
@@ -3087,6 +3096,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 	}
 
+	private void _addAssetEntryPriority(long classNameId, long classPK) {
+		double assetEntryPriority = AssetEntryLocalServiceUtil.getEntryPriority(
+			classNameId, classPK);
+
+		_larFile.writeStagedModelAttribute(
+			"asset-entry-priority", String.valueOf(assetEntryPriority));
+	}
+
 	private void _addAssetLinks(long classNameId, long classPK) {
 		List<AssetLink> assetLinks = AssetLinkLocalServiceUtil.getLinks(
 			classNameId, classPK);
@@ -3099,14 +3116,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private void _addAssetPriority(
 		Element element, long classNameId, long classPK) {
 
-		double assetEntryPriority = AssetEntryLocalServiceUtil.getEntryPriority(
-			classNameId, classPK);
-
-		_larFile.writeStagedModelAttribute(
-			"asset-entry-priority", String.valueOf(assetEntryPriority));
-	}
-
-	private void _addAssetEntryPriority(long classNameId, long classPK) {
 		double assetEntryPriority = AssetEntryLocalServiceUtil.getEntryPriority(
 			classNameId, classPK);
 
@@ -3265,6 +3274,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private long _sourceGroupId;
 	private long _sourceUserPersonalSiteGroupId;
 	private Date _startDate;
+	private boolean _streamProcessSupport;
 	private String _type;
 	private transient UserIdStrategy _userIdStrategy;
 	private long _userPersonalSiteGroupId;
