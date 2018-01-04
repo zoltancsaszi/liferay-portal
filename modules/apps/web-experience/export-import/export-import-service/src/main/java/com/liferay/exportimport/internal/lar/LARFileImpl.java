@@ -364,6 +364,10 @@ public class LARFileImpl implements LARFile {
 				_xmlStreamWriter.writeAttribute(
 					"company-id", String.valueOf(stagedModel.getCompanyId()));
 
+				if (missing) {
+					_xmlStreamWriter.writeAttribute("missing", "true");
+				}
+
 				Map<String, String> referenceAttributes =
 					StagedModelDataHandlerUtil.getReferenceAttributes(
 						_portletDataContext, stagedModel);
