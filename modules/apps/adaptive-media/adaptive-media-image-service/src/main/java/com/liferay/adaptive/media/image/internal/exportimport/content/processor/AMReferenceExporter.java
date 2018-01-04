@@ -38,18 +38,32 @@ public class AMReferenceExporter {
 	public void exportReference(FileEntry fileEntry)
 		throws PortletDataException {
 
-		if (_exportReferencedContent) {
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				_portletDataContext, _stagedModel, fileEntry,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-		}
-		else {
-			Element element = _portletDataContext.getExportDataElement(
-				_stagedModel);
+		if (_portletDataContext.isStreamProcessSupport()) {
+			if (_exportReferencedContent) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
+					_portletDataContext, _stagedModel, fileEntry,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+			}
+			else {
 
-			_portletDataContext.addReferenceElement(
-				_stagedModel, element, fileEntry,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+				_portletDataContext.addReference(
+					_stagedModel, fileEntry,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+			}
+		} else {
+			if (_exportReferencedContent) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					_portletDataContext, _stagedModel, fileEntry,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+			}
+			else {
+				Element element = _portletDataContext.getExportDataElement(
+					_stagedModel);
+
+				_portletDataContext.addReferenceElement(
+					_stagedModel, element, fileEntry,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+			}
 		}
 	}
 
