@@ -79,7 +79,7 @@ public class ImageExportDDMFormFieldValueTransformer
 				uuid, groupId);
 
 			if (_exportReferencedContent) {
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				StagedModelDataHandlerUtil.exportReferenceStagedModelStream(
 					_portletDataContext, _stagedModel, fileEntry,
 					_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
 			}
@@ -87,8 +87,8 @@ public class ImageExportDDMFormFieldValueTransformer
 				Element entityElement =
 					_portletDataContext.getExportDataElement(_stagedModel);
 
-				_portletDataContext.addReferenceElement(
-					_stagedModel, entityElement, fileEntry,
+				_portletDataContext.addReference(
+					_stagedModel, fileEntry,
 					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
 			}
 		}

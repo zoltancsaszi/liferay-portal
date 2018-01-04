@@ -287,9 +287,10 @@ public class JournalArticleExportImportContentProcessor
 
 				if (exportReferencedContent) {
 					try {
-						StagedModelDataHandlerUtil.exportReferenceStagedModel(
-							portletDataContext, stagedModel, journalArticle,
-							PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+						StagedModelDataHandlerUtil.
+							exportReferenceStagedModelStream(
+								portletDataContext, stagedModel, journalArticle,
+								PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 					}
 					catch (Exception e) {
 						if (_log.isDebugEnabled()) {
@@ -318,11 +319,8 @@ public class JournalArticleExportImportContentProcessor
 					}
 				}
 				else {
-					Element entityElement =
-						portletDataContext.getExportDataElement(stagedModel);
-
-					portletDataContext.addReferenceElement(
-						stagedModel, entityElement, journalArticle,
+					portletDataContext.addReference(
+						stagedModel, journalArticle,
 						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
 				}
 			}
