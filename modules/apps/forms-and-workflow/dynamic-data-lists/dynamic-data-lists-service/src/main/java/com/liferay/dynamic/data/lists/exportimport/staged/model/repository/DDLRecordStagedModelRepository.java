@@ -83,6 +83,8 @@ public class DDLRecordStagedModelRepository
 			serviceContext.setUuid(ddlRecord.getUuid());
 		}
 
+		serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
+
 		DDLRecord importedRecord = _ddlRecordLocalService.addRecord(
 			userId, ddlRecord.getGroupId(), ddlRecord.getRecordSetId(),
 			ddlRecord.getDisplayIndex(), ddmFormValues, serviceContext);
@@ -204,6 +206,8 @@ public class DDLRecordStagedModelRepository
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			ddlRecord);
+
+		serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
 
 		DDLRecord importedRecord = _ddlRecordLocalService.updateRecord(
 			userId, ddlRecord.getRecordId(), false, ddlRecord.getDisplayIndex(),
