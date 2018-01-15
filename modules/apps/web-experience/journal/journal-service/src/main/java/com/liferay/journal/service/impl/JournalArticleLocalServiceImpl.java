@@ -333,6 +333,10 @@ public class JournalArticleLocalServiceImpl
 			boolean latestVersion, ServiceContext serviceContext)
 		throws PortalException {
 
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
+		}
+
 		// Article
 
 		User user = userLocalService.getUser(userId);
@@ -5535,6 +5539,10 @@ public class JournalArticleLocalServiceImpl
 			boolean latestVersion, ServiceContext serviceContext)
 		throws PortalException {
 
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
+		}
+
 		// Article
 
 		User user = userLocalService.getUser(userId);
@@ -8612,6 +8620,13 @@ public class JournalArticleLocalServiceImpl
 			File smallImageFile, byte[] smallImageBytes, boolean latestVersion,
 			ServiceContext serviceContext)
 		throws PortalException {
+
+		boolean validateDDMFormValues = GetterUtil.getBoolean(
+			serviceContext.getAttribute("validateDDMFormValues"), true);
+
+		if (!validateDDMFormValues) {
+			return;
+		}
 
 		Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
 			LocalizationUtil.getDefaultLanguageId(content));
