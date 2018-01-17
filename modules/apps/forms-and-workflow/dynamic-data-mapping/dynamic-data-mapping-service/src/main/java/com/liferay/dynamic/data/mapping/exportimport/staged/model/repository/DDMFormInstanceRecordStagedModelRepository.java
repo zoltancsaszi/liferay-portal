@@ -265,7 +265,7 @@ public class DDMFormInstanceRecordStagedModelRepository
 				clazz.getClassLoader());
 
 		formInstanceRecordVersionDynamicQuery.setProjection(
-			ProjectionFactoryUtil.property("formInstanceRecordVersionId"));
+			ProjectionFactoryUtil.property("formInstanceRecordId"));
 
 		Property statusProperty = PropertyFactoryUtil.forName("status");
 
