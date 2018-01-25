@@ -40,6 +40,14 @@ public class StatusTag extends IncludeTag {
 		servletContext = ServletContextUtil.getServletContext();
 	}
 
+	public void setPortletId(String portletId) {
+		_portletId = portletId;
+	}
+
+	public void setSimple(boolean simple) {
+		_simple = simple;
+	}
+
 	public void setStagedModel(StagedModel stagedModel) {
 		_stagedModel = stagedModel;
 	}
@@ -48,6 +56,8 @@ public class StatusTag extends IncludeTag {
 	protected void cleanUp() {
 		_cssClass = null;
 		_stagedModel = null;
+		_portletId = null;
+		_simple = false;
 	}
 
 	@Override
@@ -58,6 +68,8 @@ public class StatusTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute("liferay-staging:status:cssClass", _cssClass);
+		request.setAttribute("liferay-staging:status:portletId", _portletId);
+		request.setAttribute("liferay-staging:status:simple", _simple);
 		request.setAttribute(
 			"liferay-staging:status:stagedModel", _stagedModel);
 	}
@@ -65,6 +77,8 @@ public class StatusTag extends IncludeTag {
 	private static final String _PAGE = "/status/page.jsp";
 
 	private String _cssClass;
+	private String _portletId;
+	private boolean _simple;
 	private StagedModel _stagedModel;
 
 }

@@ -16,9 +16,15 @@
 
 <%@ include file="/init.jsp" %>
 
+<%@ page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil" %>
+
+<%@ page import="javax.portlet.PortletPreferences" %>
+
 <%
 String cssClass = GetterUtil.getString(request.getAttribute("liferay-staging:status:cssClass"));
 StagedModel stagedModel = (StagedModel)request.getAttribute("liferay-staging:status:stagedModel");
+String portletId = GetterUtil.getString(request.getAttribute("liferay-staging:status:portletId"), themeDisplay.getPpid());
+boolean simple = GetterUtil.getBoolean(request.getAttribute("liferay-staging:status:simple"));
 
 Date lastPublishDate = null;
 Date modifiedDate = null;
@@ -26,7 +32,18 @@ Date modifiedDate = null;
 if ((stagedModel != null) && (stagedModel instanceof StagedGroupedModel)) {
 	StagedGroupedModel stagedGroupedModel = (StagedGroupedModel)stagedModel;
 
-	lastPublishDate = stagedGroupedModel.getLastPublishDate();
+	PortletPreferences jxPortletPreferences = PortletPreferencesFactoryUtil.getStrictPortletSetup(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), portletId);
+
+	Date layoutLastPublishDate = ExportImportDateUtil.getLastPublishDate(themeDisplay.getLayoutSet());
+	Date preferencesLastPublishDate = ExportImportDateUtil.getLastPublishDate(jxPortletPreferences);
+
+	if (layoutLastPublishDate.after(preferencesLastPublishDate)) {
+		lastPublishDate = layoutLastPublishDate;
+	}
+	else {
+		lastPublishDate = preferencesLastPublishDate;
+	}
+
 	modifiedDate = stagedGroupedModel.getModifiedDate();
 }
 

@@ -327,6 +327,19 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<description>The main portlet containing the staged model to be used to display the publishing information.</description>
+			<name>portletId</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Whether to decorate the span or just display a simple label.</description>
+			<name>simple</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
 			<description>The staged model to be used to display the publishing information.</description>
 			<name>stagedModel</name>
 			<required>true</required>

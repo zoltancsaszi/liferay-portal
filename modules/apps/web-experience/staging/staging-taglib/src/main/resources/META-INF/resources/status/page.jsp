@@ -19,12 +19,12 @@
 <c:if test="<%= themeDisplayScopeGroup.isStagingGroup() %>">
 	<c:choose>
 		<c:when test="<%= stagedPortlet %>">
-			<span class="label <%= cssClass %>">
+			<span class='<%= simple ? StringPool.BLANK : "label " + cssClass %>'>
 				<liferay-ui:message key='<%= LanguageUtil.get(request, published ? "published" : "unpublished") %>' />
 			</span>
 		</c:when>
 		<c:otherwise>
-			<span class="label label-warning">
+			<span class='<%= simple ? StringPool.BLANK : "label label-warning" %>'>
 				<liferay-ui:message key="not-staged" />
 			</span>
 		</c:otherwise>
