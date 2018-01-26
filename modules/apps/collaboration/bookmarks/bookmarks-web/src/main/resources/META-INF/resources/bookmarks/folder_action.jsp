@@ -123,4 +123,27 @@ if (row == null) {
 			url="<%= deleteURL %>"
 		/>
 	</c:if>
+
+	<c:if test="<%= folder != null %>">
+		<portlet:actionURL name="/bookmarks/publish_folder" var="publishFolderURL">
+			<portlet:param name="folderId" value="<%= String.valueOf(folder.getFolderId()) %>" />
+		</portlet:actionURL>
+
+		<liferay-ui:icon
+			message="publish"
+			url="<%= publishFolderURL %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= folder != null %>">
+		<liferay-export-import-changeset:create var="folderChangeset">
+			<liferay-export-import-changeset:add-entity stagedModel="<%= folder %>" />
+
+			<liferay-export-import-changeset:add-entities stagedModels="<%= BookmarksEntryServiceUtil.getEntries(folder.getGroupId(), folder.getFolderId(), -1, -1) %>" />
+		</liferay-export-import-changeset:create>
+
+		<liferay-export-import-changeset:publish-changeset changeset="<%= folderChangeset %>" />
+
+
+	</c:if>
 </liferay-ui:icon-menu>
