@@ -17,6 +17,7 @@ package com.liferay.document.library.display.context;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
 
@@ -52,7 +53,15 @@ public interface DLViewFileVersionDisplayContext extends DLDisplayContext {
 
 	public String getDiscussionLabel(Locale locale);
 
+	/**
+	 * @deprecated As of 3.4.0
+	 */
+	@Deprecated
 	public Menu getMenu() throws PortalException;
+
+	public Menu getMenu(
+			HttpServletRequest request, StagedGroupedModel stagedGroupedModel)
+		throws PortalException;
 
 	public List<ToolbarItem> getToolbarItems() throws PortalException;
 

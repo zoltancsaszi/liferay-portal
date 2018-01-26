@@ -35,9 +35,11 @@ import com.liferay.dynamic.data.mapping.exception.StorageException;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
+import com.liferay.exportimport.changeset.display.context.ExportImportChangesetDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -161,6 +163,10 @@ public class DefaultDLViewFileVersionDisplayContext
 		return LanguageUtil.get(_resourceBundle, "comments");
 	}
 
+	/**
+	 * @deprecated As of 2.0.0
+	 */
+	@Deprecated
 	@Override
 	public Menu getMenu() throws PortalException {
 		Menu menu = new Menu();
@@ -168,6 +174,31 @@ public class DefaultDLViewFileVersionDisplayContext
 		menu.setDirection("left-side");
 		menu.setMarkupView("lexicon");
 		menu.setMenuItems(_getMenuItems());
+		menu.setScroll(false);
+		menu.setShowWhenSingleIcon(true);
+
+		return menu;
+	}
+
+	@Override
+	public Menu getMenu(
+			HttpServletRequest request, StagedGroupedModel stagedGroupedModel)
+		throws PortalException {
+
+		List<MenuItem> menuItems = _getMenuItems();
+
+		ExportImportChangesetDisplayContext
+			exportImportChangesetDisplayContext =
+				new ExportImportChangesetDisplayContext(request);
+
+		exportImportChangesetDisplayContext.addSingleAssetPublishMenuItem(
+			menuItems, stagedGroupedModel);
+
+		Menu menu = new Menu();
+
+		menu.setDirection("left-side");
+		menu.setMarkupView("lexicon");
+		menu.setMenuItems(menuItems);
 		menu.setScroll(false);
 		menu.setShowWhenSingleIcon(true);
 

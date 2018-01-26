@@ -71,4 +71,4 @@ else {
 }
 %>
 
-<liferay-ui:menu menu="<%= dlViewFileVersionDisplayContext.getMenu() %>" />
+<liferay-ui:menu menu="<%= dlViewFileVersionDisplayContext.getMenu(request, fileShortcut != null ? fileShortcut : fileEntry) %>" />

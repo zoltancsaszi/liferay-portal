@@ -62,4 +62,6 @@ DLFileEntryType fileEntryType = (DLFileEntryType)row.getObject();
 
 		<liferay-ui:icon-delete url="<%= deleteURL %>" />
 	</c:if>
+
+	<liferay-export-import-changeset:publish-entity className="<%= DLFileEntryType.class.getName() %>" groupId="<%= fileEntryType.getGroupId() %>" uuid="<%= fileEntryType.getUuid() %>" />
 </liferay-ui:icon-menu>

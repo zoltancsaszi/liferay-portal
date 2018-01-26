@@ -34,5 +34,7 @@ dependencies {
 	provided project(":apps:forms-and-workflow:dynamic-data-mapping:dynamic-data-mapping-api")
 	provided project(":apps:web-experience:asset:asset-api")
 	provided project(":apps:web-experience:asset:asset-taglib")
+	provided project(":apps:web-experience:export-import:export-import-changeset-api")
+	provided project(":apps:web-experience:export-import:export-import-changeset-taglib")
 	provided project(":apps:web-experience:trash:trash-api")
 }
