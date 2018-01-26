@@ -50,7 +50,7 @@ public class ChangesetManagerImpl implements ChangesetManager {
 
 	@Override
 	public void addChangeset(Changeset changeset) {
-		Objects.nonNull(changeset);
+		Objects.requireNonNull(changeset);
 
 		String changesetUuid = changeset.getUuid();
 
@@ -84,7 +84,7 @@ public class ChangesetManagerImpl implements ChangesetManager {
 	}
 
 	@Override
-	public void publishChangeset(
+	public long publishChangeset(
 		Changeset changeset, ChangesetEnvironment environment) {
 
 		addChangeset(changeset);
@@ -94,13 +94,13 @@ public class ChangesetManagerImpl implements ChangesetManager {
 		Group scopeGroup = _groupLocalService.fetchGroup(groupId);
 
 		if (!scopeGroup.isStagingGroup() && !scopeGroup.isStagedRemotely()) {
-			return;
+			return 0;
 		}
 
 		String portletId = environment.getPortletId();
 
 		if (!scopeGroup.isStagedPortlet(portletId)) {
-			return;
+			return 0;
 		}
 
 		long liveGroupId = 0;
@@ -124,10 +124,9 @@ public class ChangesetManagerImpl implements ChangesetManager {
 		Stream<Map.Entry<String, String>> entryStream = entrySet.stream();
 
 		entryStream.forEach(
-			entry -> {
-				parameterMap.put(
-					entry.getKey(), new String[] {entry.getValue()});
-			});
+			entry -> parameterMap.put(
+				entry.getKey(), new String[] {entry.getValue()})
+		);
 
 		User user = _userLocalService.fetchUser(environment.getUserId());
 
@@ -146,11 +145,13 @@ public class ChangesetManagerImpl implements ChangesetManager {
 						ExportImportConfigurationConstants.TYPE_PUBLISH_PORTLET,
 						settingsMap);
 
-			long backgroundTaskId = _staging.publishPortlet(
+			return _staging.publishPortlet(
 				user.getUserId(), exportImportConfiguration);
 		}
 		catch (PortalException pe) {
 			pe.printStackTrace();
+
+			return 0;
 		}
 	}
 
