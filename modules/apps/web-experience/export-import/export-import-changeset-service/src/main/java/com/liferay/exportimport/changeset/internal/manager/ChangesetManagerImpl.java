@@ -52,7 +52,7 @@ public class ChangesetManagerImpl implements ChangesetManager {
 
 	@Override
 	public void addChangeset(Changeset changeset) {
-		Objects.nonNull(changeset);
+		Objects.requireNonNull(changeset);
 
 		String changesetUuid = changeset.getUuid();
 
@@ -127,10 +127,9 @@ public class ChangesetManagerImpl implements ChangesetManager {
 		Stream<Map.Entry<String, String>> entryStream = entrySet.stream();
 
 		entryStream.forEach(
-			entry -> {
-				parameterMap.put(
-					entry.getKey(), new String[] {entry.getValue()});
-			});
+			entry -> parameterMap.put(
+				entry.getKey(), new String[] {entry.getValue()})
+		);
 
 		User user = _userLocalService.fetchUser(
 			changesetEnvironment.getUserId());
