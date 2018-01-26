@@ -14,6 +14,8 @@
 
 package com.liferay.exportimport.changeset.web.internal.portlet.action;
 
+import com.liferay.exportimport.changeset.Changeset;
+import com.liferay.exportimport.changeset.ChangesetManager;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.changeset.exception.ExportImportEntityException;
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
@@ -21,6 +23,8 @@ import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationCo
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
@@ -116,6 +120,7 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortalException {
 
+		String changesetUuid = StringPool.BLANK;
 		String[] exportingEntities;
 
 		if (Validator.isNotNull(
@@ -131,6 +136,23 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 			long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
 			long groupId = ParamUtil.getLong(actionRequest, "groupId");
 			String uuid = ParamUtil.getString(actionRequest, "uuid");
+
+			Changeset.Builder changesetBuilder = Changeset.create();
+
+			Changeset changeset = changesetBuilder.addStagedModel(
+				() -> {
+					String className = _portal.getClassName(classNameId);
+
+					StagedModelDataHandler stagedModelDataHandler =
+						StagedModelDataHandlerRegistryUtil.
+							getStagedModelDataHandler(className);
+
+					return stagedModelDataHandler.
+						fetchStagedModelByUuidAndGroupId(uuid, groupId);
+				}
+			).build();
+
+			changesetUuid = changeset.getUuid();
 
 			StringBundler sb = new StringBundler(5);
 
@@ -154,7 +176,7 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 		Map<String, String[]> parameterMap =
 			ExportImportConfigurationParameterMapFactory.buildParameterMap();
 
-		parameterMap.put("exportingEntities", exportingEntities);
+		parameterMap.put("changesetUuid", new String[] {changesetUuid});
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -244,6 +266,9 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportImportEntityMVCActionCommand.class);
+
+	@Reference
+	private ChangesetManager _changesetManager;
 
 	@Reference
 	private ExportImportConfigurationLocalService
