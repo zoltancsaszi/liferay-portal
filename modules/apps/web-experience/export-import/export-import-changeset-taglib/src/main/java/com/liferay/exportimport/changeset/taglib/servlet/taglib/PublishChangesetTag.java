@@ -16,12 +16,14 @@ package com.liferay.exportimport.changeset.taglib.servlet.taglib;
 
 import com.liferay.exportimport.changeset.Changeset;
 import com.liferay.exportimport.changeset.ChangesetManager;
-import com.liferay.exportimport.changeset.ChangesetManagerUtil;
 import com.liferay.exportimport.changeset.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,8 +71,13 @@ public class PublishChangesetTag extends IncludeTag {
 		_portletId = portletId;
 		_changesetUuid = _changeset.getUuid();
 
-		ChangesetManager changesetManager =
-			ChangesetManagerUtil.getChangesetManager();
+		Registry registry = RegistryUtil.getRegistry();
+
+		ServiceReference<ChangesetManager> changesetManagerServiceReference =
+			registry.getServiceReference(ChangesetManager.class);
+
+		ChangesetManager changesetManager = registry.getService(
+			changesetManagerServiceReference);
 
 		changesetManager.addChangeset(_changeset);
 

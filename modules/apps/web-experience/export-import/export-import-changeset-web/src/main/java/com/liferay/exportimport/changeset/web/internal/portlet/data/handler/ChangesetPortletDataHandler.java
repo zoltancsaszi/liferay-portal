@@ -16,6 +16,7 @@ package com.liferay.exportimport.changeset.web.internal.portlet.data.handler;
 
 import com.liferay.exportimport.changeset.Changeset;
 import com.liferay.exportimport.changeset.ChangesetManager;
+import com.liferay.exportimport.changeset.ChangesetManagerUtil;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.DataLevel;

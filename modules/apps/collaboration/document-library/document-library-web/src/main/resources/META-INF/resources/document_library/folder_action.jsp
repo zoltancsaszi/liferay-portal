@@ -91,6 +91,8 @@ boolean view = false;
 if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 	view = true;
 }
+
+List<StagedModel> entries = DLFolderUtil.getFolderEntries(themeDisplay.getScopeGroupId(), folder);
 %>
 
 <c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
@@ -385,6 +387,16 @@ if ((row == null) && portletName.equals(DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 					<liferay-ui:icon-delete url="<%= deleteURL %>" />
 				</c:otherwise>
 			</c:choose>
+		</c:if>
+
+		<c:if test="<%= (folder != null) %>">
+			<liferay-export-import-changeset:create var="folderChangeset">
+				<liferay-export-import-changeset:add-entity stagedModel="<%= folder %>" />
+
+				<liferay-export-import-changeset:add-entities stagedModels="<%= entries %>" />
+			</liferay-export-import-changeset:create>
+
+			<liferay-export-import-changeset:publish-changeset changeset="<%= folderChangeset %>" />
 		</c:if>
 	</liferay-ui:icon-menu>
 
