@@ -39,6 +39,7 @@
 		<description>Creates a change set and assigns it to the given variable name.</description>
 		<name>create</name>
 		<tag-class>com.liferay.exportimport.changeset.taglib.servlet.taglib.CreateTag</tag-class>
+		<tei-class>com.liferay.exportimport.changeset.taglib.servlet.taglib.CreateTei</tei-class>
 		<body-content>JSP</body-content>
 		<attribute>
 			<description>A variable name to which the change set will be assigned to.</description>

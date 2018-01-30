@@ -15,20 +15,23 @@
 package com.liferay.exportimport.changeset.taglib.servlet.taglib;
 
 import com.liferay.exportimport.changeset.Changeset;
-import com.liferay.exportimport.changeset.ChangesetEnvironment;
 import com.liferay.exportimport.changeset.ChangesetManager;
 import com.liferay.exportimport.changeset.ChangesetManagerUtil;
+import com.liferay.exportimport.changeset.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.taglib.TagSupport;
+import com.liferay.taglib.util.IncludeTag;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
 
 /**
  * @author Mate Thurzo
  */
-public class PublishChangesetTag extends TagSupport {
+public class PublishChangesetTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -62,13 +65,14 @@ public class PublishChangesetTag extends TagSupport {
 			portletId = portletDisplay.getRootPortletId();
 		}
 
-		ChangesetEnvironment.Builder builder = ChangesetEnvironment.create(
-			groupId, portletId);
+		_groupId = groupId;
+		_portletId = portletId;
+		_changesetUuid = _changeset.getUuid();
 
 		ChangesetManager changesetManager =
 			ChangesetManagerUtil.getChangesetManager();
 
-		changesetManager.publishChangeset(_changeset, builder.create());
+		changesetManager.addChangeset(_changeset);
 
 		return EVAL_PAGE;
 	}
@@ -81,12 +85,46 @@ public class PublishChangesetTag extends TagSupport {
 		_groupId = groupId;
 	}
 
+	@Override
+	public void setPageContext(PageContext pageContext) {
+		super.setPageContext(pageContext);
+
+		servletContext = ServletContextUtil.getServletContext();
+	}
+
 	public void setPortletId(String portletId) {
 		_portletId = portletId;
 	}
 
+	@Override
+	protected void cleanUp() {
+		_changesetUuid = StringPool.BLANK;
+		_groupId = 0;
+	}
+
+	@Override
+	protected String getPage() {
+		return _PAGE;
+	}
+
+	@Override
+	protected void setAttributes(HttpServletRequest request) {
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-changeset:changeset-uuid",
+			_changesetUuid);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-changeset:groupId",
+			_groupId);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-changeset:portlet-id",
+			_portletId);
+	}
+
+	private static final String _PAGE = "/publish_changeset/page.jsp";
+
 	private Changeset _changeset;
+	private String _changesetUuid = StringPool.BLANK;
 	private long _groupId;
-	private String _portletId;
+	private String _portletId = StringPool.BLANK;
 
 }

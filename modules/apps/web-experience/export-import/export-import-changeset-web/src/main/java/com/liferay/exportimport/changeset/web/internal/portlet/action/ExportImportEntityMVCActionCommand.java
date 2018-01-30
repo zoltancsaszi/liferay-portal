@@ -16,6 +16,7 @@ package com.liferay.exportimport.changeset.web.internal.portlet.action;
 
 import com.liferay.exportimport.changeset.Changeset;
 import com.liferay.exportimport.changeset.ChangesetManager;
+import com.liferay.exportimport.changeset.constants.ChangesetConstants;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.changeset.exception.ExportImportEntityException;
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
@@ -81,7 +82,9 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 
 		String cmd = ParamUtil.getString(actionRequest, "cmd");
 
-		if (cmd.equals(Constants.EXPORT) || cmd.equals(Constants.PUBLISH)) {
+		if (cmd.equals(Constants.EXPORT) || cmd.equals(Constants.PUBLISH) ||
+			cmd.equals(ChangesetConstants.CMD_PUBLISH_CHANGESET)) {
+
 			_processExportAndPublishAction(actionRequest, actionResponse);
 		}
 		else {
@@ -128,6 +131,11 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 
 			exportingEntities = ParamUtil.getStringValues(
 				actionRequest, "exportingEntities");
+		}
+		else if (Validator.isNotNull(
+					actionRequest.getParameter("changesetUuid"))) {
+
+			changesetUuid = ParamUtil.getString(actionRequest, "changesetUuid");
 		}
 		else if (Validator.isNotNull(
 					actionRequest.getParameter("classNameId")) &&
@@ -210,7 +218,9 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 				_exportImportLocalService.exportPortletInfoAsFileInBackground(
 					themeDisplay.getUserId(), exportImportConfiguration);
 		}
-		else if (cmd.equals(Constants.PUBLISH)) {
+		else if (cmd.equals(Constants.PUBLISH) ||
+				 cmd.equals(ChangesetConstants.CMD_PUBLISH_CHANGESET)) {
+
 			Group scopeGroup = themeDisplay.getScopeGroup();
 
 			if (!scopeGroup.isStagingGroup() &&
