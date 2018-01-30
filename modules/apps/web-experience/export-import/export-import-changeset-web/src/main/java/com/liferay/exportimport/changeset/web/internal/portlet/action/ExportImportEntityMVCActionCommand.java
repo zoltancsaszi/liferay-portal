@@ -170,6 +170,8 @@ public class ExportImportEntityMVCActionCommand extends BaseMVCActionCommand {
 			sb.append(StringPool.POUND);
 			sb.append(uuid);
 
+			_changesetManager.addChangeset(changeset);
+
 			exportingEntities = new String[] {sb.toString()};
 		}
 		else {
