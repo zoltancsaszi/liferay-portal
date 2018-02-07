@@ -15,7 +15,6 @@
 package com.liferay.staging.taglib.servlet.taglib;
 
 import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.staging.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
@@ -27,7 +26,7 @@ import javax.servlet.jsp.PageContext;
  * @author Peter Borkuti
  */
 @ProviderType
-public class ProcessInProgressTag extends IncludeTag {
+public class ProcessDurationTag extends IncludeTag {
 
 	public void setBackgroundTask(BackgroundTask backgroundTask) {
 		_backgroundTask = backgroundTask;
@@ -58,15 +57,14 @@ public class ProcessInProgressTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute(
-			"liferay-staging:process-in-progress:backgroundTask",
-			_backgroundTask);
+			"liferay-staging:process-duration:backgroundTask", _backgroundTask);
 		request.setAttribute(
-				"liferay-staging:process-in-progress:listView", _listView);
+			"liferay-staging:process-duration:listView", _listView);
 	}
 
-	private static final String _PAGE = "/process_in_progress/page.jsp";
+	private static final String _PAGE = "/process_duration/page.jsp";
 
 	private BackgroundTask _backgroundTask;
-	private boolean _listView = false;
+	private boolean _listView;
 
 }
