@@ -222,22 +222,22 @@ public class JournalArticleStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long groupId = GetterUtil.getLong(
+		long originalGroupId = GetterUtil.getLong(
 			referenceElement.attributeValue("group-id"));
 
-		groupId = MapUtil.getLong(groupIds, groupId);
+		long groupId = MapUtil.getLong(groupIds, originalGroupId);
 
 		String articleArticleId = referenceElement.attributeValue("article-id");
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
-		JournalArticle existingArticle = fetchExistingArticle(
-			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
-			preloaded);
+		JournalArticle existingArticle = fetchMissingReference(uuid, groupId);
 
 		if (existingArticle == null) {
 			return false;
 		}
+
+		groupIds.put(originalGroupId, existingArticle.getGroupId());
 
 		return true;
 	}
@@ -405,10 +405,10 @@ public class JournalArticleStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long groupId = GetterUtil.getLong(
+		long originalGroupId = GetterUtil.getLong(
 			referenceElement.attributeValue("group-id"));
 
-		groupId = MapUtil.getLong(groupIds, groupId);
+		long groupId = MapUtil.getLong(groupIds, originalGroupId);
 
 		String articleArticleId = referenceElement.attributeValue("article-id");
 		boolean preloaded = GetterUtil.getBoolean(
@@ -416,24 +416,27 @@ public class JournalArticleStagedModelDataHandler
 
 		JournalArticle existingArticle = null;
 
-		existingArticle = fetchExistingArticle(
-			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
-			preloaded);
+		existingArticle = fetchMissingReference(uuid, groupId);
 
-		Map<String, String> articleArticleIds =
-			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
-				JournalArticle.class + ".articleId");
+		if (existingArticle != null) {
+			groupIds.put(originalGroupId, existingArticle.getGroupId());
 
-		articleArticleIds.put(articleArticleId, existingArticle.getArticleId());
+			Map<String, String> articleArticleIds =
+				(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
+					JournalArticle.class + ".articleId");
 
-		Map<Long, Long> articleIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				JournalArticle.class);
+			articleArticleIds.put(
+				articleArticleId, existingArticle.getArticleId());
 
-		long articleId = GetterUtil.getLong(
-			referenceElement.attributeValue("class-pk"));
+			Map<Long, Long> articleIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					JournalArticle.class);
 
-		articleIds.put(articleId, existingArticle.getId());
+			long articleId = GetterUtil.getLong(
+				referenceElement.attributeValue("class-pk"));
+
+			articleIds.put(articleId, existingArticle.getId());
+		}
 	}
 
 	@Override
