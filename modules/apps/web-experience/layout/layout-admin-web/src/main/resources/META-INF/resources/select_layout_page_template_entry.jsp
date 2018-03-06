@@ -90,6 +90,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 				<portlet:param name="groupId" value="<%= String.valueOf(layoutsAdminDisplayContext.getGroupId()) %>" />
 				<portlet:param name="parentLayoutId" value="<%= String.valueOf(layoutsAdminDisplayContext.getParentLayoutId()) %>" />
 				<portlet:param name="privateLayout" value="<%= String.valueOf(layoutsAdminDisplayContext.isPrivateLayout()) %>" />
+				<portlet:param name="explicitCreation" value="<%= String.valueOf(true) %>" />
 			</portlet:actionURL>
 
 			<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as modalCommands">
