@@ -411,12 +411,17 @@ public class JournalArticleStagedModelDataHandler
 		long groupId = MapUtil.getLong(groupIds, originalGroupId);
 
 		String articleArticleId = referenceElement.attributeValue("article-id");
+
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
-		JournalArticle existingArticle = null;
+		JournalArticle existingArticle = fetchExistingArticle(
+			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
+			preloaded);
 
-		existingArticle = fetchMissingReference(uuid, groupId);
+		if (existingArticle == null) {
+			existingArticle = fetchMissingReference(uuid, groupId);
+		}
 
 		if (existingArticle != null) {
 			groupIds.put(originalGroupId, existingArticle.getGroupId());
