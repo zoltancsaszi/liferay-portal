@@ -24,6 +24,8 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.test.util.lar.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.journal.model.JournalArticle;
@@ -41,15 +43,21 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
@@ -79,6 +87,59 @@ public class JournalArticleStagedModelDataHandlerTest
 	@Override
 	public boolean isAssetPrioritySupported() {
 		return true;
+	}
+
+	@Test
+	public void testArticleFetchFromParentGroup() throws Exception {
+		initExport();
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			stagingGroup.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		String articleId = journalArticle.getArticleId();
+
+		Group childGroup = GroupTestUtil.addGroup(stagingGroup.getGroupId());
+
+		StagedModelDataHandler<JournalArticle> stagedModelDataHandler =
+			(StagedModelDataHandler<JournalArticle>)
+				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
+					JournalArticle.class.getName());
+
+		Element element = SAXReaderUtil.createElement(
+			JournalArticle.class.getSimpleName());
+
+		element.addAttribute("uuid", journalArticle.getUuid());
+		element.addAttribute(
+			"article-resource-uuid", journalArticle.getArticleResourceUuid());
+		element.addAttribute(
+			"group-id", String.valueOf(childGroup.getGroupId()));
+		element.addAttribute("article-id", journalArticle.getArticleId());
+		element.addAttribute("preloaded", String.valueOf(false));
+		element.addAttribute(
+			"classPK", String.valueOf(journalArticle.getPrimaryKey()));
+		element.addAttribute(
+			"live-group-id", String.valueOf(liveGroup.getGroupId()));
+
+		stagedModelDataHandler.importMissingReference(
+			portletDataContext, element);
+
+		Map<String, String> articleArticleIds =
+			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
+				JournalArticle.class + ".articleId");
+
+		String importedArticleId = StringPool.BLANK;
+
+		Assert.assertEquals(1, articleArticleIds.size());
+
+		for (Map.Entry<String, String> entry : articleArticleIds.entrySet()) {
+			importedArticleId = entry.getKey();
+		}
+
+		GroupLocalServiceUtil.deleteGroup(childGroup);
+		JournalArticleLocalServiceUtil.deleteArticle(journalArticle);
+
+		Assert.assertEquals(articleId, importedArticleId);
 	}
 
 	@Test
