@@ -7,6 +7,7 @@ copyLibs {
 
 dependencies {
 	provided project(":apps:collaboration:bookmarks:bookmarks-test")
+	provided project(":apps:web-experience:export-import:export-import-api")
 	provided project(":apps:web-experience:journal:journal-test")
 
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
