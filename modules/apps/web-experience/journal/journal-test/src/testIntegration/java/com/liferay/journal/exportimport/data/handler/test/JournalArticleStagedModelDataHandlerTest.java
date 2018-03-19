@@ -53,7 +53,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Element;
@@ -130,7 +129,8 @@ public class JournalArticleStagedModelDataHandlerTest
 
 		String importedArticleId = StringPool.BLANK;
 
-		Assert.assertEquals(1, articleArticleIds.size());
+		Assert.assertEquals(
+			articleArticleIds.toString(), 1, articleArticleIds.size());
 
 		for (Map.Entry<String, String> entry : articleArticleIds.entrySet()) {
 			importedArticleId = entry.getKey();
