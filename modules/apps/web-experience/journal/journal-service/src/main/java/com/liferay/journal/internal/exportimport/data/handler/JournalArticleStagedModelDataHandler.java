@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -231,7 +232,9 @@ public class JournalArticleStagedModelDataHandler
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
-		JournalArticle existingArticle = fetchMissingReference(uuid, groupId);
+		JournalArticle existingArticle = fetchExistingArticle(
+			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
+			preloaded);
 
 		if (existingArticle == null) {
 			return false;
@@ -418,10 +421,6 @@ public class JournalArticleStagedModelDataHandler
 		JournalArticle existingArticle = fetchExistingArticle(
 			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
 			preloaded);
-
-		if (existingArticle == null) {
-			existingArticle = fetchMissingReference(uuid, groupId);
-		}
 
 		if (existingArticle != null) {
 			groupIds.put(originalGroupId, existingArticle.getGroupId());
@@ -948,12 +947,46 @@ public class JournalArticleStagedModelDataHandler
 		String articleId, String newArticleId, double version,
 		boolean preloaded) {
 
-		JournalArticle article = fetchExistingArticle(
-			articleResourceUuid, groupId, articleId, newArticleId, preloaded);
+		JournalArticle article = null;
 
-		if (article != null) {
+		Group originalGroup = _groupLocalService.fetchGroup(groupId);
+
+		Group group = originalGroup;
+
+		if (group == null) {
+			return null;
+		}
+
+		while (group != null) {
+			article = fetchExistingArticle(
+				articleResourceUuid, group.getGroupId(), articleId,
+				newArticleId, preloaded);
+
+			if (article != null) {
+				break;
+			}
+			else {
+				group = group.getParentGroup();
+			}
+		}
+
+		if (article == null) {
+			long companyId = originalGroup.getCompanyId();
+
+			group = _groupLocalService.fetchGroup(
+				companyId, String.valueOf(companyId));
+
+			if (group != null) {
+				article = fetchExistingArticle(
+					articleResourceUuid, group.getGroupId(), articleId,
+					newArticleId, preloaded);
+			}
+		}
+
+		if ((article != null) && !isStagedModelInTrash(article)) {
 			article = fetchExistingArticleVersion(
-				articleUuid, groupId, article.getArticleId(), version);
+				articleUuid, article.getGroupId(), article.getArticleId(),
+				version);
 		}
 
 		return article;
@@ -1022,6 +1055,11 @@ public class JournalArticleStagedModelDataHandler
 		DDMTemplateLocalService ddmTemplateLocalService) {
 
 		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
 	}
 
 	@Reference(unbind = "-")
@@ -1132,6 +1170,7 @@ public class JournalArticleStagedModelDataHandler
 	private ConfigurationProvider _configurationProvider;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DDMTemplateLocalService _ddmTemplateLocalService;
+	private GroupLocalService _groupLocalService;
 	private ImageLocalService _imageLocalService;
 	private ExportImportContentProcessor<String>
 		_journalArticleExportImportContentProcessor;
