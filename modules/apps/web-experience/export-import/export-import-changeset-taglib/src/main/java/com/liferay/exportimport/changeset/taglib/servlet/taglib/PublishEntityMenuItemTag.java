@@ -111,6 +111,16 @@ public class PublishEntityMenuItemTag extends IncludeTag {
 			"liferay-export-import-changeset:publish-entity-menu-item:" +
 				"changesetUuid",
 			_changesetUuid);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-entity-menu-item:" +
+				"className",
+			_className);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-entity-menu-item:groupId",
+			_groupId);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-entity-menu-item:uuid",
+			_uuid);
 	}
 
 	private static final String _PAGE = "/publish_entity_menu_item/page.jsp";
