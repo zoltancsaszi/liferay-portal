@@ -41,13 +41,14 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.staging.constants.StagingProcessesPortletKeys;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
-import java.util.Locale;
-import java.util.ResourceBundle;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Zoltan Csaszi
@@ -67,8 +68,8 @@ public class StagingUserNotificationHandler
 
 	@Override
 	protected String getBody(
-		UserNotificationEvent userNotificationEvent,
-		ServiceContext serviceContext)
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		Locale locale = _portal.getLocale(serviceContext.getRequest());
@@ -99,8 +100,8 @@ public class StagingUserNotificationHandler
 
 		String message =
 			"x-" +
-			ExportImportConfigurationConstants.getTypeLabel(
-				exportImportConfiguration.getType());
+				ExportImportConfigurationConstants.getTypeLabel(
+					exportImportConfiguration.getType());
 
 		int status = jsonObject.getInt("status");
 
@@ -112,7 +113,7 @@ public class StagingUserNotificationHandler
 		}
 		else {
 			return "Unable to process notification: " +
-				   HtmlUtil.escape(jsonObject.toString());
+				HtmlUtil.escape(jsonObject.toString());
 		}
 
 		long backgroundTaskId = jsonObject.getLong("backgroundTaskId");
@@ -129,8 +130,8 @@ public class StagingUserNotificationHandler
 
 	@Override
 	protected String getLink(
-		UserNotificationEvent userNotificationEvent,
-		ServiceContext serviceContext)
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		PortletURL renderURL = PortletURLFactoryUtil.create(
@@ -180,4 +181,5 @@ public class StagingUserNotificationHandler
 
 	@Reference(target = "(bundle.symbolic.name=com.liferay.staging.lang)")
 	private ResourceBundleLoader _resourceBundleLoader;
+
 }

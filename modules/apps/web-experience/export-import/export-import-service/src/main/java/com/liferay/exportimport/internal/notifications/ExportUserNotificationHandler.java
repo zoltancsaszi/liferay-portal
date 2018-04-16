@@ -33,20 +33,21 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.notifications.BaseUserNotificationHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
-
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
-import java.util.Locale;
-import java.util.ResourceBundle;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Akos Thurzo
@@ -56,8 +57,7 @@ import java.util.ResourceBundle;
 	property = "javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
 	service = UserNotificationHandler.class
 )
-public class ExportUserNotificationHandler
-	extends BaseUserNotificationHandler {
+public class ExportUserNotificationHandler extends BaseUserNotificationHandler {
 
 	public ExportUserNotificationHandler() {
 		setOpenDialog(true);
@@ -66,8 +66,8 @@ public class ExportUserNotificationHandler
 
 	@Override
 	protected String getBody(
-		UserNotificationEvent userNotificationEvent,
-		ServiceContext serviceContext)
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		Locale locale = _portal.getLocale(serviceContext.getRequest());
@@ -98,8 +98,8 @@ public class ExportUserNotificationHandler
 
 		String message =
 			"x-" +
-			ExportImportConfigurationConstants.getTypeLabel(
-				exportImportConfiguration.getType());
+				ExportImportConfigurationConstants.getTypeLabel(
+					exportImportConfiguration.getType());
 
 		int status = jsonObject.getInt("status");
 
@@ -111,7 +111,7 @@ public class ExportUserNotificationHandler
 		}
 		else {
 			return "Unable to process notification: " +
-				   HtmlUtil.escape(jsonObject.toString());
+				HtmlUtil.escape(jsonObject.toString());
 		}
 
 		long backgroundTaskId = jsonObject.getLong("backgroundTaskId");
@@ -128,8 +128,8 @@ public class ExportUserNotificationHandler
 
 	@Override
 	protected String getLink(
-		UserNotificationEvent userNotificationEvent,
-		ServiceContext serviceContext)
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		PortletURL renderURL = PortletURLFactoryUtil.create(
