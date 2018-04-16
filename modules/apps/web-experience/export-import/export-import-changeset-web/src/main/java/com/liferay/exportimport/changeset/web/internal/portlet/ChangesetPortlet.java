@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.scopeable=false",
+		"javax.portlet.display-name=Single Asset Publication",
 		"javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=power-user,user"
