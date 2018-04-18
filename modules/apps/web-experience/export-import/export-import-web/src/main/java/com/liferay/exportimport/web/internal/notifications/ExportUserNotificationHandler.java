@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.exportimport.internal.notifications;
+package com.liferay.exportimport.web.internal.notifications;
 
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
