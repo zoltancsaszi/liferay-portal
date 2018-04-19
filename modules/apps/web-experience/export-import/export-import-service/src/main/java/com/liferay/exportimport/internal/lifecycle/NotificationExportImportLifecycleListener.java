@@ -34,12 +34,12 @@ import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.staging.constants.StagingProcessesPortletKeys;
 
 import java.io.Serializable;
 
 import java.util.Map;
 
-import com.liferay.staging.constants.StagingProcessesPortletKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -124,22 +124,22 @@ public class NotificationExportImportLifecycleListener
 			portletId = settingsPortletId;
 		}
 		else if ((processType ==
-				  ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) ||
+					ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) ||
 				 (processType ==
-				  ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET)) {
+					 ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET)) {
 
 			portletId = ExportImportPortletKeys.EXPORT;
 		}
 		else if ((processType ==
-				  ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT) ||
+					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT) ||
 				 (processType ==
-				  ExportImportConfigurationConstants.TYPE_IMPORT_PORTLET)) {
+					 ExportImportConfigurationConstants.TYPE_IMPORT_PORTLET)) {
 
 			portletId = ExportImportPortletKeys.IMPORT;
 		}
 		else if ((processType ==
-				  ExportImportConfigurationConstants.
-					  TYPE_PUBLISH_LAYOUT_LOCAL) ||
+					ExportImportConfigurationConstants.
+						TYPE_PUBLISH_LAYOUT_LOCAL) ||
 				 (processType ==
 				  ExportImportConfigurationConstants.
 					  TYPE_PUBLISH_LAYOUT_REMOTE) ||

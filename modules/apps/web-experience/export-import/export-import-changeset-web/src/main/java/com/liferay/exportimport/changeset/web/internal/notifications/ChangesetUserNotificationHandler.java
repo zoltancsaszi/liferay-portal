@@ -28,38 +28,40 @@ import org.osgi.service.component.annotations.Reference;
  * @author Zoltan Csaszi
  */
 @Component(
-immediate = true,
-property = "javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
-service = UserNotificationHandler.class
+	immediate = true,
+	property = "javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
+	service = UserNotificationHandler.class
 )
 public class ChangesetUserNotificationHandler
 	extends BaseUserNotificationHandler {
 
-public ChangesetUserNotificationHandler() {
-	setOpenDialog(true);
-	setPortletId(ChangesetPortletKeys.CHANGESET);
-}
+	public ChangesetUserNotificationHandler() {
+		setOpenDialog(true);
+		setPortletId(ChangesetPortletKeys.CHANGESET);
+	}
 
-@Override
-protected String getBody(
-	UserNotificationEvent userNotificationEvent, ServiceContext serviceContext)
-	throws Exception {
+	@Override
+	protected String getBody(
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
+		throws Exception {
 
-	return _exportImportNotificationHelper.getBody(
-	userNotificationEvent, serviceContext.getLocale());
-}
+		return _exportImportNotificationHelper.getBody(
+			userNotificationEvent, serviceContext.getLocale());
+	}
 
-@Override
-protected String getLink(
-	UserNotificationEvent userNotificationEvent, ServiceContext serviceContext)
-	throws Exception {
+	@Override
+	protected String getLink(
+			UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext)
+		throws Exception {
 
-	return _exportImportNotificationHelper.getLink(
-	userNotificationEvent, serviceContext.getLiferayPortletRequest(),
-	serviceContext.getCurrentURL());
-}
+		return _exportImportNotificationHelper.getLink(
+			userNotificationEvent, serviceContext.getLiferayPortletRequest(),
+			serviceContext.getCurrentURL());
+	}
 
-@Reference
-private ExportImportNotificationHelper _exportImportNotificationHelper;
+	@Reference
+	private ExportImportNotificationHelper _exportImportNotificationHelper;
 
 }

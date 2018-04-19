@@ -25,23 +25,24 @@ import org.osgi.service.component.annotations.Component;
  * @author Zoltan Csaszi
  */
 @Component(
-immediate = true,
-property = "javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
-service = UserNotificationDefinition.class
+	immediate = true,
+	property = "javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
+	service = UserNotificationDefinition.class
 )
 public class SingleAssetPublicationFinishedUserNotificationDefinition
 	extends UserNotificationDefinition {
 
-public SingleAssetPublicationFinishedUserNotificationDefinition() {
-	super(
-	ChangesetPortletKeys.CHANGESET, 0,
-	UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
-	"receive-a-notification-when-someone-finishes-a-single-asset-" +
-		"publication");
+	public SingleAssetPublicationFinishedUserNotificationDefinition() {
+		super(
+			ChangesetPortletKeys.CHANGESET, 0,
+			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
+			"receive-a-notification-when-someone-finishes-a-single-asset-" +
+				"publication");
 
-	addUserNotificationDeliveryType(
-	new UserNotificationDeliveryType(
-		"website", UserNotificationDeliveryConstants.TYPE_WEBSITE, true, true));
-}
+		addUserNotificationDeliveryType(
+			new UserNotificationDeliveryType(
+				"website", UserNotificationDeliveryConstants.TYPE_WEBSITE, true,
+				true));
+	}
 
 }

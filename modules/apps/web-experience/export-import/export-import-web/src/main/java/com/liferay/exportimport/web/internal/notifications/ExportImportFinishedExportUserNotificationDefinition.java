@@ -25,22 +25,23 @@ import org.osgi.service.component.annotations.Component;
  * @author Zoltan Csaszi
  */
 @Component(
-immediate = true,
-property = "javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
-service = UserNotificationDefinition.class
+	immediate = true,
+	property = "javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
+	service = UserNotificationDefinition.class
 )
 public class ExportImportFinishedExportUserNotificationDefinition
 	extends UserNotificationDefinition {
 
-public ExportImportFinishedExportUserNotificationDefinition() {
-	super(
-	ExportImportPortletKeys.EXPORT, 0,
-	UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
-	"receive-a-notification-when-someone-finishes-an-export");
+	public ExportImportFinishedExportUserNotificationDefinition() {
+		super(
+			ExportImportPortletKeys.EXPORT, 0,
+			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
+			"receive-a-notification-when-someone-finishes-an-export");
 
-	addUserNotificationDeliveryType(
-	new UserNotificationDeliveryType(
-		"website", UserNotificationDeliveryConstants.TYPE_WEBSITE, true, true));
-}
+		addUserNotificationDeliveryType(
+			new UserNotificationDeliveryType(
+				"website", UserNotificationDeliveryConstants.TYPE_WEBSITE, true,
+				true));
+	}
 
 }
