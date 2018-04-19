@@ -14,10 +14,15 @@
 
 package com.liferay.exportimport.internal.lifecycle;
 
+import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleEvent;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleListener;
 import com.liferay.exportimport.kernel.lifecycle.ProcessAwareExportImportLifecycleListener;
+import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
@@ -26,6 +31,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
+import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -33,6 +39,7 @@ import java.io.Serializable;
 
 import java.util.Map;
 
+import com.liferay.staging.constants.StagingProcessesPortletKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -95,14 +102,78 @@ public class NotificationExportImportLifecycleListener
 		long exportImportConfigurationId = GetterUtil.getLong(
 			taskContextMap.get("exportImportConfigurationId"));
 
-		_userNotificationEventLocalService.sendUserNotificationEvents(
-			backgroundTask.getUserId(), ExportImportPortletKeys.EXPORT_IMPORT,
-			UserNotificationDeliveryConstants.TYPE_WEBSITE,
-			getPayload(backgroundTaskId, exportImportConfigurationId, status));
+		ExportImportConfiguration exportImportConfiguration =
+			_exportImportConfigurationLocalService.
+				fetchExportImportConfiguration(exportImportConfigurationId);
+
+		if (exportImportConfiguration == null) {
+			return;
+		}
+
+		int processType = exportImportConfiguration.getType();
+
+		String portletId = StringPool.BLANK;
+
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		String settingsPortletId = GetterUtil.getString(
+			settingsMap.get("portletId"));
+
+		if (settingsPortletId.equals(ChangesetPortletKeys.CHANGESET)) {
+			portletId = settingsPortletId;
+		}
+		else if ((processType ==
+				  ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET)) {
+
+			portletId = ExportImportPortletKeys.EXPORT;
+		}
+		else if ((processType ==
+				  ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.TYPE_IMPORT_PORTLET)) {
+
+			portletId = ExportImportPortletKeys.IMPORT;
+		}
+		else if ((processType ==
+				  ExportImportConfigurationConstants.
+					  TYPE_PUBLISH_LAYOUT_LOCAL) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.
+					  TYPE_PUBLISH_LAYOUT_REMOTE) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.
+					  TYPE_PUBLISH_PORTLET_LOCAL) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.
+					  TYPE_PUBLISH_PORTLET_REMOTE) ||
+				 (processType ==
+				  ExportImportConfigurationConstants.TYPE_PUBLISH_PORTLET)) {
+
+			portletId = StagingProcessesPortletKeys.STAGING_PROCESSES;
+		}
+
+		boolean deliverExportWebsite = UserNotificationManagerUtil.isDeliver(
+			backgroundTask.getUserId(), portletId, 0, 0,
+			UserNotificationDeliveryConstants.TYPE_WEBSITE);
+
+		if (deliverExportWebsite) {
+			_userNotificationEventLocalService.sendUserNotificationEvents(
+				backgroundTask.getUserId(), portletId,
+				UserNotificationDeliveryConstants.TYPE_WEBSITE,
+				getPayload(
+					backgroundTaskId, exportImportConfigurationId, status));
+		}
 	}
 
 	@Reference
 	private BackgroundTaskLocalService _backgroundTaskLocalService;
+
+	@Reference
+	private ExportImportConfigurationLocalService
+		_exportImportConfigurationLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;

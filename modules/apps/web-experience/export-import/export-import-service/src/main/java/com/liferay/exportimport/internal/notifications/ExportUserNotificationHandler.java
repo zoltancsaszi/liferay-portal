@@ -15,37 +15,28 @@
 package com.liferay.exportimport.internal.notifications;
 
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
-import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.notifications.ExportImportNotificationHelper;
-import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
-import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplayFactory;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.notifications.BaseUserNotificationHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
-import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Akos Thurzo
+ * @author Zoltan Csaszi
  */
 @Component(
 	immediate = true,
-	property = "javax.portlet.name=" + ExportImportPortletKeys.EXPORT_IMPORT,
+	property = "javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
 	service = UserNotificationHandler.class
 )
-public class ExportImportUserNotificationHandler
-	extends BaseUserNotificationHandler {
+public class ExportUserNotificationHandler extends BaseUserNotificationHandler {
 
-	public ExportImportUserNotificationHandler() {
+	public ExportUserNotificationHandler() {
 		setOpenDialog(true);
-		setPortletId(ExportImportPortletKeys.EXPORT_IMPORT);
+		setPortletId(ExportImportPortletKeys.EXPORT);
 	}
 
 	@Override
@@ -69,29 +60,7 @@ public class ExportImportUserNotificationHandler
 			serviceContext.getCurrentURL());
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExportImportUserNotificationHandler.class);
-
-	@Reference
-	private BackgroundTaskDisplayFactory _backgroundTaskDisplayFactory;
-
-	@Reference
-	private BackgroundTaskLocalService _backgroundTaskLocalService;
-
-	@Reference
-	private ExportImportConfigurationLocalService
-		_exportImportConfigurationLocalService;
-
 	@Reference
 	private ExportImportNotificationHelper _exportImportNotificationHelper;
-
-	@Reference
-	private Portal _portal;
-
-	@Reference
-	private PortletLocalService _portletLocalService;
-
-	@Reference(target = "(bundle.symbolic.name=com.liferay.staging.lang)")
-	private ResourceBundleLoader _resourceBundleLoader;
 
 }

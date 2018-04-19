@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * @author Akos Thurzo
  * @author Zoltan Csaszi
  */
 @Component(immediate = true, service = ExportImportNotificationHelper.class)
