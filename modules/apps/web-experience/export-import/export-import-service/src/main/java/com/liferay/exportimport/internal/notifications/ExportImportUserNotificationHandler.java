@@ -15,36 +15,19 @@
 package com.liferay.exportimport.internal.notifications;
 
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
-import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.background.task.model.BackgroundTask;
+import com.liferay.exportimport.notifications.ExportImportNotificationHelper;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
-import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay;
 import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplayFactory;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.notifications.BaseUserNotificationHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -71,60 +54,8 @@ public class ExportImportUserNotificationHandler
 			ServiceContext serviceContext)
 		throws Exception {
 
-		Locale locale = _portal.getLocale(serviceContext.getRequest());
-
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale);
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userNotificationEvent.getPayload());
-
-		ExportImportConfiguration exportImportConfiguration = null;
-
-		try {
-			exportImportConfiguration =
-				_exportImportConfigurationLocalService.
-					getExportImportConfiguration(
-						jsonObject.getLong("exportImportConfigurationId"));
-		}
-		catch (PortalException pe) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
-			}
-
-			return LanguageUtil.get(
-				resourceBundle,
-				"the-process-referenced-by-this-notification-does-not-exist");
-		}
-
-		String message =
-			"x-" +
-				ExportImportConfigurationConstants.getTypeLabel(
-					exportImportConfiguration.getType());
-
-		int status = jsonObject.getInt("status");
-
-		if (status == BackgroundTaskConstants.STATUS_SUCCESSFUL) {
-			message += "-process-finished-successfully";
-		}
-		else if (status == BackgroundTaskConstants.STATUS_FAILED) {
-			message += "-process-failed";
-		}
-		else {
-			return "Unable to process notification: " +
-				HtmlUtil.escape(jsonObject.toString());
-		}
-
-		long backgroundTaskId = jsonObject.getLong("backgroundTaskId");
-
-		BackgroundTaskDisplay backgroundTaskDisplay =
-			_backgroundTaskDisplayFactory.getBackgroundTaskDisplay(
-				backgroundTaskId);
-
-		String processName = backgroundTaskDisplay.getDisplayName(
-			serviceContext.getRequest());
-
-		return LanguageUtil.format(resourceBundle, message, processName);
+		return _exportImportNotificationHelper.getBody(
+			userNotificationEvent, serviceContext.getLocale());
 	}
 
 	@Override
@@ -133,30 +64,9 @@ public class ExportImportUserNotificationHandler
 			ServiceContext serviceContext)
 		throws Exception {
 
-		PortletURL renderURL = PortletURLFactoryUtil.create(
-			serviceContext.getRequest(), ExportImportPortletKeys.EXPORT_IMPORT,
-			PortletRequest.RENDER_PHASE);
-
-		renderURL.setParameter("mvcPath", "/view_export_import.jsp");
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userNotificationEvent.getPayload());
-
-		long backgroundTaskId = jsonObject.getLong("backgroundTaskId");
-
-		BackgroundTask backgroundTask =
-			_backgroundTaskLocalService.fetchBackgroundTask(backgroundTaskId);
-
-		if (backgroundTask == null) {
-			return StringPool.BLANK;
-		}
-
-		renderURL.setParameter(
-			"backgroundTaskId", String.valueOf(backgroundTaskId));
-
-		renderURL.setParameter("backURL", serviceContext.getCurrentURL());
-
-		return renderURL.toString();
+		return _exportImportNotificationHelper.getLink(
+			userNotificationEvent, serviceContext.getLiferayPortletRequest(),
+			serviceContext.getCurrentURL());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -171,6 +81,9 @@ public class ExportImportUserNotificationHandler
 	@Reference
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
+
+	@Reference
+	private ExportImportNotificationHelper _exportImportNotificationHelper;
 
 	@Reference
 	private Portal _portal;
