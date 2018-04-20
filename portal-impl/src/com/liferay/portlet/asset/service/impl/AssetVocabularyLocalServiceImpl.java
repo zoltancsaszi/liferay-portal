@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.exception.DuplicateVocabularyException;
 import com.liferay.asset.kernel.exception.VocabularyNameException;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.exportimport.kernel.lar.AssetDataException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -492,14 +493,19 @@ public class AssetVocabularyLocalServiceImpl
 
 	protected void validate(long groupId, String name) throws PortalException {
 		if (Validator.isNull(name)) {
-			throw new VocabularyNameException(
-				"Category vocabulary name cannot be null for group " + groupId);
+			AssetDataException e = new AssetDataException(
+				2, new VocabularyNameException());
+
+			e.setData(new String[] {String.valueOf(groupId)});
+			throw e;
 		}
 
 		if (hasVocabulary(groupId, name)) {
-			throw new DuplicateVocabularyException(
-				"A category vocabulary with the name " + name +
-					" already exists");
+			AssetDataException e = new AssetDataException(
+				3, new DuplicateVocabularyException());
+
+			e.setData(new String[] {name});
+			throw e;
 		}
 	}
 

@@ -41,6 +41,7 @@ import com.liferay.exportimport.kernel.exception.LARTypeException;
 import com.liferay.exportimport.kernel.exception.LayoutImportException;
 import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
+import com.liferay.exportimport.kernel.lar.AssetDataException;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.MissingReference;
@@ -1458,6 +1459,24 @@ public class StagingImpl implements Staging {
 				String.valueOf(
 					UploadServletRequestConfigurationHelperUtil.getMaxSize()));
 			errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
+		}
+		else if (e instanceof AssetDataException) {
+			AssetDataException ade = (AssetDataException)e;
+
+			if (ade.getType() == AssetDataException.VOCABULARY_NAME_IS_NULL) {
+				errorMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-vocabulary-name-cannot-be-null-for-group-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.VOCABULARY_NAME_DUPLICATED) {
+
+				errorMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-vocabulary-with-the-name-x-already-exists",
+					ade.getData());
+			}
 		}
 		else {
 			errorMessage = e.getLocalizedMessage();
