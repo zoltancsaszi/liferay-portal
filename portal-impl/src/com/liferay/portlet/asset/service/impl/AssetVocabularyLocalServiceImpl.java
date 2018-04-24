@@ -494,18 +494,18 @@ public class AssetVocabularyLocalServiceImpl
 	protected void validate(long groupId, String name) throws PortalException {
 		if (Validator.isNull(name)) {
 			AssetDataException e = new AssetDataException(
-				2, new VocabularyNameException());
+				AssetDataException.VOCABULARY_NAME_IS_NULL);
 
 			e.setData(new String[] {String.valueOf(groupId)});
-			throw e;
+			throw new VocabularyNameException(e);
 		}
 
 		if (hasVocabulary(groupId, name)) {
 			AssetDataException e = new AssetDataException(
-				3, new DuplicateVocabularyException());
+				AssetDataException.VOCABULARY_NAME_DUPLICATED);
 
 			e.setData(new String[] {name});
-			throw e;
+			throw new DuplicateVocabularyException(e);
 		}
 	}
 

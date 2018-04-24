@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.exception.AssetCategoryNameException;
 import com.liferay.asset.kernel.exception.DuplicateCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
+import com.liferay.exportimport.kernel.lar.AssetDataException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -50,7 +51,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.asset.service.base.AssetCategoryLocalServiceBaseImpl;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
@@ -754,34 +754,30 @@ public class AssetCategoryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
-			StringBundler sb = new StringBundler(5);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.CATEGORY_NAME_IS_NULL);
 
-			sb.append(
-				"Asset category name cannot be null for key {categoryId=");
-			sb.append(categoryId);
-			sb.append(", vocabularyId=");
-			sb.append(vocabularyId);
-			sb.append("}");
-
-			throw new AssetCategoryNameException(
-				StringBundler.concat(
-					"Category name cannot be null for category ",
-					String.valueOf(categoryId), " and vocabulary ",
-					String.valueOf(vocabularyId)));
+			e.setData(
+				new String[] {
+					String.valueOf(categoryId), String.valueOf(vocabularyId)
+				});
+			throw new AssetCategoryNameException(e);
 		}
 
 		AssetCategory category = assetCategoryPersistence.fetchByP_N_V(
 			parentCategoryId, name, vocabularyId);
 
 		if ((category != null) && (category.getCategoryId() != categoryId)) {
-			StringBundler sb = new StringBundler(4);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.CATEGORY_NAME_DUPLICATED);
 
-			sb.append("There is another category named ");
-			sb.append(name);
-			sb.append(" as a child of category ");
-			sb.append(parentCategoryId);
+			e.setData(
+				new String[] {
+					name, String.valueOf(vocabularyId),
+					String.valueOf(parentCategoryId)
+				});
 
-			throw new DuplicateCategoryException(sb.toString());
+			throw new DuplicateCategoryException(e);
 		}
 	}
 

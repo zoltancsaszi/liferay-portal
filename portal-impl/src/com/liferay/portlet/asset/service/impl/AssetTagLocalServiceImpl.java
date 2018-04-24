@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.exception.AssetTagNameException;
 import com.liferay.asset.kernel.exception.DuplicateTagException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.exportimport.kernel.lar.AssetDataException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -104,8 +105,13 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 		name = StringUtil.toLowerCase(StringUtil.trim(name));
 
 		if (hasTag(groupId, name)) {
+			AssetDataException ade = new AssetDataException(
+				AssetDataException.ASSET_TAG_NAME_DUPLICATED);
+
+			ade.setData(new String[] {name});
+
 			throw new DuplicateTagException(
-				"A tag with the name " + name + " already exists");
+				"A tag with the name " + name + " already exists", ade);
 		}
 
 		validate(name);
@@ -703,8 +709,13 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 		name = StringUtil.toLowerCase(StringUtil.trim(name));
 
 		if (!name.equals(tag.getName()) && hasTag(tag.getGroupId(), name)) {
+			AssetDataException ade = new AssetDataException(
+				AssetDataException.ASSET_TAG_NAME_DUPLICATED);
+
+			ade.setData(new String[] {name});
+
 			throw new DuplicateTagException(
-				"A tag with the name " + name + " already exists");
+				"A tag with the name " + name + " already exists", ade);
 		}
 
 		String tagName = tag.getName();
@@ -715,8 +726,13 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 			if ((existingAssetTag != null) &&
 				(existingAssetTag.getTagId() != tagId)) {
 
+				AssetDataException ade = new AssetDataException(
+					AssetDataException.ASSET_TAG_NAME_DUPLICATED);
+
+				ade.setData(new String[] {name});
+
 				throw new DuplicateTagException(
-					"A tag with the name " + name + " already exists");
+					"A tag with the name " + name + " already exists", ade);
 			}
 		}
 
@@ -824,15 +840,23 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 	protected void validate(String name) throws PortalException {
 		if (Validator.isNull(name)) {
+			AssetDataException ade = new AssetDataException(
+				AssetDataException.ASSET_TAG_NAME_IS_NULL);
+
 			throw new AssetTagNameException(
-				"Tag name cannot be an empty string");
+				"Tag name cannot be an empty string", ade);
 		}
 
 		if (!AssetUtil.isValidWord(name)) {
+			AssetDataException ade = new AssetDataException(
+				AssetDataException.ASSET_TAG_INVALID_CHARACTER);
+
+			ade.setData(new String[] {name});
+
 			throw new AssetTagException(
 				StringUtil.merge(
 					AssetUtil.INVALID_CHARACTERS, StringPool.SPACE),
-				AssetTagException.INVALID_CHARACTER);
+				AssetTagException.INVALID_CHARACTER, ade);
 		}
 	}
 
