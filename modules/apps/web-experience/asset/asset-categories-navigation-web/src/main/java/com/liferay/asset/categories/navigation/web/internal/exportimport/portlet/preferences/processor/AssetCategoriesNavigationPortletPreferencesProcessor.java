@@ -17,6 +17,7 @@ package com.liferay.asset.categories.navigation.web.internal.exportimport.portle
 import com.liferay.asset.categories.navigation.constants.AssetCategoriesNavigationPortletKeys;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.exportimport.kernel.exception.ExportImportRuntimeException;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
@@ -77,8 +78,17 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 				portletDataContext.getPortletId());
 		}
 		catch (Exception e) {
-			throw new PortletDataException(
-				"Unable to update portlet preferences during export", e);
+			ExportImportRuntimeException eire =
+				new ExportImportRuntimeException(StringPool.BLANK, e);
+
+			eire.setMessageKey(
+				"unable-to-update-portlet-preferences-during-export");
+
+			PortletDataException pde = new PortletDataException(eire);
+
+			pde.setType(PortletDataException.EXPORT_STAGED_MODEL);
+
+			throw pde;
 		}
 	}
 
@@ -93,8 +103,17 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception e) {
-			throw new PortletDataException(
-				"Unable to update portlet preferences during import", e);
+			ExportImportRuntimeException eire =
+				new ExportImportRuntimeException(StringPool.BLANK, e);
+
+			eire.setMessageKey(
+				"unable-to-update-portlet-preferences-during-import");
+
+			PortletDataException pde = new PortletDataException(eire);
+
+			pde.setType(PortletDataException.EXPORT_STAGED_MODEL);
+
+			throw pde;
 		}
 	}
 

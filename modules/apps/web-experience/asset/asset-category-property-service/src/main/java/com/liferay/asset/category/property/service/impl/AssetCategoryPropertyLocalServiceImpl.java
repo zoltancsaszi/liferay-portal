@@ -19,6 +19,7 @@ import com.liferay.asset.category.property.exception.CategoryPropertyValueExcept
 import com.liferay.asset.category.property.exception.DuplicateCategoryPropertyException;
 import com.liferay.asset.category.property.model.AssetCategoryProperty;
 import com.liferay.asset.category.property.service.base.AssetCategoryPropertyLocalServiceBaseImpl;
+import com.liferay.exportimport.kernel.lar.AssetDataException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portlet.asset.util.AssetUtil;
@@ -42,8 +43,13 @@ public class AssetCategoryPropertyLocalServiceImpl
 		validate(key, value);
 
 		if (hasCategoryProperty(categoryId, key)) {
-			throw new DuplicateCategoryPropertyException(
-				"A category property already exists with the key " + key);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.CATEGORY_PROPERTY_KEY_DUPLICATED,
+				new DuplicateCategoryPropertyException());
+
+			e.setData(new String[] {key, String.valueOf(categoryId)});
+
+			throw new DuplicateCategoryPropertyException(e);
 		}
 
 		long categoryPropertyId = counterLocalService.increment();
@@ -143,8 +149,16 @@ public class AssetCategoryPropertyLocalServiceImpl
 		if (!categoryPropertyKey.equals(key) &&
 			hasCategoryProperty(categoryProperty.getCategoryId(), key)) {
 
-			throw new DuplicateCategoryPropertyException(
-				"A category property already exists with the key " + key);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.CATEGORY_PROPERTY_KEY_DUPLICATED,
+				new DuplicateCategoryPropertyException());
+
+			e.setData(
+				new String[] {
+					key, String.valueOf(categoryProperty.getCategoryId())
+				});
+
+			throw new DuplicateCategoryPropertyException(e);
 		}
 
 		validate(key, value);
@@ -185,11 +199,23 @@ public class AssetCategoryPropertyLocalServiceImpl
 
 	protected void validate(String key, String value) throws PortalException {
 		if (!AssetUtil.isValidWord(key)) {
-			throw new CategoryPropertyKeyException("Invalid key " + key);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.PROPERTY_INVALID_KEY,
+				new CategoryPropertyKeyException());
+
+			e.setData(new String[] {key});
+
+			throw new CategoryPropertyKeyException(e);
 		}
 
 		if (!AssetUtil.isValidWord(value)) {
-			throw new CategoryPropertyValueException("Invalid value " + value);
+			AssetDataException e = new AssetDataException(
+				AssetDataException.PROPERTY_INVALID_VALUE,
+				new CategoryPropertyValueException());
+
+			e.setData(new String[] {value, key});
+
+			throw new CategoryPropertyValueException(e);
 		}
 	}
 
