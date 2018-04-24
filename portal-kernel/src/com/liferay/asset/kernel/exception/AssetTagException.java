@@ -29,8 +29,20 @@ public class AssetTagException extends PortalException {
 		_type = type;
 	}
 
+	public AssetTagException(int type, Throwable cause) {
+		super(cause);
+
+		_type = type;
+	}
+
 	public AssetTagException(String message, int type) {
 		super(message);
+
+		_type = type;
+	}
+
+	public AssetTagException(String message, int type, Throwable cause) {
+		super(message, cause);
 
 		_type = type;
 	}

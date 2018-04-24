@@ -17,16 +17,33 @@ package com.liferay.exportimport.kernel.lar;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.StagedModel;
 
 /**
- * @author Raymond Augé
+ * @author Zoltan Csaszi
  */
 @ProviderType
-public class AssetDataException extends PortalException {
+public class AssetDataException extends PortletDataException {
+
+	public static final int ASSET_TAG_AT_LEAST_ONE = 10;
+
+	public static final int ASSET_TAG_INVALID_CHARACTER = 9;
+
+	public static final int ASSET_TAG_NAME_DUPLICATED = 12;
+
+	public static final int ASSET_TAG_NAME_IS_NULL = 11;
+
+	public static final int CATEGORY_NAME_DUPLICATED = 5;
+
+	public static final int CATEGORY_NAME_IS_NULL = 4;
+
+	public static final int CATEGORY_PROPERTY_KEY_DUPLICATED = 8;
 
 	public static final int DEFAULT = 1;
+
+	public static final int PROPERTY_INVALID_KEY = 6;
+
+	public static final int PROPERTY_INVALID_VALUE = 7;
 
 	public static final int VOCABULARY_NAME_DUPLICATED = 3;
 
