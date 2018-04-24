@@ -119,6 +119,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -1276,6 +1277,96 @@ public class StagingImpl implements Staging {
 			warningMessagesJSONArray = getWarningMessagesJSONArray(
 				locale, missingReferences.getWeakMissingReferences());
 		}
+		else if (e instanceof AssetDataException) {
+			AssetDataException ade = (AssetDataException)e;
+
+			String localizedMessage = e.getLocalizedMessage();
+
+			if (ade.getType() == AssetDataException.VOCABULARY_NAME_IS_NULL) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-vocabulary-name-cannot-be-null-for-group-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.VOCABULARY_NAME_DUPLICATED) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-vocabulary-with-the-name-x-already-exists",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.CATEGORY_NAME_IS_NULL) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-name-cannot-be-null-for-category-x-in-" +
+						"vocabulary-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.CATEGORY_NAME_DUPLICATED) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-with-the-name-x-already-exists-in-vocabulary-x-" +
+						"as-child-category-of-x",
+					ade.getData());
+			}
+			else if (ade.getType() == AssetDataException.PROPERTY_INVALID_KEY) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "category-property-invalid-key-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.PROPERTY_INVALID_VALUE) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"category-property-invalid-value-x-for-key-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.CATEGORY_PROPERTY_KEY_DUPLICATED) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"a-category-property-already-exists-with-the-key-x-for-" +
+						"category-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.ASSET_TAG_INVALID_CHARACTER) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "tag-name-contains-invalid-characters-x",
+					ade.getData());
+			}
+			else if (ade.getType() ==
+						AssetDataException.ASSET_TAG_NAME_IS_NULL) {
+
+				localizedMessage = LanguageUtil.get(
+					resourceBundle, "tag-name-cannot-be-an-empty-string");
+			}
+			else if (ade.getType() ==
+						AssetDataException.ASSET_TAG_NAME_DUPLICATED) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "a-tag-with-that-name-already-exists-x",
+					ade.getData());
+			}
+
+			errorMessage = LanguageUtil.format(
+				locale,
+				"the-following-error-in-x-while-importing-its-data-has-" +
+					"stopped-the-process-x",
+				new String[] {
+					_portal.getPortletTitle(ade.getPortletId(), locale),
+					localizedMessage
+				},
+				false);
+		}
 		else if (e instanceof PortletDataException) {
 			PortletDataException pde = (PortletDataException)e;
 
@@ -1353,6 +1444,37 @@ public class StagingImpl implements Staging {
 				}
 			}
 			else if (pde.getType() ==
+						PortletDataException.EXPORT_STAGED_MODEL) {
+
+				String localizedMessage = pde.getLocalizedMessage();
+
+				if ((pde.getCause() instanceof ExportImportRuntimeException) &&
+					Validator.isNull(pde.getMessage())) {
+
+					ExportImportRuntimeException eire =
+						(ExportImportRuntimeException)pde.getCause();
+
+					if (ArrayUtil.getLength(eire.getData()) > 0) {
+						localizedMessage = LanguageUtil.format(
+							resourceBundle, eire.getMessageKey(),
+							eire.getData());
+					}
+					else {
+						localizedMessage = LanguageUtil.get(
+							resourceBundle, eire.getMessageKey());
+					}
+				}
+
+				errorMessage = LanguageUtil.format(
+					resourceBundle,
+					"the-x-x-could-not-be-exported-because-of-the-following-" +
+						"error-x",
+					new String[] {
+						modelResource, referrerDisplayName, localizedMessage
+					},
+					false);
+			}
+			else if (pde.getType() ==
 						PortletDataException.IMPORT_DATA_GROUP_ELEMENT) {
 
 				errorMessage = LanguageUtil.format(
@@ -1386,6 +1508,37 @@ public class StagingImpl implements Staging {
 						},
 						false);
 				}
+			}
+			else if (pde.getType() ==
+						PortletDataException.IMPORT_STAGED_MODEL) {
+
+				String localizedMessage = pde.getLocalizedMessage();
+
+				if ((pde.getCause() instanceof ExportImportRuntimeException) &&
+					Validator.isNull(pde.getMessage())) {
+
+					ExportImportRuntimeException eire =
+						(ExportImportRuntimeException)pde.getCause();
+
+					if (ArrayUtil.getLength(eire.getData()) > 0) {
+						localizedMessage = LanguageUtil.format(
+							resourceBundle, eire.getMessageKey(),
+							eire.getData());
+					}
+					else {
+						localizedMessage = LanguageUtil.get(
+							resourceBundle, eire.getMessageKey());
+					}
+				}
+
+				errorMessage = LanguageUtil.format(
+					resourceBundle,
+					"the-x-x-could-not-be-imported-because-of-the-following-" +
+						"error-x",
+					new String[] {
+						modelResource, referrerDisplayName, localizedMessage
+					},
+					false);
 			}
 			else if (pde.getType() == PortletDataException.INVALID_GROUP) {
 				errorMessage = LanguageUtil.format(
@@ -1474,24 +1627,6 @@ public class StagingImpl implements Staging {
 				String.valueOf(
 					UploadServletRequestConfigurationHelperUtil.getMaxSize()));
 			errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
-		}
-		else if (e instanceof AssetDataException) {
-			AssetDataException ade = (AssetDataException)e;
-
-			if (ade.getType() == AssetDataException.VOCABULARY_NAME_IS_NULL) {
-				errorMessage = LanguageUtil.format(
-					resourceBundle,
-					"category-vocabulary-name-cannot-be-null-for-group-x",
-					ade.getData());
-			}
-			else if (ade.getType() ==
-						AssetDataException.VOCABULARY_NAME_DUPLICATED) {
-
-				errorMessage = LanguageUtil.format(
-					resourceBundle,
-					"category-vocabulary-with-the-name-x-already-exists",
-					ade.getData());
-			}
 		}
 		else {
 			errorMessage = e.getLocalizedMessage();
