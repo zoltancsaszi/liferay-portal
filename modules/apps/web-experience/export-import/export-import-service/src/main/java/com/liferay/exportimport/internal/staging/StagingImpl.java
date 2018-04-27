@@ -31,6 +31,7 @@ import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.exportimport.kernel.background.task.BackgroundTaskExecutorNames;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.exportimport.kernel.exception.ExportImportContentProcessorException;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
 import com.liferay.exportimport.kernel.exception.ExportImportDocumentException;
@@ -119,6 +120,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -1299,6 +1301,177 @@ public class StagingImpl implements Staging {
 			errorType = ServletResponseConstants.SC_FILE_CUSTOM_EXCEPTION;
 			warningMessagesJSONArray = getWarningMessagesJSONArray(
 				locale, missingReferences.getWeakMissingReferences());
+		}
+		else if (e instanceof DLDataException) {
+			DLDataException dde = (DLDataException)e;
+
+			String localizedMessage = e.getLocalizedMessage();
+
+			if (dde.getType() == DLDataException.INVALID_FOLDER_NAME) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "invalid-folder-name-x", dde.getData());
+			}
+			else if (dde.getType() == DLDataException.INVALID_FILE_NAME) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "invalid-file-name-x", dde.getData());
+			}
+			else if (dde.getType() == DLDataException.INVALID_FILE_SIZE) {
+				if (ArrayUtil.getLength(dde.getData()) > 1) {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle,
+						"x-exceeds-the-maximum-permitted-size-of-x-for-file-x",
+						dde.getData());
+				}
+				else {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle, "invalid-file-size-x", dde.getData());
+				}
+			}
+			else if (dde.getType() ==
+						DLDataException.INVALID_SOURCE_FIlE_EXTENSION) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "invalid-source-file-extension-x",
+					dde.getData());
+			}
+			else if (dde.getType() ==
+						DLDataException.INVALID_FILE_VERSION_LABEL) {
+
+				if (ArrayUtil.getLength(dde.getData()) > 1) {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle,
+						"version-label-x-invalid-for-file-entry",
+						dde.getData());
+				}
+				else if (ArrayUtil.getLength(dde.getData()) == 1) {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle,
+						"version-label-of-file-x-cannot-be-null",
+						dde.getData());
+				}
+				else {
+					localizedMessage = LanguageUtil.get(
+						resourceBundle, "invalid-version-label");
+				}
+			}
+			else if (dde.getType() == DLDataException.INVALID_ROOT_FOLDER) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"portlet-x-refers-to-an-invalid-root-folder-id-x",
+					dde.getData());
+			}
+			else if (dde.getType() ==
+						DLDataException.UNABLE_TO_UPDATE_PORTLET_PREFERENCES) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "unable-to-update-portlet-preferences",
+					cause.getLocalizedMessage());
+			}
+			else if (dde.getType() == DLDataException.CMIS_FILE_NAME_IS_NULL) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"cmis-file-title-x-in-folder-x-cannot-be-null",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.CMIS_FILE_DUPLICATED) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"cmis-a-file-named-x-already-exists-in-folder-x",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.CMIS_FOLDER_DUPLICATED) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"cmis-a-folder-named-x-already-exists-in-folder-x",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.FILE_TITLE_IS_NULL) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "file-title-x-in-folder-x-cannot-be-null",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.PWC_FILE_VERSION) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle,
+					"unable-to-delete-a-private-working-copy-of-file-version-" +
+						"of-file-x",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.IMAGE_SIZE_EXCEPTION) {
+				localizedMessage = LanguageUtil.get(
+					resourceBundle, "invalid-image-size");
+			}
+			else if (dde.getType() == DLDataException.NO_SUCH_FOLDER) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "no-such-folder-x", dde.getData());
+			}
+			else if (dde.getType() == DLDataException.DUPLICATED_FOLDER_NAME) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "a-folder-named-x-already-exists",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.DUPLICATED_FILE_NAME) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "a-file-named-x-already-exists",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.INVALID_FILE_ENTRY_TYPE) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "invalid-file-entry-type-x-for-folder-x",
+					dde.getData());
+			}
+			else if (dde.getType() ==
+						DLDataException.FILE_EXTENSION_EXCEEDS_LIMIT) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "extension-x-exceeds-max-length-of-x",
+					dde.getData());
+			}
+			else if (dde.getType() ==
+						DLDataException.REQUIRED_FILE_ENTRY_TYPE) {
+
+				if (ArrayUtil.getLength(dde.getData()) > 0) {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle,
+						"there-are-file-entries-of-file-entry-type-x",
+						dde.getData());
+				}
+				else {
+					localizedMessage = LanguageUtil.get(
+						resourceBundle, "file-entry-type-ids-empty");
+				}
+			}
+			else if (dde.getType() ==
+						DLDataException.DUPLICATED_FILE_ENTRY_TYPE) {
+
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "a-file-entry-type-x-already-exists",
+					dde.getData());
+			}
+			else if (dde.getType() == DLDataException.NO_SUCH_METADATA_SET) {
+				if (ArrayUtil.getLength(dde.getData()) > 0) {
+					localizedMessage = LanguageUtil.format(
+						resourceBundle, "no-such-ddm-structure-id-x",
+						dde.getData());
+				}
+				else {
+					localizedMessage = LanguageUtil.get(
+						resourceBundle, "ddm-structure-id-array-is-empty");
+				}
+
+				localizedMessage = LanguageUtil.get(
+					resourceBundle, "ddm-structure-id-array-is-empty");
+			}
+
+			errorMessage = LanguageUtil.format(
+				locale,
+				"the-following-error-in-x-while-importing-its-data-has-" +
+					"stopped-the-process-x",
+				new String[] {
+					_portal.getPortletTitle(dde.getPortletId(), locale),
+					localizedMessage
+				},
+				false);
 		}
 		else if (e instanceof PortletDataException) {
 			PortletDataException pde = (PortletDataException)e;
