@@ -18,6 +18,7 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
@@ -103,6 +104,13 @@ public class DLExportImportPortletPreferencesProcessor
 
 				_log.error(sb.toString());
 
+				DLDataException dde = new DLDataException(
+					DLDataException.INVALID_ROOT_FOLDER);
+
+				dde.setData(new String[] {
+					portletId, String.valueOf(rootFolderId)
+				});
+
 				throw new PortletDataException(sb.toString(), pe);
 			}
 
@@ -144,8 +152,9 @@ public class DLExportImportPortletPreferencesProcessor
 						"rootFolderId", String.valueOf(rootFolderId));
 				}
 				catch (ReadOnlyException roe) {
-					throw new PortletDataException(
-						"Unable to update portlet preferences during import",
+					//"Unable to update portlet preferences during import"
+					throw new DLDataException(
+						DLDataException.UNABLE_TO_UPDATE_PORTLET_PREFERENCES,
 						roe);
 				}
 			}

@@ -23,6 +23,7 @@ import com.liferay.document.library.kernel.exception.InvalidFileVersionException
 import com.liferay.document.library.kernel.exception.SourceFileNameException;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.DLValidator;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelper;
@@ -122,7 +123,12 @@ public final class DLValidatorImpl implements DLValidator {
 		throws FolderNameException {
 
 		if (!isValidName(directoryName)) {
-			throw new FolderNameException(directoryName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FOLDER_NAME);
+
+			dde.setData(new String[] {directoryName});
+
+			throw new FolderNameException(directoryName, dde);
 		}
 	}
 
@@ -145,14 +151,24 @@ public final class DLValidatorImpl implements DLValidator {
 		}
 
 		if (!validFileExtension) {
-			throw new FileExtensionException(fileName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_NAME);
+
+			dde.setData(new String[] {fileName});
+
+			throw new FileExtensionException(fileName, dde);
 		}
 	}
 
 	@Override
 	public void validateFileName(String fileName) throws FileNameException {
 		if (!isValidName(fileName)) {
-			throw new FileNameException(fileName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_NAME);
+
+			dde.setData(new String[] {fileName});
+
+			throw new FileNameException(fileName, dde);
 		}
 
 		if (!DLWebDAVUtil.isRepresentableTitle(fileName)) {
@@ -166,7 +182,12 @@ public final class DLValidatorImpl implements DLValidator {
 		throws FileSizeException {
 
 		if (bytes == null) {
-			throw new FileSizeException(fileName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_SIZE);
+
+			dde.setData(new String[] {fileName});
+
+			throw new FileSizeException(fileName, dde);
 		}
 
 		validateFileSize(fileName, bytes.length);
@@ -177,7 +198,11 @@ public final class DLValidatorImpl implements DLValidator {
 		throws FileSizeException {
 
 		if (file == null) {
-			throw new FileSizeException(fileName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_SIZE);
+
+			dde.setData(new String[] {fileName});
+			throw new FileSizeException(fileName, dde);
 		}
 
 		validateFileSize(fileName, file.length());
@@ -189,12 +214,22 @@ public final class DLValidatorImpl implements DLValidator {
 
 		try {
 			if (is == null) {
+				DLDataException dde = new DLDataException(
+					DLDataException.INVALID_FILE_SIZE);
+
+				dde.setData(new String[] {fileName});
+
 				throw new FileSizeException(fileName);
 			}
 
 			validateFileSize(fileName, is.available());
 		}
 		catch (IOException ioe) {
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_SIZE);
+
+			dde.setData(new String[] {fileName});
+
 			throw new FileSizeException(ioe);
 		}
 	}
@@ -206,11 +241,19 @@ public final class DLValidatorImpl implements DLValidator {
 		long maxSize = _dlConfiguration.fileMaxSize();
 
 		if ((maxSize > 0) && (size > maxSize)) {
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_SIZE);
+
+			dde.setData(new String[] {
+				String.valueOf(size), String.valueOf(maxSize), fileName
+			});
+
 			throw new FileSizeException(
 				StringBundler.concat(
 					String.valueOf(size),
 					" exceeds the maximum permitted size of ",
-					String.valueOf(maxSize), " for file ", fileName));
+					String.valueOf(maxSize), " for file ", fileName),
+				dde);
 		}
 	}
 
@@ -225,7 +268,14 @@ public final class DLValidatorImpl implements DLValidator {
 			PropsValues.DL_FILE_EXTENSIONS_STRICT_CHECK &&
 			!fileExtension.equals(sourceFileExtension)) {
 
-			throw new SourceFileNameException(sourceFileExtension);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_SOURCE_FIlE_EXTENSION);
+
+			dde.setData(new String[] {
+				sourceFileName, sourceFileExtension, fileExtension
+			});
+
+			throw new SourceFileNameException(sourceFileExtension, dde);
 		}
 	}
 
@@ -238,8 +288,13 @@ public final class DLValidatorImpl implements DLValidator {
 		}
 
 		if (!DLUtil.isValidVersion(versionLabel)) {
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_VERSION_LABEL);
+
+			dde.setData(new String[] {versionLabel, "invalid"});
+
 			throw new InvalidFileVersionException(
-				"Invalid version label " + versionLabel);
+				"Invalid version label " + versionLabel, dde);
 		}
 	}
 

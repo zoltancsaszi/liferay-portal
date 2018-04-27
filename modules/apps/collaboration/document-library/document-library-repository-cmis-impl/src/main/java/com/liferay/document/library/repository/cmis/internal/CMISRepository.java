@@ -33,6 +33,7 @@ import com.liferay.document.library.repository.cmis.internal.model.CMISFileEntry
 import com.liferay.document.library.repository.cmis.internal.model.CMISFileVersion;
 import com.liferay.document.library.repository.cmis.internal.model.CMISFolder;
 import com.liferay.document.library.repository.cmis.search.CMISSearchQueryBuilder;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchRepositoryEntryException;
@@ -146,7 +147,14 @@ public class CMISRepository extends BaseCmisRepository {
 
 		if (Validator.isNull(title)) {
 			if (size == 0) {
-				throw new FileNameException("Title is null");
+				DLDataException dde = new DLDataException(
+					DLDataException.CMIS_FILE_NAME_IS_NULL);
+
+				dde.setData(new String[] {
+					sourceFileName, String.valueOf(folderId)
+				});
+
+				throw new FileNameException("Title is null", dde);
 			}
 			else {
 				title = sourceFileName;
@@ -2320,13 +2328,23 @@ public class CMISRepository extends BaseCmisRepository {
 		String objectId = getObjectId(session, folderId, true, title);
 
 		if (objectId != null) {
-			throw new DuplicateFileEntryException(title);
+			DLDataException dde = new DLDataException(
+				DLDataException.CMIS_FILE_DUPLICATED);
+
+			dde.setData(new String[] {title, String.valueOf(folderId)});
+
+			throw new DuplicateFileEntryException(title, dde);
 		}
 
 		objectId = getObjectId(session, folderId, false, title);
 
 		if (objectId != null) {
-			throw new DuplicateFolderNameException(title);
+			DLDataException dde = new DLDataException(
+				DLDataException.CMIS_FOLDER_DUPLICATED);
+
+			dde.setData(new String[] {title, String.valueOf(folderId)});
+
+			throw new DuplicateFolderNameException(title, dde);
 		}
 	}
 
