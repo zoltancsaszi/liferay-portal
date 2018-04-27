@@ -419,6 +419,16 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 				throw (PortletDataException)t.getCause();
 			}
 
+			if (t.getCause() instanceof PortletDataException) {
+				PortletDataException pde = (PortletDataException)t.getCause();
+
+				pde.setPortletId(portletDataContext.getPortletId());
+				pde.setCompanyId(portletDataContext.getCompanyId());
+				pde.setStagedModel(stagedModel);
+
+				throw pde;
+			}
+
 			PortletDataException pde = new PortletDataException(
 				t.getMessage(), t);
 
