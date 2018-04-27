@@ -28,6 +28,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.util.DLValidatorUtil;
 import com.liferay.document.library.kernel.util.comparator.FolderIdComparator;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
@@ -1001,8 +1002,11 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 					RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW) &&
 			fileEntryTypeIds.isEmpty()) {
 
+			DLDataException dde = new DLDataException(
+				DLDataException.REQUIRED_FILE_ENTRY_TYPE);
+
 			throw new RequiredFileEntryTypeException(
-				"File entry type IDs is empty");
+				"File entry type IDs is empty", dde);
 		}
 
 		boolean hasLock = hasFolderLock(userId, folderId);
@@ -1415,14 +1419,24 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			groupId, parentFolderId, name);
 
 		if (dlFileEntry != null) {
-			throw new DuplicateFileEntryException(name);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FILE_NAME);
+
+			dde.setData(new String[] {name});
+
+			throw new DuplicateFileEntryException(name, dde);
 		}
 
 		DLFolder dlFolder = dlFolderPersistence.fetchByG_P_N(
 			groupId, parentFolderId, name);
 
 		if ((dlFolder != null) && (dlFolder.getFolderId() != folderId)) {
-			throw new DuplicateFolderNameException(name);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FOLDER_NAME);
+
+			dde.setData(new String[] {name});
+
+			throw new DuplicateFolderNameException(name, dde);
 		}
 	}
 
@@ -1439,7 +1453,12 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		throws PortalException {
 
 		if (folderName.contains(StringPool.SLASH)) {
-			throw new FolderNameException(folderName);
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FOLDER_NAME);
+
+			dde.setData(new String[] {folderName});
+
+			throw new FolderNameException(folderName, dde);
 		}
 	}
 

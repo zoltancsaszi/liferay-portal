@@ -45,6 +45,7 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.util.ExpandoBridgeUtil;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -164,7 +165,13 @@ public class DLFileEntryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
-			throw new FileNameException("Title is null");
+			DLDataException dde = new DLDataException(
+				DLDataException.FILE_TITLE_IS_NULL);
+
+			dde.setData(new String[] {
+				sourceFileName, String.valueOf(folderId)
+			});
+			throw new FileNameException("Title is null", dde);
 		}
 
 		// File entry
@@ -860,12 +867,20 @@ public class DLFileEntryLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(version)) {
-			throw new InvalidFileVersionException("Version is null");
+			DLDataException dde = new DLDataException(
+				DLDataException.INVALID_FILE_VERSION_LABEL);
+
+			dde.setData(new String[] {String.valueOf(fileEntryId)});
+			throw new InvalidFileVersionException("Version is null", dde);
 		}
 
 		if (version.equals(DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
+			DLDataException dde = new DLDataException(
+				DLDataException.PWC_FILE_VERSION);
+
+			dde.setData(new String[] {String.valueOf(fileEntryId)});
 			throw new InvalidFileVersionException(
-				"Unable to delete a private working copy file version");
+				"Unable to delete a private working copy file version", dde);
 		}
 
 		if (!hasFileEntryLock(userId, fileEntryId)) {
@@ -881,16 +896,22 @@ public class DLFileEntryLocalServiceImpl
 				fileEntryId, version);
 
 			if (!dlFileVersion.isApproved()) {
+				DLDataException dde = new DLDataException(
+					DLDataException.INVALID_FILE_VERSION_LABEL);
+
 				throw new InvalidFileVersionException(
-					"Cannot delete an unapproved file version");
+					"Cannot delete an unapproved file version", dde);
 			}
 			else {
 				int count = dlFileVersionPersistence.countByF_S(
 					fileEntryId, WorkflowConstants.STATUS_APPROVED);
 
 				if (count <= 1) {
+					DLDataException dde = new DLDataException(
+						DLDataException.INVALID_FILE_VERSION_LABEL);
+
 					throw new InvalidFileVersionException(
-						"Cannot delete the only approved file version");
+						"Cannot delete the only approved file version", dde);
 				}
 			}
 
@@ -2030,7 +2051,10 @@ public class DLFileEntryLocalServiceImpl
 			}
 		}
 		catch (IOException ioe) {
-			throw new ImageSizeException(ioe);
+			DLDataException dde = new DLDataException(
+				DLDataException.IMAGE_SIZE_EXCEPTION, ioe);
+
+			throw new ImageSizeException(dde);
 		}
 	}
 
@@ -2164,7 +2188,12 @@ public class DLFileEntryLocalServiceImpl
 				folderId);
 
 			if (groupId != parentDLFolder.getGroupId()) {
-				throw new NoSuchFolderException();
+				DLDataException dde = new DLDataException(
+					DLDataException.NO_SUCH_FOLDER);
+
+				dde.setData(new String[] {String.valueOf(folderId)});
+
+				throw new NoSuchFolderException(dde);
 			}
 		}
 
@@ -2172,7 +2201,12 @@ public class DLFileEntryLocalServiceImpl
 			groupId, folderId, title);
 
 		if (dlFolder != null) {
-			throw new DuplicateFolderNameException(title);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FOLDER_NAME);
+
+			dde.setData(new String[] {title});
+
+			throw new DuplicateFolderNameException(title, dde);
 		}
 
 		DLFileEntry dlFileEntry = dlFileEntryPersistence.fetchByG_F_T(
@@ -2181,7 +2215,12 @@ public class DLFileEntryLocalServiceImpl
 		if ((dlFileEntry != null) &&
 			(dlFileEntry.getFileEntryId() != fileEntryId)) {
 
-			throw new DuplicateFileEntryException(title);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FILE_NAME);
+
+			dde.setData(new String[] {title});
+
+			throw new DuplicateFileEntryException(title, dde);
 		}
 
 		dlFileEntry = dlFileEntryPersistence.fetchByG_F_FN(
@@ -2190,7 +2229,12 @@ public class DLFileEntryLocalServiceImpl
 		if ((dlFileEntry != null) &&
 			(dlFileEntry.getFileEntryId() != fileEntryId)) {
 
-			throw new DuplicateFileEntryException(title);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FILE_NAME);
+
+			dde.setData(new String[] {fileName});
+
+			throw new DuplicateFileEntryException(title, dde);
 		}
 	}
 
@@ -2845,10 +2889,18 @@ public class DLFileEntryLocalServiceImpl
 			}
 		}
 
+		DLDataException dde = new DLDataException(
+			DLDataException.INVALID_FILE_ENTRY_TYPE);
+
+		dde.setData(new String[] {
+			String.valueOf(fileEntryTypeId), String.valueOf(folderId)
+		});
+
 		throw new InvalidFileEntryTypeException(
 			StringBundler.concat(
 				"Invalid file entry type ", String.valueOf(fileEntryTypeId),
-				" for folder ", String.valueOf(folderId)));
+				" for folder ", String.valueOf(folderId)),
+			dde);
 	}
 
 	protected void validateFileExtension(String extension)
@@ -2859,8 +2911,15 @@ public class DLFileEntryLocalServiceImpl
 				DLFileEntry.class.getName(), "extension");
 
 			if (extension.length() > maxLength) {
+				DLDataException dde = new DLDataException(
+					DLDataException.FILE_EXTENSION_EXCEEDS_LIMIT);
+
+				dde.setData(new String[] {
+					extension, String.valueOf(maxLength)
+				});
+
 				throw new FileExtensionException(
-					extension + " exceeds max length of " + maxLength);
+					extension + " exceeds max length of " + maxLength, dde);
 			}
 		}
 	}

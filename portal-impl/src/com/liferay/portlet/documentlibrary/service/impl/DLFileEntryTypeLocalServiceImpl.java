@@ -35,6 +35,7 @@ import com.liferay.dynamic.data.mapping.kernel.DDMStructureManager;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructureManagerUtil;
 import com.liferay.dynamic.data.mapping.kernel.StorageEngineManager;
 import com.liferay.dynamic.data.mapping.kernel.StructureDefinitionException;
+import com.liferay.exportimport.kernel.exception.DLDataException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -206,9 +207,17 @@ public class DLFileEntryTypeLocalServiceImpl
 		if (dlFileEntryPersistence.countByFileEntryTypeId(
 				dlFileEntryType.getFileEntryTypeId()) > 0) {
 
+			DLDataException dde = new DLDataException(
+				DLDataException.REQUIRED_FILE_ENTRY_TYPE);
+
+			dde.setData(new String[] {
+				String.valueOf(dlFileEntryType.getFileEntryTypeId())
+			});
+
 			throw new RequiredFileEntryTypeException(
 				"There are file entries of file entry type " +
-					dlFileEntryType.getFileEntryTypeId());
+					dlFileEntryType.getFileEntryTypeId(),
+				dde);
 		}
 
 		DDMStructure ddmStructure = DDMStructureManagerUtil.fetchStructure(
@@ -802,11 +811,20 @@ public class DLFileEntryTypeLocalServiceImpl
 		if ((dlFileEntryType != null) &&
 			(dlFileEntryType.getFileEntryTypeId() != fileEntryTypeId)) {
 
-			throw new DuplicateFileEntryTypeException(fileEntryTypeKey);
+			DLDataException dde = new DLDataException(
+				DLDataException.DUPLICATED_FILE_ENTRY_TYPE);
+
+			dde.setData(new String[] {fileEntryTypeKey});
+
+			throw new DuplicateFileEntryTypeException(fileEntryTypeKey, dde);
 		}
 
 		if (ddmStructureIds.length == 0) {
-			throw new NoSuchMetadataSetException("DDM structure IDs is empty");
+			DLDataException dde = new DLDataException(
+				DLDataException.NO_SUCH_METADATA_SET);
+
+			throw new NoSuchMetadataSetException(
+				"DDM structure IDs is empty", dde);
 		}
 
 		for (long ddmStructureId : ddmStructureIds) {
@@ -814,8 +832,13 @@ public class DLFileEntryTypeLocalServiceImpl
 				ddmStructureId);
 
 			if (ddmStructure == null) {
+				DLDataException dde = new DLDataException(
+					DLDataException.NO_SUCH_METADATA_SET);
+
+				dde.setData(new String[] {String.valueOf(ddmStructureId)});
+
 				throw new NoSuchMetadataSetException(
-					"{ddmStructureId=" + ddmStructureId);
+					"{ddmStructureId=" + ddmStructureId + "}", dde);
 			}
 		}
 	}
