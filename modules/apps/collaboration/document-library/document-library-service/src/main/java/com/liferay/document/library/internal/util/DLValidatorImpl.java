@@ -219,18 +219,18 @@ public final class DLValidatorImpl implements DLValidator {
 
 				dde.setData(new String[] {fileName});
 
-				throw new FileSizeException(fileName);
+				throw new FileSizeException(fileName, dde);
 			}
 
 			validateFileSize(fileName, is.available());
 		}
 		catch (IOException ioe) {
 			DLDataException dde = new DLDataException(
-				DLDataException.INVALID_FILE_SIZE);
+				DLDataException.INVALID_FILE_SIZE, ioe);
 
 			dde.setData(new String[] {fileName});
 
-			throw new FileSizeException(ioe);
+			throw new FileSizeException(dde);
 		}
 	}
 

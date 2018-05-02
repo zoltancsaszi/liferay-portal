@@ -398,8 +398,13 @@ public class CMISRepository extends BaseCmisRepository {
 			return toFileEntry(newDocument);
 		}
 		catch (CmisObjectNotFoundException confe) {
+			DLDataException dde = new DLDataException(
+				DLDataException.CMIS_NO_SUCH_FOLDER, confe);
+
+			dde.setData(new String[] {String.valueOf(destFolderId)});
+
 			throw new NoSuchFolderException(
-				"No CMIS folder with {folderId=" + destFolderId + "}", confe);
+				"No CMIS folder with {folderId=" + destFolderId + "}", dde);
 		}
 		catch (PortalException | SystemException e) {
 			throw e;

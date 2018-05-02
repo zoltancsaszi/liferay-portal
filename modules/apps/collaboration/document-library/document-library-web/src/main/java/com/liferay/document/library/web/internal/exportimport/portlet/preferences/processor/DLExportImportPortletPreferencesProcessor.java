@@ -105,13 +105,15 @@ public class DLExportImportPortletPreferencesProcessor
 				_log.error(sb.toString());
 
 				DLDataException dde = new DLDataException(
-					DLDataException.INVALID_ROOT_FOLDER);
+					DLDataException.INVALID_ROOT_FOLDER, pe);
+
+				dde.setPortletId(portletId);
 
 				dde.setData(new String[] {
 					portletId, String.valueOf(rootFolderId)
 				});
 
-				throw new PortletDataException(sb.toString(), pe);
+				throw dde;
 			}
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
