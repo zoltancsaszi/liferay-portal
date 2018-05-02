@@ -1385,6 +1385,11 @@ public class StagingImpl implements Staging {
 					"cmis-a-folder-named-x-already-exists-in-folder-x",
 					dde.getData());
 			}
+			else if (dde.getType() == DLDataException.CMIS_NO_SUCH_FOLDER) {
+				localizedMessage = LanguageUtil.format(
+					resourceBundle, "cmis-no-such-folder-with-folder-id-x",
+					dde.getData());
+			}
 			else if (dde.getType() == DLDataException.FILE_TITLE_IS_NULL) {
 				localizedMessage = LanguageUtil.format(
 					resourceBundle, "file-title-x-in-folder-x-cannot-be-null",
