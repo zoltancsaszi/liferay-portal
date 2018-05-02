@@ -269,7 +269,7 @@ public final class DLValidatorImpl implements DLValidator {
 			!fileExtension.equals(sourceFileExtension)) {
 
 			DLDataException dde = new DLDataException(
-				DLDataException.INVALID_SOURCE_FIlE_EXTENSION);
+				DLDataException.INVALID_SOURCE_FILE_EXTENSION);
 
 			dde.setData(new String[] {
 				sourceFileName, sourceFileExtension, fileExtension
