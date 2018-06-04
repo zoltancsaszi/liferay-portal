@@ -3415,7 +3415,7 @@ public class StagingImpl implements Staging {
 				_layoutRevisionLocalService.getLayoutRevisions(
 					layoutSetBranchId, plid, true);
 
-			if (layoutRevisions != null) {
+			if ((layoutRevisions != null) && !layoutRevisions.isEmpty()) {
 				LayoutRevision layoutRevision = layoutRevisions.get(0);
 
 				return layoutRevision.getLayoutRevisionId();
