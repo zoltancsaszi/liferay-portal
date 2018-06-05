@@ -15,6 +15,7 @@
 package com.liferay.staging.configuration.web.internal.portlet;
 
 import com.liferay.exportimport.kernel.service.StagingLocalService;
+import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -150,6 +151,10 @@ public class StagingConfigurationPortlet extends MVCPortlet {
 
 			stagedGroup = liveGroup.isStagedRemotely();
 
+			_staging.validateRemoteGroupIsSame(
+				liveGroup.getGroupId(), remoteGroupId, remoteAddress,
+				remotePort, remotePathContext, secureConnection);
+
 			_stagingLocalService.enableRemoteStaging(
 				themeDisplay.getUserId(), liveGroup, branchingPublic,
 				branchingPrivate, remoteAddress, remotePort, remotePathContext,
@@ -233,6 +238,11 @@ public class StagingConfigurationPortlet extends MVCPortlet {
 		_groupLocalService = groupLocalService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setStaging(Staging staging) {
+		_staging = staging;
+	}
+
 	@Reference
 	protected void setStagingLocalService(
 		StagingLocalService stagingLocalService) {
@@ -258,6 +268,7 @@ public class StagingConfigurationPortlet extends MVCPortlet {
 	@Reference
 	private Portal _portal;
 
+	private Staging _staging;
 	private StagingLocalService _stagingLocalService;
 
 }
