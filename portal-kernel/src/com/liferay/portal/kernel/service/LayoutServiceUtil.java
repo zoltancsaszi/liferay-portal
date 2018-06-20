@@ -912,6 +912,11 @@ public class LayoutServiceUtil {
 			.importPortletInfoInBackground(taskName, portletId, parameterMap, is);
 	}
 
+	public static boolean isLayoutContainsPortletId(long plid, String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().isLayoutContainsPortletId(plid, portletId);
+	}
+
 	/**
 	* Schedules a range of layouts to be published.
 	*

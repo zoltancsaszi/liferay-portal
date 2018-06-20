@@ -666,6 +666,21 @@ public class LayoutServiceSoap {
 		}
 	}
 
+	public static boolean isLayoutContainsPortletId(long plid, String portletId)
+		throws RemoteException {
+		try {
+			boolean returnValue = LayoutServiceUtil.isLayoutContainsPortletId(plid,
+					portletId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Sets the layouts for the group, replacing and prioritizing all layouts of
 	* the parent layout.

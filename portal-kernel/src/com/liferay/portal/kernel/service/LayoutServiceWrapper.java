@@ -930,6 +930,12 @@ public class LayoutServiceWrapper implements LayoutService,
 			parameterMap, is);
 	}
 
+	@Override
+	public boolean isLayoutContainsPortletId(long plid, String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutService.isLayoutContainsPortletId(plid, portletId);
+	}
+
 	/**
 	* Schedules a range of layouts to be published.
 	*

@@ -734,6 +734,10 @@ public interface LayoutService extends BaseService {
 		String portletId, Map<String, String[]> parameterMap, InputStream is)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isLayoutContainsPortletId(long plid, String portletId)
+		throws PortalException;
+
 	/**
 	* Schedules a range of layouts to be published.
 	*
