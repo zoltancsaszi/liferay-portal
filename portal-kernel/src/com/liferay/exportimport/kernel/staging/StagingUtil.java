@@ -120,11 +120,11 @@ public class StagingUtil {
 			userId, stagingGroupId, plid, portletId);
 	}
 
-	public static void getRemoteLayoutPlid(
+	public static long getRemoteLayoutPlid(
 			long userId, long stagingGroupId, long plid)
 		throws PortalException {
 
-		_staging.getRemoteLayoutPlid(userId, stagingGroupId, plid);
+		return _staging.getRemoteLayoutPlid(userId, stagingGroupId, plid);
 	}
 
 	public static long copyFromLive(PortletRequest portletRequest)

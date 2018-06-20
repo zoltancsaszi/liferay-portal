@@ -90,7 +90,7 @@ public interface Staging {
 	public boolean getRemoteLayoutHasPortletId(
 		long userId, long stagingGroupId, long plid, String portletId);
 
-	public void getRemoteLayoutPlid(
+	public long getRemoteLayoutPlid(
 			long userId, long stagingGroupId, long plid)
 		throws PortalException;
 
