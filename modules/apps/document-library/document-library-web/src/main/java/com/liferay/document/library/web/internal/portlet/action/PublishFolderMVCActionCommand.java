@@ -15,22 +15,27 @@
 package com.liferay.document.library.web.internal.portlet.action;
 
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileShortcut;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.exportimport.changeset.Changeset;
 import com.liferay.exportimport.changeset.portlet.action.ExportImportChangesetMVCActionCommand;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.ActionRequest;
@@ -59,13 +64,14 @@ public class PublishFolderMVCActionCommand extends BaseMVCActionCommand {
 
 		final long folderId = ParamUtil.getLong(actionRequest, "folderId");
 
+		DLFolder folder = _dlFolderLocalService.getFolder(folderId);
+
 		Changeset.Builder builder = Changeset.create();
 
 		Changeset changeset = builder.addStagedModel(
 			() -> _getFolder(folderId)
-		).addStagedModelHierarchy(
-			() -> _dlFolderLocalService.fetchFolder(folderId),
-			this::_getFoldersAndFileEntriesAndFileShortcuts
+		).addMultipleStagedModel(
+			() -> _getFolderEntries(folder)
 		).build();
 
 		_exportImportChangesetMVCActionCommand.processPublishAction(
@@ -85,24 +91,53 @@ public class PublishFolderMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private List<Object> _getFoldersAndFileEntriesAndFileShortcuts(
-		DLFolder folder) {
+	private List<StagedModel> _getFolderEntries(DLFolder folder) {
+		List<StagedModel> entries = new ArrayList<>();
 
 		try {
-			return _dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
-				folder.getGroupId(), folder.getFolderId(),
-				WorkflowConstants.STATUS_APPROVED, true, -1, -1);
+			if (folder != null) {
+				QueryDefinition<?> queryDefinition = new QueryDefinition<>(
+					WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null);
+
+				for (Object entry : _dlFolderLocalService.
+						getFoldersAndFileEntriesAndFileShortcuts(
+							folder.getGroupId(), folder.getFolderId(), null,
+							true, queryDefinition)) {
+
+					if (entry instanceof DLFileEntry) {
+						entries.add(
+							_dlAppLocalService.getFileEntry(
+								((DLFileEntry)entry).getPrimaryKey()));
+					}
+					else if (entry instanceof DLFolder) {
+						DLFolder subfolder = (DLFolder)entry;
+
+						entries.add(
+							_dlAppLocalService.getFolder(
+								subfolder.getFolderId()));
+
+						entries.addAll(_getFolderEntries(subfolder));
+					}
+					else if (entry instanceof DLFileShortcut) {
+						entries.add(
+							_dlAppLocalService.getFileShortcut(
+								((DLFileShortcut)entry).getPrimaryKey()));
+					}
+				}
+			}
 		}
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to get folders, file entries, file shortcuts for " +
-						"folder " + folder.getFolderId(),
+						"folder " +
+							folder.getFolderId(),
 					pe);
 			}
-
-			return Collections.emptyList();
 		}
+
+		return entries;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
