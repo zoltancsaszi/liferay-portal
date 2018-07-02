@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -167,11 +168,14 @@ public class PublishFolderMVCActionCommand extends BaseMVCActionCommand {
 			return journalServiceConfiguration.
 				singleAssetPublishIncludeVersionHistory();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
+		catch (ConfigurationException ce) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to retrieve journal service configuration", ce);
+			}
 
-		return false;
+			return false;
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
