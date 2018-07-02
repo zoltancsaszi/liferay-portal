@@ -101,23 +101,7 @@ public class PublishFolderMVCActionCommand extends BaseMVCActionCommand {
 				else if (childObject instanceof JournalArticle) {
 					JournalArticle journalArticle = (JournalArticle)childObject;
 
-					boolean includeVersionHistory = false;
-
-					try {
-						JournalServiceConfiguration
-							journalServiceConfiguration =
-								ConfigurationProviderUtil.
-									getCompanyConfiguration(
-										JournalServiceConfiguration.class,
-										CompanyThreadLocal.getCompanyId());
-
-						includeVersionHistory =
-							journalServiceConfiguration.
-								singleAssetPublishIncludeVersionHistory();
-					}
-					catch (Exception e) {
-						_log.error(e, e);
-					}
+					boolean includeVersionHistory = _isIncludeVersionHistory();
 
 					StagedModelDataHandler<JournalArticle>
 						stagedModelDataHandler = _getStagedModelDataHandler();
@@ -170,6 +154,24 @@ public class PublishFolderMVCActionCommand extends BaseMVCActionCommand {
 		return (StagedModelDataHandler<JournalArticle>)
 			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
 				JournalArticle.class.getName());
+	}
+
+	private boolean _isIncludeVersionHistory() {
+		try {
+			JournalServiceConfiguration journalServiceConfiguration =
+				ConfigurationProviderUtil.
+					getCompanyConfiguration(
+						JournalServiceConfiguration.class,
+						CompanyThreadLocal.getCompanyId());
+
+			return journalServiceConfiguration.
+				singleAssetPublishIncludeVersionHistory();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
