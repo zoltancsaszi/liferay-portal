@@ -197,6 +197,7 @@ else {
 
 	<c:if test="<%= (folder != null) && hasExportImportPortletInfoPermission && inStagingGroup && portletStaged %>">
 		<portlet:actionURL name="/journal/publish_folder" var="publishFolderURL">
+			<portlet:param name="backURL" value="<%= currentURL %>" />
 			<portlet:param name="folderId" value="<%= String.valueOf(folder.getFolderId()) %>" />
 		</portlet:actionURL>
 
