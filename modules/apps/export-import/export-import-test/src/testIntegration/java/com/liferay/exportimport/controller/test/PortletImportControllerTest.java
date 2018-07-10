@@ -16,20 +16,37 @@ package com.liferay.exportimport.controller.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
+import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.exportimport.test.util.lar.BaseExportImportTestCase;
+import com.liferay.exportimport.test.util.model.Dummy;
+import com.liferay.exportimport.test.util.model.DummyFolder;
+import com.liferay.exportimport.test.util.model.util.DummyFolderTestUtil;
+import com.liferay.exportimport.test.util.model.util.DummyTestUtil;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.PortletPreferencesImpl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
@@ -64,6 +81,65 @@ public class PortletImportControllerTest extends BaseExportImportTestCase {
 		importedGroupLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
 			layout.getUuid(), importedGroup.getGroupId(),
 			layout.isPrivateLayout());
+	}
+
+	@Test
+	public void testPortletImportPermission() throws Exception {
+		PortletDataContext portletDataContext =
+			ExportImportTestUtil.getExportPortletDataContext();
+
+		ClassName className = ClassNameLocalServiceUtil.addClassName(
+			Dummy.class.getName());
+
+		DummyFolder dummyFolder = DummyFolderTestUtil.createDummyFolder(
+			portletDataContext.getGroupId());
+
+		Dummy dummy = DummyTestUtil.createDummy(
+			portletDataContext.getGroupId(), dummyFolder.getId());
+
+		// Setting PermissionMap
+
+		String permissionKey = Dummy.class.getName() + "#" + dummy.getId();
+
+		List<KeyValuePair> permissionValueList = new ArrayList<>();
+
+		permissionValueList.add(new KeyValuePair("Site Member", ""));
+		permissionValueList.add(new KeyValuePair("Guest", ""));
+		permissionValueList.add(new KeyValuePair("Owner", ""));
+
+		portletDataContext.getPermissions().put(
+			permissionKey, permissionValueList);
+
+		// Setting ParameterMap
+
+		portletDataContext.getParameterMap().put(
+			PortletDataHandlerKeys.PERMISSIONS, new String[] {"true"});
+
+		// Do the permission import
+
+		long newResourcePK = CounterLocalServiceUtil.increment(
+			Dummy.class.getName());
+
+		portletDataContext.importPermissions(
+			Dummy.class.getName(), dummy.getId(), newResourcePK);
+
+		DynamicQuery dynamicQuery =
+			ResourcePermissionLocalServiceUtil.dynamicQuery();
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq("name", Dummy.class.getName()));
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("actionIds", 0L));
+
+		long dummiesCount =
+			ResourcePermissionLocalServiceUtil.dynamicQueryCount(dynamicQuery);
+
+		ClassNameLocalServiceUtil.deleteClassName(className.getClassNameId());
+
+		ResourcePermissionLocalServiceUtil.deleteResourcePermissions(
+			portletDataContext.getCompanyId(), Dummy.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL, newResourcePK);
+
+		Assert.assertEquals(3L, dummiesCount);
 	}
 
 	@Test
