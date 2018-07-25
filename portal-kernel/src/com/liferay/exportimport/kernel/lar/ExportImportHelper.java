@@ -16,6 +16,7 @@ package com.liferay.exportimport.kernel.lar;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
@@ -121,6 +122,11 @@ public interface ExportImportHelper {
 
 	public static final String TEMP_FOLDER_NAME =
 		ExportImportHelper.class.getName();
+
+	public void addBackgroundTaskStagingSummary(
+			long userId, long sourceGroupId, BackgroundTask backgroundTask,
+			File file)
+		throws PortalException;
 
 	public long[] getAllLayoutIds(long groupId, boolean privateLayout);
 
