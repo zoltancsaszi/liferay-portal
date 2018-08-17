@@ -246,7 +246,7 @@ public class StagingPermissionChecker implements PermissionChecker {
 	}
 
 	private boolean _isStagingFolder(String name, String actionId) {
-		if (ExportImportThreadLocal.isStagingInProcess() &&
+		if (ExportImportThreadLocal.isStagingInProcessOnLive() &&
 			actionId.equals("VIEW") &&
 			(name.equals(Folder.class.getName()) ||
 			 name.equals(DLFolder.class.getName()) ||

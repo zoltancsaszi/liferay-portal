@@ -46,10 +46,10 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 	public void cleanUpStagingRequest(long stagingRequestId)
 		throws PortalException {
 
-		boolean portletStagingInProcess =
-			ExportImportThreadLocal.isPortletStagingInProcess();
+		boolean stagingInProcessOnLive =
+			ExportImportThreadLocal.isStagingInProcessOnLive();
 
-		ExportImportThreadLocal.setPortletStagingInProcess(true);
+		ExportImportThreadLocal.setStagingInProcessOnLive(true);
 
 		try {
 			checkPermission(stagingRequestId);
@@ -67,8 +67,8 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			throw pe;
 		}
 		finally {
-			ExportImportThreadLocal.setPortletStagingInProcess(
-				portletStagingInProcess);
+			ExportImportThreadLocal.setStagingInProcessOnLive(
+				stagingInProcessOnLive);
 		}
 	}
 
@@ -76,10 +76,10 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 	public long createStagingRequest(long groupId, String checksum)
 		throws PortalException {
 
-		boolean portletStagingInProcess =
-			ExportImportThreadLocal.isPortletStagingInProcess();
+		boolean stagingInProcessOnLive =
+			ExportImportThreadLocal.isStagingInProcessOnLive();
 
-		ExportImportThreadLocal.setPortletStagingInProcess(true);
+		ExportImportThreadLocal.setStagingInProcessOnLive(true);
 
 		try {
 			GroupPermissionUtil.check(
@@ -101,8 +101,8 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			throw pe;
 		}
 		finally {
-			ExportImportThreadLocal.setPortletStagingInProcess(
-				portletStagingInProcess);
+			ExportImportThreadLocal.setStagingInProcessOnLive(
+				stagingInProcessOnLive);
 		}
 	}
 
@@ -210,10 +210,10 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			ExportImportConfiguration exportImportConfiguration)
 		throws PortalException {
 
-		boolean portletStagingInProcess =
-			ExportImportThreadLocal.isPortletStagingInProcess();
+		boolean stagingInProcessOnLive =
+			ExportImportThreadLocal.isStagingInProcessOnLive();
 
-		ExportImportThreadLocal.setPortletStagingInProcess(true);
+		ExportImportThreadLocal.setStagingInProcessOnLive(true);
 
 		try {
 			checkPermission(stagingRequestId);
@@ -234,8 +234,8 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			throw pe;
 		}
 		finally {
-			ExportImportThreadLocal.setPortletStagingInProcess(
-				portletStagingInProcess);
+			ExportImportThreadLocal.setStagingInProcessOnLive(
+				stagingInProcessOnLive);
 		}
 	}
 
@@ -244,10 +244,10 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			long stagingRequestId, String fileName, byte[] bytes)
 		throws PortalException {
 
-		boolean portletStagingInProcess =
-			ExportImportThreadLocal.isPortletStagingInProcess();
+		boolean stagingInProcessOnLive =
+			ExportImportThreadLocal.isStagingInProcessOnLive();
 
-		ExportImportThreadLocal.setPortletStagingInProcess(true);
+		ExportImportThreadLocal.setStagingInProcessOnLive(true);
 
 		try {
 			checkPermission(stagingRequestId);
@@ -268,8 +268,8 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			throw pe;
 		}
 		finally {
-			ExportImportThreadLocal.setPortletStagingInProcess(
-				portletStagingInProcess);
+			ExportImportThreadLocal.setStagingInProcessOnLive(
+				stagingInProcessOnLive);
 		}
 	}
 
@@ -284,10 +284,10 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			Map<String, String[]> parameterMap)
 		throws PortalException {
 
-		boolean portletStagingInProcess =
-			ExportImportThreadLocal.isPortletStagingInProcess();
+		boolean stagingInProcessOnLive =
+			ExportImportThreadLocal.isStagingInProcessOnLive();
 
-		ExportImportThreadLocal.setPortletStagingInProcess(true);
+		ExportImportThreadLocal.setStagingInProcessOnLive(true);
 
 		try {
 			checkPermission(stagingRequestId);
@@ -296,8 +296,8 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 				getUserId(), stagingRequestId, privateLayout, parameterMap);
 		}
 		finally {
-			ExportImportThreadLocal.setPortletStagingInProcess(
-				portletStagingInProcess);
+			ExportImportThreadLocal.setStagingInProcessOnLive(
+				stagingInProcessOnLive);
 		}
 	}
 
