@@ -961,9 +961,6 @@ public class JournalArticleStagedModelDataHandler
 
 				_importAssetDisplayPage(
 					portletDataContext, article, importedArticle);
-
-				_importFriendlyURLEntries(
-					portletDataContext, article, importedArticle);
 			}
 			finally {
 				ServiceContextThreadLocal.popServiceContext();
@@ -1270,8 +1267,11 @@ public class JournalArticleStagedModelDataHandler
 				article.getResourcePrimKey());
 
 		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
+
+			StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, friendlyURLEntry);
+
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, article, friendlyURLEntry,
+				portletDataContext, friendlyURLEntry, article,
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 	}
@@ -1314,37 +1314,6 @@ public class JournalArticleStagedModelDataHandler
 					existingAssetDisplayPageEntry);
 			}
 		}
-	}
-
-	private void _importFriendlyURLEntries(
-			PortletDataContext portletDataContext, JournalArticle article,
-			JournalArticle importedArticle)
-		throws PortalException {
-
-		List<Element> friendlyURLEntryElements =
-			portletDataContext.getReferenceDataElements(
-				article, FriendlyURLEntry.class);
-
-		for (Element friendlyURLEntryElement : friendlyURLEntryElements) {
-			String path = friendlyURLEntryElement.attributeValue("path");
-
-			FriendlyURLEntry friendlyURLEntry =
-				(FriendlyURLEntry)portletDataContext.getZipEntryAsObject(path);
-
-			friendlyURLEntry.setClassNameId(
-				_portal.getClassNameId(JournalArticle.class));
-			friendlyURLEntry.setClassPK(importedArticle.getResourcePrimKey());
-
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, friendlyURLEntry);
-		}
-
-		FriendlyURLEntry mainFriendlyURLEntry =
-			_friendlyURLEntryLocalService.getMainFriendlyURLEntry(
-				JournalArticle.class, importedArticle.getResourcePrimKey());
-
-		_journalArticleLocalService.updateArticle(
-			importedArticle.getId(), mainFriendlyURLEntry.getUrlTitle());
 	}
 
 	/**
