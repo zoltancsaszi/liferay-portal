@@ -1107,11 +1107,6 @@ public class JournalArticleStagedModelDataHandler
 			articleId, newArticleId, version, preloaded);
 	}
 
-	@Override
-	protected String[] getSkipImportReferenceStagedModelNames() {
-		return _SKIP_IMPORT_REFERENCE_STAGED_MODEL_NAMES;
-	}
-
 	protected boolean isExpireAllArticleVersions(long companyId)
 		throws PortalException {
 
@@ -1337,9 +1332,6 @@ public class JournalArticleStagedModelDataHandler
 					article.getLegacyDescription()));
 		}
 	}
-
-	private static final String[] _SKIP_IMPORT_REFERENCE_STAGED_MODEL_NAMES =
-		{FriendlyURLEntry.class.getName()};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleStagedModelDataHandler.class);

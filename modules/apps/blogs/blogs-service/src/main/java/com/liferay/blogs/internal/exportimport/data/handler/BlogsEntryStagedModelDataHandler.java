@@ -354,11 +354,6 @@ public class BlogsEntryStagedModelDataHandler
 		}
 	}
 
-	@Override
-	protected String[] getSkipImportReferenceStagedModelNames() {
-		return _SKIP_IMPORT_REFERENCE_STAGED_MODEL_NAMES;
-	}
-
 	private void _exportFriendlyURLEntries(
 			PortletDataContext portletDataContext, BlogsEntry blogsEntry)
 		throws PortletDataException {
@@ -378,9 +373,6 @@ public class BlogsEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 	}
-
-	private static final String[] _SKIP_IMPORT_REFERENCE_STAGED_MODEL_NAMES =
-		{FriendlyURLEntry.class.getName()};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BlogsEntryStagedModelDataHandler.class);
