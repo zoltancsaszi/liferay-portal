@@ -370,8 +370,8 @@ public class BlogsEntryStagedModelDataHandler
 				blogsEntry.getGroupId(), classNameId, blogsEntry.getEntryId());
 
 		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
-
-			StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, friendlyURLEntry);
+			StagedModelDataHandlerUtil.exportStagedModel(
+				portletDataContext, friendlyURLEntry);
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, friendlyURLEntry, blogsEntry,

@@ -1267,8 +1267,8 @@ public class JournalArticleStagedModelDataHandler
 				article.getResourcePrimKey());
 
 		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
-
-			StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, friendlyURLEntry);
+			StagedModelDataHandlerUtil.exportStagedModel(
+				portletDataContext, friendlyURLEntry);
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, friendlyURLEntry, article,
