@@ -16,6 +16,7 @@ package com.liferay.layout.set.prototype.internal.exportimport.data.handler;
 
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
@@ -127,9 +128,18 @@ public class LayoutSetPrototypePortletDataHandler
 		List<Element> layoutSetPrototypeElements =
 			layoutSetPrototypesElement.elements();
 
+		ExportImportThreadLocal.setAllPortletAdditionCountersTotal(
+			layoutSetPrototypeElements.size());
+
 		for (Element layoutSetPrototypeElement : layoutSetPrototypeElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, layoutSetPrototypeElement);
+
+			int currentAdditionCounter =
+				ExportImportThreadLocal.getCurrentPortletAdditionCounter();
+
+			ExportImportThreadLocal.setCurrentPortletAdditionCounter(
+				currentAdditionCounter + 1);
 		}
 
 		return null;

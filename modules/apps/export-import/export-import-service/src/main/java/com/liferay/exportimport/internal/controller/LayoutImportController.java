@@ -93,6 +93,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -203,6 +204,38 @@ public class LayoutImportController implements ImportController {
 
 			portletDataContext = getPortletDataContext(
 				exportImportConfiguration, file);
+
+			boolean layoutSetPrototype = false;
+
+			if (exportImportConfiguration.getSettingsMap() instanceof Map) {
+				Map<String, Serializable> settingsMap =
+					exportImportConfiguration.getSettingsMap();
+
+				Map<String, Serializable> parameterMap =
+					(HashMap<String, Serializable>)settingsMap.get(
+						"parameterMap");
+
+				if (parameterMap instanceof Map) {
+					Object layoutSetPrototypeSettings = parameterMap.get(
+						"LAYOUT_SET_PROTOTYPE_SETTINGS");
+
+					if (layoutSetPrototypeSettings instanceof String[]) {
+						String[] layoutSetPrototypeSettingsArray =
+							(String[])layoutSetPrototypeSettings;
+
+						layoutSetPrototype = GetterUtil.getBoolean(
+							layoutSetPrototypeSettingsArray[0]);
+					}
+				}
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"LAYOUT_SET_PROTOTYPE_SETTINGS: " + layoutSetPrototype);
+			}
+
+			ExportImportThreadLocal.setEmbeddedLarImportInProcess(
+				layoutSetPrototype);
 
 			_exportImportLifecycleManager.fireExportImportLifecycleEvent(
 				ExportImportLifecycleConstants.EVENT_LAYOUT_IMPORT_STARTED,

@@ -18,10 +18,14 @@ import com.liferay.exportimport.internal.background.task.display.PortletExportIm
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
+import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
+import com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageTranslator;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -119,6 +123,29 @@ public class PortletImportBackgroundTaskExecutor
 		BackgroundTask backgroundTask) {
 
 		return new PortletExportImportBackgroundTaskDisplay(backgroundTask);
+	}
+
+	@Override
+	public BackgroundTaskStatusMessageTranslator
+		getBackgroundTaskStatusMessageTranslator() {
+
+		if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
+			com.liferay.portal.background.task.model.BackgroundTask
+				backgroundTask =
+					BackgroundTaskLocalServiceUtil.fetchBackgroundTask(
+						BackgroundTaskThreadLocal.getBackgroundTaskId());
+
+			if (LayoutSetPrototypePortletKeys.LAYOUT_SET_PROTOTYPE.equals(
+					backgroundTask.getName())) {
+
+				setBackgroundTaskStatusMessageTranslator(
+					new EmbeddedLarBackgroundTaskStatusMessageTranslator());
+				setIsolationLevel(
+					BackgroundTaskConstants.ISOLATION_LEVEL_COMPANY);
+			}
+		}
+
+		return super.getBackgroundTaskStatusMessageTranslator();
 	}
 
 	private static class PortletImportCallable implements Callable<Void> {
