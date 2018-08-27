@@ -34,6 +34,10 @@ public class ExportImportThreadLocal {
 		return false;
 	}
 
+	public static boolean isEmbeddedLarImportInProcess() {
+		return _embeddedLarImportInProcess;
+	}
+
 	public static boolean isExportInProcess() {
 		if (isLayoutExportInProcess() || isPortletExportInProcess()) {
 			return true;
@@ -107,6 +111,12 @@ public class ExportImportThreadLocal {
 		return false;
 	}
 
+	public static void setEmbeddedLarImportInProcess(
+		boolean embeddedLarImportInProcess) {
+
+		_embeddedLarImportInProcess = embeddedLarImportInProcess;
+	}
+
 	public static boolean isStagingInProcessOnRemoteLive() {
 		return _stagingInProcessOnRemoteLive.get();
 	}
@@ -174,6 +184,7 @@ public class ExportImportThreadLocal {
 
 		_portletValidationInProcess.set(portletValidationInProcess);
 	}
+	private static boolean _embeddedLarImportInProcess;
 
 	public static void setStagingInProcessOnRemoteLive(
 		boolean stagingInProcessOnRemoteLive) {
