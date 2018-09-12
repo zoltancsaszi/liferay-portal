@@ -16,7 +16,6 @@ package com.liferay.layout.set.prototype.internal.exportimport.data.handler;
 
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.DataLevel;
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
@@ -24,10 +23,15 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageSender;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -128,18 +132,44 @@ public class LayoutSetPrototypePortletDataHandler
 		List<Element> layoutSetPrototypeElements =
 			layoutSetPrototypesElement.elements();
 
-		ExportImportThreadLocal.setAllPortletAdditionCountersTotal(
-			layoutSetPrototypeElements.size());
+		Message message = new Message();
+
+		message.put("larFileCounterTotal", layoutSetPrototypeElements.size());
+		message.put("phase", Constants.IMPORT);
+		message.put("messageType", "larFile");
+		message.put("portletId", portletDataContext.getPortletId());
+		message.put("groupId", portletDataContext.getGroupId());
+		message.put(
+			BackgroundTaskConstants.BACKGROUND_TASK_ID,
+			BackgroundTaskThreadLocal.getBackgroundTaskId());
+		message.put("clearStatus", true);
+
+		_backgroundTaskStatusMessageSender.sendBackgroundTaskStatusMessage(
+			message);
+
+		int currentLarFileAdditionCounter = 0;
 
 		for (Element layoutSetPrototypeElement : layoutSetPrototypeElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, layoutSetPrototypeElement);
 
-			int currentAdditionCounter =
-				ExportImportThreadLocal.getCurrentPortletAdditionCounter();
+			message = new Message();
 
-			ExportImportThreadLocal.setCurrentPortletAdditionCounter(
-				currentAdditionCounter + 1);
+			message.put(
+				"larFileCounterTotal", layoutSetPrototypeElements.size());
+			message.put(
+				"currentLarFileAdditionCounter",
+				++currentLarFileAdditionCounter);
+			message.put("phase", Constants.IMPORT);
+			message.put("messageType", "larFile");
+			message.put("portletId", portletDataContext.getPortletId());
+			message.put("groupId", portletDataContext.getGroupId());
+			message.put(
+				BackgroundTaskConstants.BACKGROUND_TASK_ID,
+				BackgroundTaskThreadLocal.getBackgroundTaskId());
+
+			_backgroundTaskStatusMessageSender.sendBackgroundTaskStatusMessage(
+				message);
 		}
 
 		return null;
@@ -171,5 +201,9 @@ public class LayoutSetPrototypePortletDataHandler
 	}
 
 	protected LayoutSetPrototypeLocalService layoutSetPrototypeLocalService;
+
+	@Reference(unbind = "-")
+	private BackgroundTaskStatusMessageSender
+		_backgroundTaskStatusMessageSender;
 
 }
