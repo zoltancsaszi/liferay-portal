@@ -39,13 +39,16 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 
 		int percentage = 100;
 
+		long larFileCounterTotal = GetterUtil.getLong(backgroundTaskStatus.getAttribute("larFileCounterTotal"));
+		long currentLarFileAdditionCounter = GetterUtil.getLong(backgroundTaskStatus.getAttribute("currentLarFileAdditionCounter"));
+
 		long allModelAdditionCountersTotal = GetterUtil.getLong(backgroundTaskStatus.getAttribute("allModelAdditionCountersTotal"));
 		long allPortletAdditionCounter = GetterUtil.getLong(backgroundTaskStatus.getAttribute("allPortletAdditionCounter"));
 		long currentModelAdditionCountersTotal = GetterUtil.getLong(backgroundTaskStatus.getAttribute("currentModelAdditionCountersTotal"));
 		long currentPortletAdditionCounter = GetterUtil.getLong(backgroundTaskStatus.getAttribute("currentPortletAdditionCounter"));
 
-		long allProgressBarCountersTotal = allModelAdditionCountersTotal + allPortletAdditionCounter;
-		long currentProgressBarCountersTotal = currentModelAdditionCountersTotal + currentPortletAdditionCounter;
+		long allProgressBarCountersTotal = allModelAdditionCountersTotal + allPortletAdditionCounter + larFileCounterTotal;
+		long currentProgressBarCountersTotal = currentModelAdditionCountersTotal + currentPortletAdditionCounter + currentLarFileAdditionCounter;
 
 		if (allProgressBarCountersTotal > 0) {
 			int base = 100;
