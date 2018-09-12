@@ -323,10 +323,6 @@ public class PortletImportControllerImpl implements PortletImportController {
 
 			throw t;
 		}
-		finally {
-			ExportImportThreadLocal.setAllPortletAdditionCountersTotal(0);
-			ExportImportThreadLocal.setCurrentPortletAdditionCounter(0);
-		}
 	}
 
 	@Override
