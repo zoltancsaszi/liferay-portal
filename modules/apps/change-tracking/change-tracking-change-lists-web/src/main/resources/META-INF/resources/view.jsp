@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,15 +12,10 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package com.liferay.change.tracking.constants;
+<%@ include file="/META-INF/resources/init.jsp" %>
 
-/**
- * @author Mate Thurzo
- */
-public class ChangeTrackingPortletKeys {
+<div class="container-fluid-1280 entry-body">
 
-	public static final String CHANGE_LISTS =
-		"com_liferay_change_tracking_change_lists_web_portlet_" +
-			"ChangeListsPortlet";
-}
+</div>
