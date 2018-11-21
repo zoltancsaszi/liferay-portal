@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,14 +12,23 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package com.liferay.change.tracking.constants;
+<%@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/trash" prefix="liferay-trash" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-/**
- * @author Mate Thurzo
- */
-public class ChangeTrackingPortletKeys {
+<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 
-	public static final String CHANGE_LISTS =
-		"com_liferay_change_tracking_change_lists_web_portlet_ChangeListsPortlet";
-}
+<liferay-frontend:defineObjects />
+
+<liferay-theme:defineObjects />
+
+<liferay-trash:defineObjects />
+
+<%
+String portletResource = ParamUtil.getString(request, "portletResource");
+%>
+
+<%@ include file="/init-ext.jsp" %>
