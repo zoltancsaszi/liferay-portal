@@ -57,7 +57,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Akos Thurzo
  */
-@Ignore
+//@Ignore
 @RunWith(Arquillian.class)
 @Sync(cleanTransaction = true)
 public class StagingGroupHelperTest {
