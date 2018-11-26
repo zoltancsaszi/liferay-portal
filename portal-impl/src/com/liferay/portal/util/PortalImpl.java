@@ -4176,10 +4176,13 @@ public class PortalImpl implements Portal {
 		InetSocketAddress inetSocketAddress = null;
 
 		if (secure) {
+			System.out.println(
+				"secure inetSocketAddress: " + inetSocketAddress);
 			inetSocketAddress = _securePortalServerInetSocketAddress.get();
 		}
 		else {
 			inetSocketAddress = _portalServerInetSocketAddress.get();
+			System.out.println("inetSocketAddress: " + inetSocketAddress);
 		}
 
 		if (inetSocketAddress == null) {
