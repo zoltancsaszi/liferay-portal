@@ -106,6 +106,7 @@ public class SystemEventTest {
 
 		String pathContext = PortalUtil.getPathContext();
 
+		System.out.println("pathContext: " + pathContext);
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
 
 		StagingLocalServiceUtil.enableRemoteStaging(
