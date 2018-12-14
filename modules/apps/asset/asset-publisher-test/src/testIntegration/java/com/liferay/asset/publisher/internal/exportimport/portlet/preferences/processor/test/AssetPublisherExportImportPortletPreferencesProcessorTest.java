@@ -116,7 +116,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessorTest {
 			ExportImportTestUtil.getImportPortletDataContext(
 				_group.getGroupId());
 
-		_portletDataContextExport.setPlid(_layout.getPlid());
+		_portletDataContextImport.setPlid(_layout.getPlid());
 		_portletDataContextImport.setPortletId(
 			AssetPublisherPortletKeys.ASSET_PUBLISHER);
 
