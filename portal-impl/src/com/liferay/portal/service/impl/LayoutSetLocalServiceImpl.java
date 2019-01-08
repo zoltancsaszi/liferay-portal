@@ -86,6 +86,9 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 		layoutSetResource.setModifiedDate(now);
 		layoutSetResource.setPrivateLayout(privateLayout);
 
+		layoutSetVersion.setLayoutSetResourceId(
+			layoutSetResource.getLayoutSetResourceId());
+
 		initLayoutSet(layoutSetResource, layoutSetVersion);
 
 		layoutSetResourcePersistence.update(layoutSetResource);
@@ -170,6 +173,18 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 				_log.debug(nsvhe, nsvhe);
 			}
 		}
+	}
+
+	@Override
+	public LayoutSet fetchLayoutSet(long layoutSetId) {
+		LayoutSetResource layoutSetResource =
+			layoutSetResourcePersistence.fetchByPrimaryKey(layoutSetId);
+
+		if (layoutSetResource == null) {
+			return null;
+		}
+
+		return _createLayoutSetDTO(layoutSetResource);
 	}
 
 	@Override
@@ -280,12 +295,20 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	}
 
 	@Override
-	public LayoutSet updateLayoutSet(LayoutSet layoutSet)
-		throws PortalException {
-
+	public LayoutSet updateLayoutSet(LayoutSet layoutSet) {
 		LayoutSetResource layoutSetResource =
-			layoutSetResourcePersistence.findByPrimaryKey(
-				layoutSet.getPrimaryKey());
+			layoutSetResourcePersistence.fetchByPrimaryKey(
+				layoutSet.getLayoutSetId());
+
+		if (layoutSetResource == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to find layout set resource " +
+						layoutSet.getLayoutSetId());
+			}
+
+			return null;
+		}
 
 		LayoutSetVersion layoutSetVersion = _createNewLayoutSetVersion(
 			layoutSetResource);
@@ -796,18 +819,10 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	private LayoutSetVersion _getLatestVersion(
 		LayoutSetResource layoutSetResource) {
 
+		// todo: we need an OBC by date
+
 		return layoutSetVersionPersistence.fetchByLayoutSetResourceId_First(
-			layoutSetResource.getLayoutSetResourceId(),
-			new OrderByComparator<LayoutSetVersion>() {
-
-				@Override
-				public int compare(LayoutSetVersion o1, LayoutSetVersion o2) {
-					Date createDate = o1.getCreateDate();
-
-					return createDate.compareTo(o2.getCreateDate());
-				}
-
-			});
+			layoutSetResource.getLayoutSetResourceId(), null);
 	}
 
 	private LayoutSetBranch _getLayoutSetBranch(
