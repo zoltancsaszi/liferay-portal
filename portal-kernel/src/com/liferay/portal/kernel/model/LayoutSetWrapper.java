@@ -502,11 +502,6 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	}
 
 	@Override
-	public void persist() {
-		_layoutSet.persist();
-	}
-
-	@Override
 	public void setCachedModel(boolean cachedModel) {
 		_layoutSet.setCachedModel(cachedModel);
 	}

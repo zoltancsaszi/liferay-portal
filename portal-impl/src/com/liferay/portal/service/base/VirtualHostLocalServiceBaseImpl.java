@@ -40,7 +40,7 @@ import com.liferay.portal.kernel.service.VirtualHostLocalService;
 import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
 import com.liferay.portal.kernel.service.persistence.GroupFinder;
 import com.liferay.portal.kernel.service.persistence.GroupPersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
+import com.liferay.portal.kernel.service.persistence.LayoutSetResourcePersistence;
 import com.liferay.portal.kernel.service.persistence.VirtualHostPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -466,41 +466,22 @@ public abstract class VirtualHostLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the layout set local service.
+	 * Returns the layout set resource persistence.
 	 *
-	 * @return the layout set local service
+	 * @return the layout set resource persistence
 	 */
-	public com.liferay.portal.kernel.service.LayoutSetLocalService getLayoutSetLocalService() {
-		return layoutSetLocalService;
+	public LayoutSetResourcePersistence getLayoutSetResourcePersistence() {
+		return layoutSetResourcePersistence;
 	}
 
 	/**
-	 * Sets the layout set local service.
+	 * Sets the layout set resource persistence.
 	 *
-	 * @param layoutSetLocalService the layout set local service
+	 * @param layoutSetResourcePersistence the layout set resource persistence
 	 */
-	public void setLayoutSetLocalService(
-		com.liferay.portal.kernel.service.LayoutSetLocalService layoutSetLocalService) {
-		this.layoutSetLocalService = layoutSetLocalService;
-	}
-
-	/**
-	 * Returns the layout set persistence.
-	 *
-	 * @return the layout set persistence
-	 */
-	public LayoutSetPersistence getLayoutSetPersistence() {
-		return layoutSetPersistence;
-	}
-
-	/**
-	 * Sets the layout set persistence.
-	 *
-	 * @param layoutSetPersistence the layout set persistence
-	 */
-	public void setLayoutSetPersistence(
-		LayoutSetPersistence layoutSetPersistence) {
-		this.layoutSetPersistence = layoutSetPersistence;
+	public void setLayoutSetResourcePersistence(
+		LayoutSetResourcePersistence layoutSetResourcePersistence) {
+		this.layoutSetResourcePersistence = layoutSetResourcePersistence;
 	}
 
 	public void afterPropertiesSet() {
@@ -571,10 +552,8 @@ public abstract class VirtualHostLocalServiceBaseImpl
 	protected GroupPersistence groupPersistence;
 	@BeanReference(type = GroupFinder.class)
 	protected GroupFinder groupFinder;
-	@BeanReference(type = com.liferay.portal.kernel.service.LayoutSetLocalService.class)
-	protected com.liferay.portal.kernel.service.LayoutSetLocalService layoutSetLocalService;
-	@BeanReference(type = LayoutSetPersistence.class)
-	protected LayoutSetPersistence layoutSetPersistence;
+	@BeanReference(type = LayoutSetResourcePersistence.class)
+	protected LayoutSetResourcePersistence layoutSetResourcePersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

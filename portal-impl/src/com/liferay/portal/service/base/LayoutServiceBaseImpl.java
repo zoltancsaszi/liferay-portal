@@ -40,8 +40,8 @@ import com.liferay.portal.kernel.service.persistence.LayoutFinder;
 import com.liferay.portal.kernel.service.persistence.LayoutFriendlyURLPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutPrototypePersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPrototypePersistence;
+import com.liferay.portal.kernel.service.persistence.LayoutSetResourcePersistence;
 import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.service.persistence.PortletPreferencesFinder;
 import com.liferay.portal.kernel.service.persistence.PortletPreferencesPersistence;
@@ -736,25 +736,6 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the layout set persistence.
-	 *
-	 * @return the layout set persistence
-	 */
-	public LayoutSetPersistence getLayoutSetPersistence() {
-		return layoutSetPersistence;
-	}
-
-	/**
-	 * Sets the layout set persistence.
-	 *
-	 * @param layoutSetPersistence the layout set persistence
-	 */
-	public void setLayoutSetPersistence(
-		LayoutSetPersistence layoutSetPersistence) {
-		this.layoutSetPersistence = layoutSetPersistence;
-	}
-
-	/**
 	 * Returns the layout set prototype local service.
 	 *
 	 * @return the layout set prototype local service
@@ -809,6 +790,25 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	public void setLayoutSetPrototypePersistence(
 		LayoutSetPrototypePersistence layoutSetPrototypePersistence) {
 		this.layoutSetPrototypePersistence = layoutSetPrototypePersistence;
+	}
+
+	/**
+	 * Returns the layout set resource persistence.
+	 *
+	 * @return the layout set resource persistence
+	 */
+	public LayoutSetResourcePersistence getLayoutSetResourcePersistence() {
+		return layoutSetResourcePersistence;
+	}
+
+	/**
+	 * Sets the layout set resource persistence.
+	 *
+	 * @param layoutSetResourcePersistence the layout set resource persistence
+	 */
+	public void setLayoutSetResourcePersistence(
+		LayoutSetResourcePersistence layoutSetResourcePersistence) {
+		this.layoutSetResourcePersistence = layoutSetResourcePersistence;
 	}
 
 	/**
@@ -1306,14 +1306,14 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.kernel.service.LayoutSetLocalService layoutSetLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.LayoutSetService.class)
 	protected com.liferay.portal.kernel.service.LayoutSetService layoutSetService;
-	@BeanReference(type = LayoutSetPersistence.class)
-	protected LayoutSetPersistence layoutSetPersistence;
 	@BeanReference(type = com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService.class)
 	protected com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService layoutSetPrototypeLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.LayoutSetPrototypeService.class)
 	protected com.liferay.portal.kernel.service.LayoutSetPrototypeService layoutSetPrototypeService;
 	@BeanReference(type = LayoutSetPrototypePersistence.class)
 	protected LayoutSetPrototypePersistence layoutSetPrototypePersistence;
+	@BeanReference(type = LayoutSetResourcePersistence.class)
+	protected LayoutSetResourcePersistence layoutSetResourcePersistence;
 	@BeanReference(type = com.liferay.portal.kernel.service.PluginSettingLocalService.class)
 	protected com.liferay.portal.kernel.service.PluginSettingLocalService pluginSettingLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.PluginSettingService.class)
