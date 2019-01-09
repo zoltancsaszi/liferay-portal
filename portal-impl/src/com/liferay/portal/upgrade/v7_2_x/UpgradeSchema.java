@@ -23,6 +23,7 @@ public class UpgradeSchema extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		System.out.println("updateSchema");
 		runSQLTemplate("update-7.1.0-7.2.0.sql", false);
 	}
 
