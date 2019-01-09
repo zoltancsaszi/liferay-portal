@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ColorSchemeFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,6 +56,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Brian Wing Shun Chan
@@ -223,6 +224,23 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 		return null;
 
 		//layoutSetResourcePersistence.fetchByP_L(privateLayout, logoId);
+	}
+
+	@Override
+	public List<LayoutSet> fetchLayoutSets(
+		long companyId, boolean privateLayout) {
+
+		List<LayoutSetResource> layoutSetResources =
+			layoutSetResourcePersistence.findByC_P(companyId, privateLayout);
+
+		Stream<LayoutSetResource> layoutSetResourcesStream =
+			layoutSetResources.stream();
+
+		return layoutSetResourcesStream.map(
+			this::_createLayoutSetDTO
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
