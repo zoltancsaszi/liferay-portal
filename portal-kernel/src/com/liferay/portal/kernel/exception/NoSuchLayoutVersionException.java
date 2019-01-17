@@ -11,16 +11,31 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+package com.liferay.portal.kernel.exception;
 
-package com.liferay.layout.uad.exporter;
+import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.user.associated.data.exporter.UADExporter;
-
-import org.osgi.service.component.annotations.Component;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(immediate = true, service = UADExporter.class)
-public class LayoutBranchUADExporter extends BaseLayoutBranchUADExporter {
+@ProviderType
+public class NoSuchLayoutVersionException extends NoSuchModelException {
+
+	public NoSuchLayoutVersionException() {
+	}
+
+	public NoSuchLayoutVersionException(String msg) {
+		super(msg);
+	}
+
+	public NoSuchLayoutVersionException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public NoSuchLayoutVersionException(Throwable cause) {
+		super(cause);
+	}
+
 }
