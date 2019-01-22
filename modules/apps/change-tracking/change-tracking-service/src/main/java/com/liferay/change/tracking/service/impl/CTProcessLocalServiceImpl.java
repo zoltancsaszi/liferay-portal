@@ -14,28 +14,69 @@
 
 package com.liferay.change.tracking.service.impl;
 
+import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.service.base.CTProcessLocalServiceBaseImpl;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+
+import java.util.Date;
+import java.util.List;
 
 /**
- * The implementation of the ct process local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.change.tracking.service.CTProcessLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see CTProcessLocalServiceBaseImpl
- * @see com.liferay.change.tracking.service.CTProcessLocalServiceUtil
+ * @author Daniel Kocsis
  */
 public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.change.tracking.service.CTProcessLocalServiceUtil} to access the ct process local service.
-	 */
+	@Override
+	public CTProcess addCTProcess(
+			long userId, long ctCollectionId, ServiceContext serviceContext)
+		throws PortalException {
+
+		_validate(ctCollectionId);
+
+		long ctProcessId = counterLocalService.increment();
+
+		CTProcess ctProcess = ctProcessPersistence.create(ctProcessId);
+
+		User user = userLocalService.getUser(userId);
+
+		ctProcess.setCompanyId(user.getCompanyId());
+		ctProcess.setUserId(user.getUserId());
+		ctProcess.setUserName(user.getFullName());
+
+		Date now = new Date();
+
+		ctProcess.setCreateDate(serviceContext.getCreateDate(now));
+		ctProcess.setModifiedDate(serviceContext.getModifiedDate(now));
+
+		ctProcess.setCtCollectionId(ctCollectionId);
+
+		// todo: starting a new background task from here
+
+		return ctProcessPersistence.update(ctProcess);
+	}
+
+	@Override
+	public CTProcess deleteCTProcess(CTProcess ctProcess)
+		throws PortalException {
+
+		if (ctProcess.getBackgroundTaskId() > 0) {
+			BackgroundTaskManagerUtil.deleteBackgroundTask(
+				ctProcess.getBackgroundTaskId());
+		}
+
+		return ctProcessPersistence.remove(ctProcess);
+	}
+
+	@Override
+	public List<CTProcess> getCTProcesses(long ctCollectionId) {
+		return ctProcessPersistence.findByCollectionId(ctCollectionId);
+	}
+
+	private void _validate(long ctCollectionId) throws PortalException {
+		ctCollectionLocalService.getCTCollection(ctCollectionId);
+	}
 
 }
