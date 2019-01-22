@@ -105,8 +105,9 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 				"value.object.column.bitmask.enabled.com.liferay.change.tracking.model.CTProcess"),
 			true);
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
-	public static final long USERID_COLUMN_BITMASK = 2L;
-	public static final long CTPROCESSID_COLUMN_BITMASK = 4L;
+	public static final long CTCOLLECTIONID_COLUMN_BITMASK = 2L;
+	public static final long USERID_COLUMN_BITMASK = 4L;
+	public static final long CTPROCESSID_COLUMN_BITMASK = 8L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.change.tracking.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.change.tracking.model.CTProcess"));
 
@@ -341,7 +342,19 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 	@Override
 	public void setCtCollectionId(long ctCollectionId) {
+		_columnBitmask |= CTCOLLECTIONID_COLUMN_BITMASK;
+
+		if (!_setOriginalCtCollectionId) {
+			_setOriginalCtCollectionId = true;
+
+			_originalCtCollectionId = _ctCollectionId;
+		}
+
 		_ctCollectionId = ctCollectionId;
+	}
+
+	public long getOriginalCtCollectionId() {
+		return _originalCtCollectionId;
 	}
 
 	public long getColumnBitmask() {
@@ -454,6 +467,10 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 		ctProcessModelImpl._setOriginalUserId = false;
 
 		ctProcessModelImpl._setModifiedDate = false;
+
+		ctProcessModelImpl._originalCtCollectionId = ctProcessModelImpl._ctCollectionId;
+
+		ctProcessModelImpl._setOriginalCtCollectionId = false;
 
 		ctProcessModelImpl._columnBitmask = 0;
 	}
@@ -589,6 +606,8 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 	private boolean _setModifiedDate;
 	private long _backgroundTaskId;
 	private long _ctCollectionId;
+	private long _originalCtCollectionId;
+	private boolean _setOriginalCtCollectionId;
 	private long _columnBitmask;
 	private CTProcess _escapedModel;
 }

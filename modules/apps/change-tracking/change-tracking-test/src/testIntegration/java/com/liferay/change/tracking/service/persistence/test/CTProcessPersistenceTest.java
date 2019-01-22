@@ -175,6 +175,13 @@ public class CTProcessPersistenceTest {
 	}
 
 	@Test
+	public void testCountByCollectionId() throws Exception {
+		_persistence.countByCollectionId(RandomTestUtil.nextLong());
+
+		_persistence.countByCollectionId(0L);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		CTProcess newCTProcess = addCTProcess();
 

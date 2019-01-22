@@ -121,10 +121,12 @@ public abstract class CTProcessLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param ctProcess the ct process
 	 * @return the ct process that was removed
+	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public CTProcess deleteCTProcess(CTProcess ctProcess) {
+	public CTProcess deleteCTProcess(CTProcess ctProcess)
+		throws PortalException {
 		return ctProcessPersistence.remove(ctProcess);
 	}
 
