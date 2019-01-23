@@ -27,6 +27,7 @@ import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -50,6 +52,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -72,7 +75,9 @@ public class CTEngineManagerTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -86,6 +91,8 @@ public class CTEngineManagerTest {
 		if (_ctEngineManager.isChangeTrackingEnabled(
 				TestPropsValues.getCompanyId())) {
 
+			_originallyEnabled = true;
+
 			_ctEngineManager.disableChangeTracking(
 				TestPropsValues.getCompanyId());
 		}
@@ -93,7 +100,65 @@ public class CTEngineManagerTest {
 
 	@After
 	public void tearDown() throws Exception {
-		_ctEngineManager.disableChangeTracking(TestPropsValues.getCompanyId());
+		if (_originallyEnabled) {
+			_ctEngineManager.enableChangeTracking(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+		}
+		else {
+			_ctEngineManager.disableChangeTracking(
+				TestPropsValues.getCompanyId());
+		}
+	}
+
+	@Test
+	public void testChangeTrackingPublishWithBackgroundTask() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		Optional<CTCollection> ctCollectionOptional =
+			_ctEngineManager.createCTCollection(
+				TestPropsValues.getUserId(), "testCollection",
+				"testCollection");
+
+		CTCollection ctCollection = ctCollectionOptional.get();
+
+		_ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), 1, 1, 1,
+			ctCollection.getCtCollectionId(), serviceContext);
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		CTCollection productionCTCollection =
+			productionCTCollectionOptional.get();
+
+		List<CTEntry> ctEntries = _ctEntryLocalService.getCTCollectionCTEntries(
+			productionCTCollection.getCtCollectionId());
+
+		int count = ctEntries.size();
+
+		Map<String, Serializable> taskContextMap = new HashMap<>();
+
+		taskContextMap.put("ctCollectionId", ctCollection.getCtCollectionId());
+		taskContextMap.put("userId", ctCollection.getUserId());
+
+		_backgroundTaskManager.addBackgroundTask(
+			_user.getUserId(), TestPropsValues.getGroupId(),
+			ctCollection.getName(),
+			CTConstants.CT_PUBLISH_BACKGROUND_TASK_EXECUTOR, taskContextMap,
+			serviceContext);
+
+		ctEntries = _ctEntryLocalService.getCTCollectionCTEntries(
+			productionCTCollection.getCtCollectionId());
+
+		Assert.assertEquals(
+			"Number of entries in productionCTCollection", count + 1,
+			ctEntries.size());
+
+		_ctCollectionLocalService.deleteCTCollection(ctCollection);
 	}
 
 	@Test
@@ -684,6 +749,9 @@ public class CTEngineManagerTest {
 	}
 
 	@Inject
+	private BackgroundTaskManager _backgroundTaskManager;
+
+	@Inject
 	private ClassNameLocalService _classNameLocalService;
 
 	@Inject
@@ -701,6 +769,8 @@ public class CTEngineManagerTest {
 
 	@Inject
 	private CTEntryLocalService _ctEntryLocalService;
+
+	private boolean _originallyEnabled;
 
 	@DeleteAfterTestRun
 	private User _user;
