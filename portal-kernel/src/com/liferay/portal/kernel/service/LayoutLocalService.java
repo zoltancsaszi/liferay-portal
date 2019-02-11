@@ -740,6 +740,18 @@ public interface LayoutLocalService extends BaseLocalService,
 	public Layout fetchLayoutByIconImageId(boolean privateLayout,
 		long iconImageId) throws PortalException;
 
+	/**
+	* Returns the layout matching the UUID, group, and privacy.
+	*
+	* @param uuid the layout's UUID
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @return the matching layout, or <code>null</code> if a matching layout could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Layout fetchLayoutByUuidAndGroupId(String uuid, long groupId,
+		boolean privateLayout);
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchPublished(Layout layout);
@@ -849,6 +861,19 @@ public interface LayoutLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout getLayoutByIconImageId(long iconImageId)
 		throws PortalException;
+
+	/**
+	* Returns the layout matching the UUID, group, and privacy.
+	*
+	* @param uuid the layout's UUID
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @return the matching layout
+	* @throws PortalException if a matching layout could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Layout getLayoutByUuidAndGroupId(String uuid, long groupId,
+		boolean privateLayout) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Map<Long, List<Layout>> getLayoutChildLayouts(LayoutSet layoutSet,
@@ -1034,6 +1059,31 @@ public interface LayoutLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsByLayoutPrototypeUuidCount(String layoutPrototypeUuid);
+
+	/**
+	* Returns all the layouts matching the UUID and company.
+	*
+	* @param uuid the UUID of the layouts
+	* @param companyId the primary key of the company
+	* @return the matching layouts, or an empty list if no matches were found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayoutsByUuidAndCompanyId(String uuid, long companyId);
+
+	/**
+	* Returns a range of layouts matching the UUID and company.
+	*
+	* @param uuid the UUID of the layouts
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of layouts
+	* @param end the upper bound of the range of layouts (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching layouts, or an empty list if no matches were found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayoutsByUuidAndCompanyId(String uuid,
+		long companyId, int start, int end,
+		OrderByComparator<Layout> orderByComparator);
 
 	/**
 	* Returns the number of layouts.

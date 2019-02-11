@@ -888,6 +888,21 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 			iconImageId);
 	}
 
+	/**
+	* Returns the layout matching the UUID, group, and privacy.
+	*
+	* @param uuid the layout's UUID
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @return the matching layout, or <code>null</code> if a matching layout could not be found
+	*/
+	@Override
+	public com.liferay.portal.kernel.model.Layout fetchLayoutByUuidAndGroupId(
+		String uuid, long groupId, boolean privateLayout) {
+		return _layoutLocalService.fetchLayoutByUuidAndGroupId(uuid, groupId,
+			privateLayout);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.model.Layout fetchPublished(
 		com.liferay.portal.kernel.model.Layout layout) {
@@ -1032,6 +1047,23 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 		long iconImageId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutLocalService.getLayoutByIconImageId(iconImageId);
+	}
+
+	/**
+	* Returns the layout matching the UUID, group, and privacy.
+	*
+	* @param uuid the layout's UUID
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @return the matching layout
+	* @throws PortalException if a matching layout could not be found
+	*/
+	@Override
+	public com.liferay.portal.kernel.model.Layout getLayoutByUuidAndGroupId(
+		String uuid, long groupId, boolean privateLayout)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutLocalService.getLayoutByUuidAndGroupId(uuid, groupId,
+			privateLayout);
 	}
 
 	@Override
@@ -1269,6 +1301,37 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	@Override
 	public int getLayoutsByLayoutPrototypeUuidCount(String layoutPrototypeUuid) {
 		return _layoutLocalService.getLayoutsByLayoutPrototypeUuidCount(layoutPrototypeUuid);
+	}
+
+	/**
+	* Returns all the layouts matching the UUID and company.
+	*
+	* @param uuid the UUID of the layouts
+	* @param companyId the primary key of the company
+	* @return the matching layouts, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Layout> getLayoutsByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return _layoutLocalService.getLayoutsByUuidAndCompanyId(uuid, companyId);
+	}
+
+	/**
+	* Returns a range of layouts matching the UUID and company.
+	*
+	* @param uuid the UUID of the layouts
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of layouts
+	* @param end the upper bound of the range of layouts (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching layouts, or an empty list if no matches were found
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Layout> getLayoutsByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.model.Layout> orderByComparator) {
+		return _layoutLocalService.getLayoutsByUuidAndCompanyId(uuid,
+			companyId, start, end, orderByComparator);
 	}
 
 	/**
