@@ -7807,10 +7807,6 @@ public class LayoutVersionUtil {
 		return getPersistence().countAll();
 	}
 
-	public static Set<String> getBadColumnNames() {
-		return getPersistence().getBadColumnNames();
-	}
-
 	public static LayoutVersionPersistence getPersistence() {
 		if (_persistence == null) {
 			_persistence = (LayoutVersionPersistence)PortalBeanLocatorUtil.locate(LayoutVersionPersistence.class.getName());

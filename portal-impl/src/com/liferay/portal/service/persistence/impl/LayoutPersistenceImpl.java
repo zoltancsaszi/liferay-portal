@@ -2294,7 +2294,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		}
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "layout.groupId = ? AND layout.system = [$FALSE$]";
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "layout.groupId = ? AND layout.system_ = [$FALSE$]";
 	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2_SQL = "layout.groupId = ? AND layout.system_ = [$FALSE$]";
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
@@ -12673,7 +12673,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIVATELAYOUT_2_SQL = "layout.privateLayout = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PARENTLAYOUTID_2 = "layout.parentLayoutId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PARENTLAYOUTID_2_SQL = "layout.parentLayoutId = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIORITY_2 = "layout.priority <= ? AND layout.system_ = [$FALSE$]";
+	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIORITY_2 = "layout.priority <= ? AND layout.system = [$FALSE$]";
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIORITY_2_SQL = "layout.priority <= ? AND layout.system_ = [$FALSE$]";
 	private FinderPath _finderPathFetchByHeadId;
 	private FinderPath _finderPathCountByHeadId;
