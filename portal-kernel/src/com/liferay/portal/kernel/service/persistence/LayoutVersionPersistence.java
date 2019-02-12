@@ -19,11 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.NoSuchLayoutVersionException;
 import com.liferay.portal.kernel.model.LayoutVersion;
 
-import java.io.Serializable;
-
-import java.util.Map;
-import java.util.Set;
-
 /**
  * The persistence interface for the layout version service.
  *
@@ -43,9 +38,6 @@ public interface LayoutVersionPersistence extends BasePersistence<LayoutVersion>
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutVersionUtil} to access the layout version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
 	 */
-	@Override
-	public Map<Serializable, LayoutVersion> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys);
 
 	/**
 	* Returns all the layout versions where plid = &#63;.
@@ -6249,7 +6241,4 @@ public interface LayoutVersionPersistence extends BasePersistence<LayoutVersion>
 	* @return the number of layout versions
 	*/
 	public int countAll();
-
-	@Override
-	public Set<String> getBadColumnNames();
 }
