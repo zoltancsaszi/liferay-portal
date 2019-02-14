@@ -623,21 +623,22 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private FinderPath _finderPathCountByUUID_G_P;
 
 	/**
-	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
+	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; and head = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
+	 * @param head the head
 	 * @return the matching layout
 	 * @throws NoSuchLayoutException if a matching layout could not be found
 	 */
 	@Override
 	public Layout findByUUID_G_P(String uuid, long groupId,
-		boolean privateLayout) throws NoSuchLayoutException {
-		Layout layout = fetchByUUID_G_P(uuid, groupId, privateLayout);
+		boolean privateLayout, boolean head) throws NoSuchLayoutException {
+		Layout layout = fetchByUUID_G_P(uuid, groupId, privateLayout, head);
 
 		if (layout == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler msg = new StringBundler(10);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -649,6 +650,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(", privateLayout=");
 			msg.append(privateLayout);
+
+			msg.append(", head=");
+			msg.append(head);
 
 			msg.append("}");
 
@@ -663,34 +667,36 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
+	 * @param head the head
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByUUID_G_P(String uuid, long groupId,
-		boolean privateLayout) {
-		return fetchByUUID_G_P(uuid, groupId, privateLayout, true);
+		boolean privateLayout, boolean head) {
+		return fetchByUUID_G_P(uuid, groupId, privateLayout, head, true);
 	}
 
 	/**
-	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
+	 * @param head the head
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByUUID_G_P(String uuid, long groupId,
-		boolean privateLayout, boolean retrieveFromCache) {
+		boolean privateLayout, boolean head, boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId, privateLayout };
+		Object[] finderArgs = new Object[] { uuid, groupId, privateLayout, head };
 
 		Object result = null;
 
@@ -704,13 +710,14 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if (!Objects.equals(uuid, layout.getUuid()) ||
 					(groupId != layout.getGroupId()) ||
-					(privateLayout != layout.isPrivateLayout())) {
+					(privateLayout != layout.isPrivateLayout()) ||
+					(head != layout.isHead())) {
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler query = new StringBundler(6);
 
 			query.append(_SQL_SELECT_LAYOUT_WHERE);
 
@@ -728,6 +735,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			query.append(_FINDER_COLUMN_UUID_G_P_GROUPID_2);
 
 			query.append(_FINDER_COLUMN_UUID_G_P_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_UUID_G_P_HEAD_2);
 
 			String sql = query.toString();
 
@@ -747,6 +756,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				qPos.add(groupId);
 
 				qPos.add(privateLayout);
+
+				qPos.add(head);
 
 				List<Layout> list = q.list();
 
@@ -782,42 +793,45 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Removes the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; from the database.
+	 * Removes the layout where uuid = &#63; and groupId = &#63; and privateLayout = &#63; and head = &#63; from the database.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
+	 * @param head the head
 	 * @return the layout that was removed
 	 */
 	@Override
 	public Layout removeByUUID_G_P(String uuid, long groupId,
-		boolean privateLayout) throws NoSuchLayoutException {
-		Layout layout = findByUUID_G_P(uuid, groupId, privateLayout);
+		boolean privateLayout, boolean head) throws NoSuchLayoutException {
+		Layout layout = findByUUID_G_P(uuid, groupId, privateLayout, head);
 
 		return remove(layout);
 	}
 
 	/**
-	 * Returns the number of layouts where uuid = &#63; and groupId = &#63; and privateLayout = &#63;.
+	 * Returns the number of layouts where uuid = &#63; and groupId = &#63; and privateLayout = &#63; and head = &#63;.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
+	 * @param head the head
 	 * @return the number of matching layouts
 	 */
 	@Override
-	public int countByUUID_G_P(String uuid, long groupId, boolean privateLayout) {
+	public int countByUUID_G_P(String uuid, long groupId,
+		boolean privateLayout, boolean head) {
 		uuid = Objects.toString(uuid, "");
 
 		FinderPath finderPath = _finderPathCountByUUID_G_P;
 
-		Object[] finderArgs = new Object[] { uuid, groupId, privateLayout };
+		Object[] finderArgs = new Object[] { uuid, groupId, privateLayout, head };
 
 		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
 				this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler query = new StringBundler(5);
 
 			query.append(_SQL_COUNT_LAYOUT_WHERE);
 
@@ -835,6 +849,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			query.append(_FINDER_COLUMN_UUID_G_P_GROUPID_2);
 
 			query.append(_FINDER_COLUMN_UUID_G_P_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_UUID_G_P_HEAD_2);
 
 			String sql = query.toString();
 
@@ -854,6 +870,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				qPos.add(groupId);
 
 				qPos.add(privateLayout);
+
+				qPos.add(head);
 
 				count = (Long)q.uniqueResult();
 
@@ -875,7 +893,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private static final String _FINDER_COLUMN_UUID_G_P_UUID_2 = "layout.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_G_P_UUID_3 = "(layout.uuid IS NULL OR layout.uuid = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_G_P_GROUPID_2 = "layout.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_P_PRIVATELAYOUT_2 = "layout.privateLayout = ?";
+	private static final String _FINDER_COLUMN_UUID_G_P_PRIVATELAYOUT_2 = "layout.privateLayout = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_P_HEAD_2 = "layout.head = ?";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -2275,7 +2294,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		}
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "layout.groupId = ? AND layout.system = [$FALSE$]";
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "layout.groupId = ? AND layout.system_ = [$FALSE$]";
 	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2_SQL = "layout.groupId = ? AND layout.system_ = [$FALSE$]";
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
@@ -7204,21 +7223,22 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private FinderPath _finderPathCountByG_P_L;
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; and head = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param layoutId the layout ID
+	 * @param head the head
 	 * @return the matching layout
 	 * @throws NoSuchLayoutException if a matching layout could not be found
 	 */
 	@Override
-	public Layout findByG_P_L(long groupId, boolean privateLayout, long layoutId)
-		throws NoSuchLayoutException {
-		Layout layout = fetchByG_P_L(groupId, privateLayout, layoutId);
+	public Layout findByG_P_L(long groupId, boolean privateLayout,
+		long layoutId, boolean head) throws NoSuchLayoutException {
+		Layout layout = fetchByG_P_L(groupId, privateLayout, layoutId, head);
 
 		if (layout == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler msg = new StringBundler(10);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -7230,6 +7250,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(", layoutId=");
 			msg.append(layoutId);
+
+			msg.append(", head=");
+			msg.append(head);
 
 			msg.append("}");
 
@@ -7244,32 +7267,36 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param layoutId the layout ID
+	 * @param head the head
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByG_P_L(long groupId, boolean privateLayout,
-		long layoutId) {
-		return fetchByG_P_L(groupId, privateLayout, layoutId, true);
+		long layoutId, boolean head) {
+		return fetchByG_P_L(groupId, privateLayout, layoutId, head, true);
 	}
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param layoutId the layout ID
+	 * @param head the head
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByG_P_L(long groupId, boolean privateLayout,
-		long layoutId, boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] { groupId, privateLayout, layoutId };
+		long layoutId, boolean head, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] {
+				groupId, privateLayout, layoutId, head
+			};
 
 		Object result = null;
 
@@ -7283,13 +7310,14 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((groupId != layout.getGroupId()) ||
 					(privateLayout != layout.isPrivateLayout()) ||
-					(layoutId != layout.getLayoutId())) {
+					(layoutId != layout.getLayoutId()) ||
+					(head != layout.isHead())) {
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler query = new StringBundler(6);
 
 			query.append(_SQL_SELECT_LAYOUT_WHERE);
 
@@ -7298,6 +7326,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			query.append(_FINDER_COLUMN_G_P_L_PRIVATELAYOUT_2);
 
 			query.append(_FINDER_COLUMN_G_P_L_LAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_L_HEAD_2);
 
 			String sql = query.toString();
 
@@ -7315,6 +7345,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				qPos.add(privateLayout);
 
 				qPos.add(layoutId);
+
+				qPos.add(head);
 
 				List<Layout> list = q.list();
 
@@ -7349,40 +7381,45 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Removes the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; from the database.
+	 * Removes the layout where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; and head = &#63; from the database.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param layoutId the layout ID
+	 * @param head the head
 	 * @return the layout that was removed
 	 */
 	@Override
 	public Layout removeByG_P_L(long groupId, boolean privateLayout,
-		long layoutId) throws NoSuchLayoutException {
-		Layout layout = findByG_P_L(groupId, privateLayout, layoutId);
+		long layoutId, boolean head) throws NoSuchLayoutException {
+		Layout layout = findByG_P_L(groupId, privateLayout, layoutId, head);
 
 		return remove(layout);
 	}
 
 	/**
-	 * Returns the number of layouts where groupId = &#63; and privateLayout = &#63; and layoutId = &#63;.
+	 * Returns the number of layouts where groupId = &#63; and privateLayout = &#63; and layoutId = &#63; and head = &#63;.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param layoutId the layout ID
+	 * @param head the head
 	 * @return the number of matching layouts
 	 */
 	@Override
-	public int countByG_P_L(long groupId, boolean privateLayout, long layoutId) {
+	public int countByG_P_L(long groupId, boolean privateLayout, long layoutId,
+		boolean head) {
 		FinderPath finderPath = _finderPathCountByG_P_L;
 
-		Object[] finderArgs = new Object[] { groupId, privateLayout, layoutId };
+		Object[] finderArgs = new Object[] {
+				groupId, privateLayout, layoutId, head
+			};
 
 		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
 				this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler query = new StringBundler(5);
 
 			query.append(_SQL_COUNT_LAYOUT_WHERE);
 
@@ -7391,6 +7428,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			query.append(_FINDER_COLUMN_G_P_L_PRIVATELAYOUT_2);
 
 			query.append(_FINDER_COLUMN_G_P_L_LAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_L_HEAD_2);
 
 			String sql = query.toString();
 
@@ -7408,6 +7447,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				qPos.add(privateLayout);
 
 				qPos.add(layoutId);
+
+				qPos.add(head);
 
 				count = (Long)q.uniqueResult();
 
@@ -7428,7 +7469,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 	private static final String _FINDER_COLUMN_G_P_L_GROUPID_2 = "layout.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_PRIVATELAYOUT_2 = "layout.privateLayout = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_L_LAYOUTID_2 = "layout.layoutId = ?";
+	private static final String _FINDER_COLUMN_G_P_L_LAYOUTID_2 = "layout.layoutId = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_L_HEAD_2 = "layout.head = ?";
 	private FinderPath _finderPathWithPaginationFindByG_P_P;
 	private FinderPath _finderPathWithoutPaginationFindByG_P_P;
 	private FinderPath _finderPathCountByG_P_P;
@@ -10045,21 +10087,22 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private FinderPath _finderPathCountByG_P_F;
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; and head = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param friendlyURL the friendly url
+	 * @param head the head
 	 * @return the matching layout
 	 * @throws NoSuchLayoutException if a matching layout could not be found
 	 */
 	@Override
 	public Layout findByG_P_F(long groupId, boolean privateLayout,
-		String friendlyURL) throws NoSuchLayoutException {
-		Layout layout = fetchByG_P_F(groupId, privateLayout, friendlyURL);
+		String friendlyURL, boolean head) throws NoSuchLayoutException {
+		Layout layout = fetchByG_P_F(groupId, privateLayout, friendlyURL, head);
 
 		if (layout == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler msg = new StringBundler(10);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -10071,6 +10114,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			msg.append(", friendlyURL=");
 			msg.append(friendlyURL);
+
+			msg.append(", head=");
+			msg.append(head);
 
 			msg.append("}");
 
@@ -10085,34 +10131,38 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param friendlyURL the friendly url
+	 * @param head the head
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByG_P_F(long groupId, boolean privateLayout,
-		String friendlyURL) {
-		return fetchByG_P_F(groupId, privateLayout, friendlyURL, true);
+		String friendlyURL, boolean head) {
+		return fetchByG_P_F(groupId, privateLayout, friendlyURL, head, true);
 	}
 
 	/**
-	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param friendlyURL the friendly url
+	 * @param head the head
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Override
 	public Layout fetchByG_P_F(long groupId, boolean privateLayout,
-		String friendlyURL, boolean retrieveFromCache) {
+		String friendlyURL, boolean head, boolean retrieveFromCache) {
 		friendlyURL = Objects.toString(friendlyURL, "");
 
-		Object[] finderArgs = new Object[] { groupId, privateLayout, friendlyURL };
+		Object[] finderArgs = new Object[] {
+				groupId, privateLayout, friendlyURL, head
+			};
 
 		Object result = null;
 
@@ -10126,13 +10176,14 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			if ((groupId != layout.getGroupId()) ||
 					(privateLayout != layout.isPrivateLayout()) ||
-					!Objects.equals(friendlyURL, layout.getFriendlyURL())) {
+					!Objects.equals(friendlyURL, layout.getFriendlyURL()) ||
+					(head != layout.isHead())) {
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler query = new StringBundler(6);
 
 			query.append(_SQL_SELECT_LAYOUT_WHERE);
 
@@ -10150,6 +10201,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 				query.append(_FINDER_COLUMN_G_P_F_FRIENDLYURL_2);
 			}
+
+			query.append(_FINDER_COLUMN_G_P_F_HEAD_2);
 
 			String sql = query.toString();
 
@@ -10169,6 +10222,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				if (bindFriendlyURL) {
 					qPos.add(friendlyURL);
 				}
+
+				qPos.add(head);
 
 				List<Layout> list = q.list();
 
@@ -10203,43 +10258,47 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	}
 
 	/**
-	 * Removes the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; from the database.
+	 * Removes the layout where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; and head = &#63; from the database.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param friendlyURL the friendly url
+	 * @param head the head
 	 * @return the layout that was removed
 	 */
 	@Override
 	public Layout removeByG_P_F(long groupId, boolean privateLayout,
-		String friendlyURL) throws NoSuchLayoutException {
-		Layout layout = findByG_P_F(groupId, privateLayout, friendlyURL);
+		String friendlyURL, boolean head) throws NoSuchLayoutException {
+		Layout layout = findByG_P_F(groupId, privateLayout, friendlyURL, head);
 
 		return remove(layout);
 	}
 
 	/**
-	 * Returns the number of layouts where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63;.
+	 * Returns the number of layouts where groupId = &#63; and privateLayout = &#63; and friendlyURL = &#63; and head = &#63;.
 	 *
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param friendlyURL the friendly url
+	 * @param head the head
 	 * @return the number of matching layouts
 	 */
 	@Override
 	public int countByG_P_F(long groupId, boolean privateLayout,
-		String friendlyURL) {
+		String friendlyURL, boolean head) {
 		friendlyURL = Objects.toString(friendlyURL, "");
 
 		FinderPath finderPath = _finderPathCountByG_P_F;
 
-		Object[] finderArgs = new Object[] { groupId, privateLayout, friendlyURL };
+		Object[] finderArgs = new Object[] {
+				groupId, privateLayout, friendlyURL, head
+			};
 
 		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
 				this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler query = new StringBundler(5);
 
 			query.append(_SQL_COUNT_LAYOUT_WHERE);
 
@@ -10257,6 +10316,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 				query.append(_FINDER_COLUMN_G_P_F_FRIENDLYURL_2);
 			}
+
+			query.append(_FINDER_COLUMN_G_P_F_HEAD_2);
 
 			String sql = query.toString();
 
@@ -10277,6 +10338,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					qPos.add(friendlyURL);
 				}
 
+				qPos.add(head);
+
 				count = (Long)q.uniqueResult();
 
 				FinderCacheUtil.putResult(finderPath, finderArgs, count);
@@ -10296,8 +10359,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 	private static final String _FINDER_COLUMN_G_P_F_GROUPID_2 = "layout.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_F_PRIVATELAYOUT_2 = "layout.privateLayout = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_F_FRIENDLYURL_2 = "layout.friendlyURL = ?";
-	private static final String _FINDER_COLUMN_G_P_F_FRIENDLYURL_3 = "(layout.friendlyURL IS NULL OR layout.friendlyURL = '')";
+	private static final String _FINDER_COLUMN_G_P_F_FRIENDLYURL_2 = "layout.friendlyURL = ? AND ";
+	private static final String _FINDER_COLUMN_G_P_F_FRIENDLYURL_3 = "(layout.friendlyURL IS NULL OR layout.friendlyURL = '') AND ";
+	private static final String _FINDER_COLUMN_G_P_F_HEAD_2 = "layout.head = ?";
 	private FinderPath _finderPathFetchByG_P_SPLU;
 	private FinderPath _finderPathCountByG_P_SPLU;
 
@@ -12611,6 +12675,196 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PARENTLAYOUTID_2_SQL = "layout.parentLayoutId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIORITY_2 = "layout.priority <= ? AND layout.system = [$FALSE$]";
 	private static final String _FINDER_COLUMN_G_P_P_LTP_PRIORITY_2_SQL = "layout.priority <= ? AND layout.system_ = [$FALSE$]";
+	private FinderPath _finderPathFetchByHeadId;
+	private FinderPath _finderPathCountByHeadId;
+
+	/**
+	 * Returns the layout where headId = &#63; or throws a {@link NoSuchLayoutException} if it could not be found.
+	 *
+	 * @param headId the head ID
+	 * @return the matching layout
+	 * @throws NoSuchLayoutException if a matching layout could not be found
+	 */
+	@Override
+	public Layout findByHeadId(long headId) throws NoSuchLayoutException {
+		Layout layout = fetchByHeadId(headId);
+
+		if (layout == null) {
+			StringBundler msg = new StringBundler(4);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("headId=");
+			msg.append(headId);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchLayoutException(msg.toString());
+		}
+
+		return layout;
+	}
+
+	/**
+	 * Returns the layout where headId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param headId the head ID
+	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
+	 */
+	@Override
+	public Layout fetchByHeadId(long headId) {
+		return fetchByHeadId(headId, true);
+	}
+
+	/**
+	 * Returns the layout where headId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param headId the head ID
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
+	 */
+	@Override
+	public Layout fetchByHeadId(long headId, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { headId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(_finderPathFetchByHeadId,
+					finderArgs, this);
+		}
+
+		if (result instanceof Layout) {
+			Layout layout = (Layout)result;
+
+			if ((headId != layout.getHeadId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_SELECT_LAYOUT_WHERE);
+
+			query.append(_FINDER_COLUMN_HEADID_HEADID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(headId);
+
+				List<Layout> list = q.list();
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(_finderPathFetchByHeadId,
+						finderArgs, list);
+				}
+				else {
+					Layout layout = list.get(0);
+
+					result = layout;
+
+					cacheResult(layout);
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(_finderPathFetchByHeadId,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (Layout)result;
+		}
+	}
+
+	/**
+	 * Removes the layout where headId = &#63; from the database.
+	 *
+	 * @param headId the head ID
+	 * @return the layout that was removed
+	 */
+	@Override
+	public Layout removeByHeadId(long headId) throws NoSuchLayoutException {
+		Layout layout = findByHeadId(headId);
+
+		return remove(layout);
+	}
+
+	/**
+	 * Returns the number of layouts where headId = &#63;.
+	 *
+	 * @param headId the head ID
+	 * @return the number of matching layouts
+	 */
+	@Override
+	public int countByHeadId(long headId) {
+		FinderPath finderPath = _finderPathCountByHeadId;
+
+		Object[] finderArgs = new Object[] { headId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_LAYOUT_WHERE);
+
+			query.append(_FINDER_COLUMN_HEADID_HEADID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(headId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_HEADID_HEADID_2 = "layout.headId = ?";
 
 	public LayoutPersistenceImpl() {
 		setModelClass(Layout.class);
@@ -12632,7 +12886,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 		FinderCacheUtil.putResult(_finderPathFetchByUUID_G_P,
 			new Object[] {
-				layout.getUuid(), layout.getGroupId(), layout.isPrivateLayout()
+				layout.getUuid(), layout.getGroupId(), layout.isPrivateLayout(),
+				layout.isHead()
 			}, layout);
 
 		FinderCacheUtil.putResult(_finderPathFetchByIconImageId,
@@ -12645,13 +12900,13 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		FinderCacheUtil.putResult(_finderPathFetchByG_P_L,
 			new Object[] {
 				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId()
+				layout.getLayoutId(), layout.isHead()
 			}, layout);
 
 		FinderCacheUtil.putResult(_finderPathFetchByG_P_F,
 			new Object[] {
 				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getFriendlyURL()
+				layout.getFriendlyURL(), layout.isHead()
 			}, layout);
 
 		FinderCacheUtil.putResult(_finderPathFetchByG_P_SPLU,
@@ -12659,6 +12914,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getSourcePrototypeLayoutUuid()
 			}, layout);
+
+		FinderCacheUtil.putResult(_finderPathFetchByHeadId,
+			new Object[] { layout.getHeadId() }, layout);
 
 		layout.resetOriginalValues();
 	}
@@ -12732,7 +12990,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 	protected void cacheUniqueFindersCache(LayoutModelImpl layoutModelImpl) {
 		Object[] args = new Object[] {
 				layoutModelImpl.getUuid(), layoutModelImpl.getGroupId(),
-				layoutModelImpl.isPrivateLayout()
+				layoutModelImpl.isPrivateLayout(), layoutModelImpl.isHead()
 			};
 
 		FinderCacheUtil.putResult(_finderPathCountByUUID_G_P, args,
@@ -12759,7 +13017,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 		args = new Object[] {
 				layoutModelImpl.getGroupId(), layoutModelImpl.isPrivateLayout(),
-				layoutModelImpl.getLayoutId()
+				layoutModelImpl.getLayoutId(), layoutModelImpl.isHead()
 			};
 
 		FinderCacheUtil.putResult(_finderPathCountByG_P_L, args,
@@ -12769,7 +13027,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 		args = new Object[] {
 				layoutModelImpl.getGroupId(), layoutModelImpl.isPrivateLayout(),
-				layoutModelImpl.getFriendlyURL()
+				layoutModelImpl.getFriendlyURL(), layoutModelImpl.isHead()
 			};
 
 		FinderCacheUtil.putResult(_finderPathCountByG_P_F, args,
@@ -12786,6 +13044,13 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Long.valueOf(1), false);
 		FinderCacheUtil.putResult(_finderPathFetchByG_P_SPLU, args,
 			layoutModelImpl, false);
+
+		args = new Object[] { layoutModelImpl.getHeadId() };
+
+		FinderCacheUtil.putResult(_finderPathCountByHeadId, args,
+			Long.valueOf(1), false);
+		FinderCacheUtil.putResult(_finderPathFetchByHeadId, args,
+			layoutModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(LayoutModelImpl layoutModelImpl,
@@ -12793,7 +13058,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		if (clearCurrent) {
 			Object[] args = new Object[] {
 					layoutModelImpl.getUuid(), layoutModelImpl.getGroupId(),
-					layoutModelImpl.isPrivateLayout()
+					layoutModelImpl.isPrivateLayout(), layoutModelImpl.isHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUUID_G_P, args);
@@ -12805,7 +13070,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Object[] args = new Object[] {
 					layoutModelImpl.getOriginalUuid(),
 					layoutModelImpl.getOriginalGroupId(),
-					layoutModelImpl.getOriginalPrivateLayout()
+					layoutModelImpl.getOriginalPrivateLayout(),
+					layoutModelImpl.getOriginalHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUUID_G_P, args);
@@ -12854,7 +13120,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Object[] args = new Object[] {
 					layoutModelImpl.getGroupId(),
 					layoutModelImpl.isPrivateLayout(),
-					layoutModelImpl.getLayoutId()
+					layoutModelImpl.getLayoutId(), layoutModelImpl.isHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByG_P_L, args);
@@ -12866,7 +13132,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Object[] args = new Object[] {
 					layoutModelImpl.getOriginalGroupId(),
 					layoutModelImpl.getOriginalPrivateLayout(),
-					layoutModelImpl.getOriginalLayoutId()
+					layoutModelImpl.getOriginalLayoutId(),
+					layoutModelImpl.getOriginalHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByG_P_L, args);
@@ -12877,7 +13144,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Object[] args = new Object[] {
 					layoutModelImpl.getGroupId(),
 					layoutModelImpl.isPrivateLayout(),
-					layoutModelImpl.getFriendlyURL()
+					layoutModelImpl.getFriendlyURL(), layoutModelImpl.isHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByG_P_F, args);
@@ -12889,7 +13156,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			Object[] args = new Object[] {
 					layoutModelImpl.getOriginalGroupId(),
 					layoutModelImpl.getOriginalPrivateLayout(),
-					layoutModelImpl.getOriginalFriendlyURL()
+					layoutModelImpl.getOriginalFriendlyURL(),
+					layoutModelImpl.getOriginalHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByG_P_F, args);
@@ -12917,6 +13185,21 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 			FinderCacheUtil.removeResult(_finderPathCountByG_P_SPLU, args);
 			FinderCacheUtil.removeResult(_finderPathFetchByG_P_SPLU, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] { layoutModelImpl.getHeadId() };
+
+			FinderCacheUtil.removeResult(_finderPathCountByHeadId, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByHeadId, args);
+		}
+
+		if ((layoutModelImpl.getColumnBitmask() &
+				_finderPathFetchByHeadId.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] { layoutModelImpl.getOriginalHeadId() };
+
+			FinderCacheUtil.removeResult(_finderPathCountByHeadId, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByHeadId, args);
 		}
 	}
 
@@ -14059,18 +14342,19 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G_P",
 				new String[] {
 					String.class.getName(), Long.class.getName(),
-					Boolean.class.getName()
+					Boolean.class.getName(), Boolean.class.getName()
 				},
 				LayoutModelImpl.UUID_COLUMN_BITMASK |
 				LayoutModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutModelImpl.PRIVATELAYOUT_COLUMN_BITMASK);
+				LayoutModelImpl.PRIVATELAYOUT_COLUMN_BITMASK |
+				LayoutModelImpl.HEAD_COLUMN_BITMASK);
 
 		_finderPathCountByUUID_G_P = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G_P",
 				new String[] {
 					String.class.getName(), Long.class.getName(),
-					Boolean.class.getName()
+					Boolean.class.getName(), Boolean.class.getName()
 				});
 
 		_finderPathWithPaginationFindByUuid_C = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
@@ -14318,18 +14602,19 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				FINDER_CLASS_NAME_ENTITY, "fetchByG_P_L",
 				new String[] {
 					Long.class.getName(), Boolean.class.getName(),
-					Long.class.getName()
+					Long.class.getName(), Boolean.class.getName()
 				},
 				LayoutModelImpl.GROUPID_COLUMN_BITMASK |
 				LayoutModelImpl.PRIVATELAYOUT_COLUMN_BITMASK |
-				LayoutModelImpl.LAYOUTID_COLUMN_BITMASK);
+				LayoutModelImpl.LAYOUTID_COLUMN_BITMASK |
+				LayoutModelImpl.HEAD_COLUMN_BITMASK);
 
 		_finderPathCountByG_P_L = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_L",
 				new String[] {
 					Long.class.getName(), Boolean.class.getName(),
-					Long.class.getName()
+					Long.class.getName(), Boolean.class.getName()
 				});
 
 		_finderPathWithPaginationFindByG_P_P = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
@@ -14408,18 +14693,19 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				FINDER_CLASS_NAME_ENTITY, "fetchByG_P_F",
 				new String[] {
 					Long.class.getName(), Boolean.class.getName(),
-					String.class.getName()
+					String.class.getName(), Boolean.class.getName()
 				},
 				LayoutModelImpl.GROUPID_COLUMN_BITMASK |
 				LayoutModelImpl.PRIVATELAYOUT_COLUMN_BITMASK |
-				LayoutModelImpl.FRIENDLYURL_COLUMN_BITMASK);
+				LayoutModelImpl.FRIENDLYURL_COLUMN_BITMASK |
+				LayoutModelImpl.HEAD_COLUMN_BITMASK);
 
 		_finderPathCountByG_P_F = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_F",
 				new String[] {
 					Long.class.getName(), Boolean.class.getName(),
-					String.class.getName()
+					String.class.getName(), Boolean.class.getName()
 				});
 
 		_finderPathFetchByG_P_SPLU = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
@@ -14478,6 +14764,17 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 					Long.class.getName(), Boolean.class.getName(),
 					Long.class.getName(), Integer.class.getName()
 				});
+
+		_finderPathFetchByHeadId = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
+				LayoutModelImpl.FINDER_CACHE_ENABLED, LayoutImpl.class,
+				FINDER_CLASS_NAME_ENTITY, "fetchByHeadId",
+				new String[] { Long.class.getName() },
+				LayoutModelImpl.HEADID_COLUMN_BITMASK);
+
+		_finderPathCountByHeadId = new FinderPath(LayoutModelImpl.ENTITY_CACHE_ENABLED,
+				LayoutModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByHeadId",
+				new String[] { Long.class.getName() });
 	}
 
 	public void destroy() {
