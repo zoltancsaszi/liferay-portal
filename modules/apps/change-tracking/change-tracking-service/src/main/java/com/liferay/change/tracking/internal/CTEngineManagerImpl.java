@@ -25,8 +25,13 @@ import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTProcessLocalService;
 import com.liferay.change.tracking.util.comparator.CTEntryCreateDateComparator;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.dao.orm.Disjunction;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -405,6 +410,34 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		}
 	}
 
+	@Override
+	public List<CTCollection> searchByKeywords(
+		long companyId, QueryDefinition<CTCollection> queryDefinition) {
+
+		String keywords = GetterUtil.getString(
+			queryDefinition.getAttribute("keywords"));
+
+		Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+
+		for (String keyword : StringUtil.split(keywords, CharPool.SPACE)) {
+			disjunction.add(
+				RestrictionsFactoryUtil.ilike("name", _wildcard(keyword)));
+
+			disjunction.add(
+				RestrictionsFactoryUtil.ilike(
+					"description", _wildcard(keyword)));
+		}
+
+		DynamicQuery query = _ctCollectionLocalService.dynamicQuery();
+
+		query.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+		query.add(disjunction);
+
+		return _ctCollectionLocalService.dynamicQuery(
+			query, queryDefinition.getStart(), queryDefinition.getEnd(),
+			queryDefinition.getOrderByComparator());
+	}
+
 	private void _copyEntriesFromProduction(CTCollection ctCollection) {
 		Optional<CTCollection> productionCTCollectionOptional =
 			getProductionCTCollectionOptional(ctCollection.getCompanyId());
@@ -528,6 +561,10 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		portalPreferences.setValue(
 			CTPortletKeys.CHANGE_LISTS, _RECENT_CT_COLLECTION_ID,
 			String.valueOf(ctCollectionId));
+	}
+
+	private String _wildcard(String value) {
+		return CharPool.PERCENT + value + CharPool.PERCENT;
 	}
 
 	private static final String _RECENT_CT_COLLECTION_ID =

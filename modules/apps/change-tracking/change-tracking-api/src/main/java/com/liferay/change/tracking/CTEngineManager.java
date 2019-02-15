@@ -198,4 +198,16 @@ public interface CTEngineManager {
 	 */
 	public void publishCTCollection(long userId, long ctCollectionId);
 
+	/**
+	 * Returns all the change tracking collection associated with the given
+	 * company and keywords.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  queryDefinition the object contains settings regarding
+	 *         pagination, order and filter (keywords)
+	 * @return the list of change tracking collections
+	 */
+	public List<CTCollection> searchByKeywords(
+		long companyId, QueryDefinition<CTCollection> queryDefinition);
+
 }
