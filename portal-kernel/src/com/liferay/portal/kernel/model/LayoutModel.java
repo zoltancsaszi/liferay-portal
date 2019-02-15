@@ -18,6 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
+import com.liferay.portal.kernel.model.version.VersionedModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -35,10 +36,8 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface LayoutModel
-	extends BaseModel<Layout>, LocalizedModel, MVCCModel, ShardedModel,
-			StagedGroupedModel {
-
+public interface LayoutModel extends BaseModel<Layout>, LocalizedModel, MVCCModel,
+	ShardedModel, StagedGroupedModel, VersionedModel<LayoutVersion> {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -50,6 +49,7 @@ public interface LayoutModel
 	 *
 	 * @return the primary key of this layout
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -57,6 +57,7 @@ public interface LayoutModel
 	 *
 	 * @param primaryKey the primary key of this layout
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -91,6 +92,22 @@ public interface LayoutModel
 	 */
 	@Override
 	public void setUuid(String uuid);
+
+	/**
+	 * Returns the head ID of this layout.
+	 *
+	 * @return the head ID of this layout
+	 */
+	@Override
+	public long getHeadId();
+
+	/**
+	 * Sets the head ID of this layout.
+	 *
+	 * @param headId the head ID of this layout
+	 */
+	@Override
+	public void setHeadId(long headId);
 
 	/**
 	 * Returns the plid of this layout.
@@ -588,8 +605,8 @@ public interface LayoutModel
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescription(
-		String description, Locale locale, Locale defaultLocale);
+	public void setDescription(String description, Locale locale,
+		Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -606,8 +623,8 @@ public interface LayoutModel
 	 * @param descriptionMap the locales and localized descriptions of this layout
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale);
+	public void setDescriptionMap(Map<Locale, String> descriptionMap,
+		Locale defaultLocale);
 
 	/**
 	 * Returns the keywords of this layout.
@@ -689,8 +706,7 @@ public interface LayoutModel
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setKeywords(
-		String keywords, Locale locale, Locale defaultLocale);
+	public void setKeywords(String keywords, Locale locale, Locale defaultLocale);
 
 	public void setKeywordsCurrentLanguageId(String languageId);
 
@@ -707,8 +723,8 @@ public interface LayoutModel
 	 * @param keywordsMap the locales and localized keywordses of this layout
 	 * @param defaultLocale the default locale
 	 */
-	public void setKeywordsMap(
-		Map<Locale, String> keywordsMap, Locale defaultLocale);
+	public void setKeywordsMap(Map<Locale, String> keywordsMap,
+		Locale defaultLocale);
 
 	/**
 	 * Returns the robots of this layout.
@@ -807,8 +823,7 @@ public interface LayoutModel
 	 * @param robotsMap the locales and localized robotses of this layout
 	 * @param defaultLocale the default locale
 	 */
-	public void setRobotsMap(
-		Map<Locale, String> robotsMap, Locale defaultLocale);
+	public void setRobotsMap(Map<Locale, String> robotsMap, Locale defaultLocale);
 
 	/**
 	 * Returns the type of this layout.
@@ -1050,5 +1065,4 @@ public interface LayoutModel
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
-
 }
