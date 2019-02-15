@@ -25920,6 +25920,6 @@ public class LayoutVersionPersistenceImpl extends BasePersistenceImpl<LayoutVers
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No LayoutVersion exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(LayoutVersionPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid", "type", "hidden"
+				"uuid", "type", "hidden", "system"
 			});
 }
