@@ -309,7 +309,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 					_portletDataContext.addReferenceElement(
 						_stagedModel, entityElement, fileEntry, referenceType,
-						!disposableDependency);
+						true);
 				}
 			}
 		}
