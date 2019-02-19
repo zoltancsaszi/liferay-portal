@@ -16,6 +16,8 @@ package com.liferay.asset.categories.internal.service.permission;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.permission.PermissionUpdateHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -46,7 +48,12 @@ public class AssetCategoryPermissionUpdateHandler
 
 		assetCategory.setModifiedDate(new Date());
 
-		_assetCategoryLocalService.updateAssetCategory(assetCategory);
+		try {
+			_assetCategoryLocalService.updateAssetCategory(assetCategory);
+		}
+		catch (PortalException pe) {
+			throw new SystemException(pe);
+		}
 	}
 
 	@Reference(unbind = "-")
