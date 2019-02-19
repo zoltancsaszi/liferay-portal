@@ -91,6 +91,8 @@ public interface AssetCategory extends AssetCategoryModel,
 	public java.util.List<AssetCategory> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public java.util.List<AssetEntry> getEntries();
+
 	public AssetCategory getParentCategory();
 
 	public String getPath(java.util.Locale locale)
@@ -100,4 +102,6 @@ public interface AssetCategory extends AssetCategoryModel,
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public boolean isRootCategory();
+
+	public void setEntries(java.util.List<AssetEntry> entries);
 }

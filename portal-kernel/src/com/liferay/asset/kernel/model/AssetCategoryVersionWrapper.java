@@ -16,8 +16,6 @@ package com.liferay.asset.kernel.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
@@ -27,28 +25,29 @@ import java.util.Map;
 
 /**
  * <p>
- * This class is a wrapper for {@link AssetCategory}.
+ * This class is a wrapper for {@link AssetCategoryVersion}.
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see AssetCategory
+ * @see AssetCategoryVersion
  * @generated
  */
 @ProviderType
-public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
-	implements AssetCategory, ModelWrapper<AssetCategory> {
-	public AssetCategoryWrapper(AssetCategory assetCategory) {
-		super(assetCategory);
+public class AssetCategoryVersionWrapper extends BaseModelWrapper<AssetCategoryVersion>
+	implements AssetCategoryVersion, ModelWrapper<AssetCategoryVersion> {
+	public AssetCategoryVersionWrapper(
+		AssetCategoryVersion assetCategoryVersion) {
+		super(assetCategoryVersion);
 	}
 
 	@Override
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
+		attributes.put("assetCategoryVersionId", getAssetCategoryVersionId());
+		attributes.put("version", getVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
-		attributes.put("headId", getHeadId());
 		attributes.put("categoryId", getCategoryId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -70,10 +69,17 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
+		Long assetCategoryVersionId = (Long)attributes.get(
+				"assetCategoryVersionId");
 
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
+		if (assetCategoryVersionId != null) {
+			setAssetCategoryVersionId(assetCategoryVersionId);
+		}
+
+		Integer version = (Integer)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
 		}
 
 		String uuid = (String)attributes.get("uuid");
@@ -87,12 +93,6 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 
 		if (externalReferenceCode != null) {
 			setExternalReferenceCode(externalReferenceCode);
-		}
-
-		Long headId = (Long)attributes.get("headId");
-
-		if (headId != null) {
-			setHeadId(headId);
 		}
 
 		Long categoryId = (Long)attributes.get("categoryId");
@@ -186,10 +186,14 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 		}
 	}
 
+	/**
+	* Returns the asset category version ID of this asset category version.
+	*
+	* @return the asset category version ID of this asset category version
+	*/
 	@Override
-	public java.util.List<AssetCategory> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return model.getAncestors();
+	public long getAssetCategoryVersionId() {
+		return model.getAssetCategoryVersionId();
 	}
 
 	@Override
@@ -198,9 +202,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the category ID of this asset category.
+	* Returns the category ID of this asset category version.
 	*
-	* @return the category ID of this asset category
+	* @return the category ID of this asset category version
 	*/
 	@Override
 	public long getCategoryId() {
@@ -208,9 +212,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the company ID of this asset category.
+	* Returns the company ID of this asset category version.
 	*
-	* @return the company ID of this asset category
+	* @return the company ID of this asset category version
 	*/
 	@Override
 	public long getCompanyId() {
@@ -218,9 +222,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the create date of this asset category.
+	* Returns the create date of this asset category version.
 	*
-	* @return the create date of this asset category
+	* @return the create date of this asset category version
 	*/
 	@Override
 	public Date getCreateDate() {
@@ -233,9 +237,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the description of this asset category.
+	* Returns the description of this asset category version.
 	*
-	* @return the description of this asset category
+	* @return the description of this asset category version
 	*/
 	@Override
 	public String getDescription() {
@@ -243,10 +247,10 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized description of this asset category in the language. Uses the default language if no localization exists for the requested language.
+	* Returns the localized description of this asset category version in the language. Uses the default language if no localization exists for the requested language.
 	*
 	* @param locale the locale of the language
-	* @return the localized description of this asset category
+	* @return the localized description of this asset category version
 	*/
 	@Override
 	public String getDescription(java.util.Locale locale) {
@@ -254,11 +258,11 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized description of this asset category in the language, optionally using the default language if no localization exists for the requested language.
+	* Returns the localized description of this asset category version in the language, optionally using the default language if no localization exists for the requested language.
 	*
 	* @param locale the local of the language
 	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized description of this asset category. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	* @return the localized description of this asset category version. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	*/
 	@Override
 	public String getDescription(java.util.Locale locale, boolean useDefault) {
@@ -266,10 +270,10 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized description of this asset category in the language. Uses the default language if no localization exists for the requested language.
+	* Returns the localized description of this asset category version in the language. Uses the default language if no localization exists for the requested language.
 	*
 	* @param languageId the ID of the language
-	* @return the localized description of this asset category
+	* @return the localized description of this asset category version
 	*/
 	@Override
 	public String getDescription(String languageId) {
@@ -277,11 +281,11 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized description of this asset category in the language, optionally using the default language if no localization exists for the requested language.
+	* Returns the localized description of this asset category version in the language, optionally using the default language if no localization exists for the requested language.
 	*
 	* @param languageId the ID of the language
 	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized description of this asset category
+	* @return the localized description of this asset category version
 	*/
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
@@ -299,24 +303,19 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns a map of the locales and localized descriptions of this asset category.
+	* Returns a map of the locales and localized descriptions of this asset category version.
 	*
-	* @return the locales and localized descriptions of this asset category
+	* @return the locales and localized descriptions of this asset category version
 	*/
 	@Override
 	public Map<java.util.Locale, String> getDescriptionMap() {
 		return model.getDescriptionMap();
 	}
 
-	@Override
-	public java.util.List<AssetEntry> getEntries() {
-		return model.getEntries();
-	}
-
 	/**
-	* Returns the external reference code of this asset category.
+	* Returns the external reference code of this asset category version.
 	*
-	* @return the external reference code of this asset category
+	* @return the external reference code of this asset category version
 	*/
 	@Override
 	public String getExternalReferenceCode() {
@@ -324,9 +323,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the group ID of this asset category.
+	* Returns the group ID of this asset category version.
 	*
-	* @return the group ID of this asset category
+	* @return the group ID of this asset category version
 	*/
 	@Override
 	public long getGroupId() {
@@ -334,19 +333,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the head ID of this asset category.
+	* Returns the last publish date of this asset category version.
 	*
-	* @return the head ID of this asset category
-	*/
-	@Override
-	public long getHeadId() {
-		return model.getHeadId();
-	}
-
-	/**
-	* Returns the last publish date of this asset category.
-	*
-	* @return the last publish date of this asset category
+	* @return the last publish date of this asset category version
 	*/
 	@Override
 	public Date getLastPublishDate() {
@@ -354,9 +343,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the left category ID of this asset category.
+	* Returns the left category ID of this asset category version.
 	*
-	* @return the left category ID of this asset category
+	* @return the left category ID of this asset category version
 	*/
 	@Override
 	public long getLeftCategoryId() {
@@ -364,9 +353,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the modified date of this asset category.
+	* Returns the modified date of this asset category version.
 	*
-	* @return the modified date of this asset category
+	* @return the modified date of this asset category version
 	*/
 	@Override
 	public Date getModifiedDate() {
@@ -374,56 +363,29 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the mvcc version of this asset category.
+	* Returns the name of this asset category version.
 	*
-	* @return the mvcc version of this asset category
-	*/
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
-	* Returns the name of this asset category.
-	*
-	* @return the name of this asset category
+	* @return the name of this asset category version
 	*/
 	@Override
 	public String getName() {
 		return model.getName();
 	}
 
-	@Override
-	public AssetCategory getParentCategory() {
-		return model.getParentCategory();
-	}
-
 	/**
-	* Returns the parent category ID of this asset category.
+	* Returns the parent category ID of this asset category version.
 	*
-	* @return the parent category ID of this asset category
+	* @return the parent category ID of this asset category version
 	*/
 	@Override
 	public long getParentCategoryId() {
 		return model.getParentCategoryId();
 	}
 
-	@Override
-	public String getPath(java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return model.getPath(locale);
-	}
-
-	@Override
-	public String getPath(java.util.Locale locale, boolean reverse)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return model.getPath(locale, reverse);
-	}
-
 	/**
-	* Returns the primary key of this asset category.
+	* Returns the primary key of this asset category version.
 	*
-	* @return the primary key of this asset category
+	* @return the primary key of this asset category version
 	*/
 	@Override
 	public long getPrimaryKey() {
@@ -431,9 +393,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the right category ID of this asset category.
+	* Returns the right category ID of this asset category version.
 	*
-	* @return the right category ID of this asset category
+	* @return the right category ID of this asset category version
 	*/
 	@Override
 	public long getRightCategoryId() {
@@ -441,9 +403,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the title of this asset category.
+	* Returns the title of this asset category version.
 	*
-	* @return the title of this asset category
+	* @return the title of this asset category version
 	*/
 	@Override
 	public String getTitle() {
@@ -451,10 +413,10 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized title of this asset category in the language. Uses the default language if no localization exists for the requested language.
+	* Returns the localized title of this asset category version in the language. Uses the default language if no localization exists for the requested language.
 	*
 	* @param locale the locale of the language
-	* @return the localized title of this asset category
+	* @return the localized title of this asset category version
 	*/
 	@Override
 	public String getTitle(java.util.Locale locale) {
@@ -462,11 +424,11 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized title of this asset category in the language, optionally using the default language if no localization exists for the requested language.
+	* Returns the localized title of this asset category version in the language, optionally using the default language if no localization exists for the requested language.
 	*
 	* @param locale the local of the language
 	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized title of this asset category. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	* @return the localized title of this asset category version. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
 	*/
 	@Override
 	public String getTitle(java.util.Locale locale, boolean useDefault) {
@@ -474,10 +436,10 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized title of this asset category in the language. Uses the default language if no localization exists for the requested language.
+	* Returns the localized title of this asset category version in the language. Uses the default language if no localization exists for the requested language.
 	*
 	* @param languageId the ID of the language
-	* @return the localized title of this asset category
+	* @return the localized title of this asset category version
 	*/
 	@Override
 	public String getTitle(String languageId) {
@@ -485,11 +447,11 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the localized title of this asset category in the language, optionally using the default language if no localization exists for the requested language.
+	* Returns the localized title of this asset category version in the language, optionally using the default language if no localization exists for the requested language.
 	*
 	* @param languageId the ID of the language
 	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized title of this asset category
+	* @return the localized title of this asset category version
 	*/
 	@Override
 	public String getTitle(String languageId, boolean useDefault) {
@@ -507,9 +469,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns a map of the locales and localized titles of this asset category.
+	* Returns a map of the locales and localized titles of this asset category version.
 	*
-	* @return the locales and localized titles of this asset category
+	* @return the locales and localized titles of this asset category version
 	*/
 	@Override
 	public Map<java.util.Locale, String> getTitleMap() {
@@ -517,9 +479,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the user ID of this asset category.
+	* Returns the user ID of this asset category version.
 	*
-	* @return the user ID of this asset category
+	* @return the user ID of this asset category version
 	*/
 	@Override
 	public long getUserId() {
@@ -527,9 +489,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the user name of this asset category.
+	* Returns the user name of this asset category version.
 	*
-	* @return the user name of this asset category
+	* @return the user name of this asset category version
 	*/
 	@Override
 	public String getUserName() {
@@ -537,9 +499,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the user uuid of this asset category.
+	* Returns the user uuid of this asset category version.
 	*
-	* @return the user uuid of this asset category
+	* @return the user uuid of this asset category version
 	*/
 	@Override
 	public String getUserUuid() {
@@ -547,9 +509,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the uuid of this asset category.
+	* Returns the uuid of this asset category version.
 	*
-	* @return the uuid of this asset category
+	* @return the uuid of this asset category version
 	*/
 	@Override
 	public String getUuid() {
@@ -557,23 +519,23 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Returns the vocabulary ID of this asset category.
+	* Returns the version of this asset category version.
 	*
-	* @return the vocabulary ID of this asset category
+	* @return the version of this asset category version
+	*/
+	@Override
+	public int getVersion() {
+		return model.getVersion();
+	}
+
+	/**
+	* Returns the vocabulary ID of this asset category version.
+	*
+	* @return the vocabulary ID of this asset category version
 	*/
 	@Override
 	public long getVocabularyId() {
 		return model.getVocabularyId();
-	}
-
-	@Override
-	public boolean isRootCategory() {
-		return model.isRootCategory();
-	}
-
-	@Override
-	public void persist() {
-		model.persist();
 	}
 
 	@Override
@@ -590,9 +552,19 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the category ID of this asset category.
+	* Sets the asset category version ID of this asset category version.
 	*
-	* @param categoryId the category ID of this asset category
+	* @param assetCategoryVersionId the asset category version ID of this asset category version
+	*/
+	@Override
+	public void setAssetCategoryVersionId(long assetCategoryVersionId) {
+		model.setAssetCategoryVersionId(assetCategoryVersionId);
+	}
+
+	/**
+	* Sets the category ID of this asset category version.
+	*
+	* @param categoryId the category ID of this asset category version
 	*/
 	@Override
 	public void setCategoryId(long categoryId) {
@@ -600,9 +572,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the company ID of this asset category.
+	* Sets the company ID of this asset category version.
 	*
-	* @param companyId the company ID of this asset category
+	* @param companyId the company ID of this asset category version
 	*/
 	@Override
 	public void setCompanyId(long companyId) {
@@ -610,9 +582,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the create date of this asset category.
+	* Sets the create date of this asset category version.
 	*
-	* @param createDate the create date of this asset category
+	* @param createDate the create date of this asset category version
 	*/
 	@Override
 	public void setCreateDate(Date createDate) {
@@ -620,9 +592,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the description of this asset category.
+	* Sets the description of this asset category version.
 	*
-	* @param description the description of this asset category
+	* @param description the description of this asset category version
 	*/
 	@Override
 	public void setDescription(String description) {
@@ -630,9 +602,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized description of this asset category in the language.
+	* Sets the localized description of this asset category version in the language.
 	*
-	* @param description the localized description of this asset category
+	* @param description the localized description of this asset category version
 	* @param locale the locale of the language
 	*/
 	@Override
@@ -641,9 +613,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized description of this asset category in the language, and sets the default locale.
+	* Sets the localized description of this asset category version in the language, and sets the default locale.
 	*
-	* @param description the localized description of this asset category
+	* @param description the localized description of this asset category version
 	* @param locale the locale of the language
 	* @param defaultLocale the default locale
 	*/
@@ -659,9 +631,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized descriptions of this asset category from the map of locales and localized descriptions.
+	* Sets the localized descriptions of this asset category version from the map of locales and localized descriptions.
 	*
-	* @param descriptionMap the locales and localized descriptions of this asset category
+	* @param descriptionMap the locales and localized descriptions of this asset category version
 	*/
 	@Override
 	public void setDescriptionMap(Map<java.util.Locale, String> descriptionMap) {
@@ -669,9 +641,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized descriptions of this asset category from the map of locales and localized descriptions, and sets the default locale.
+	* Sets the localized descriptions of this asset category version from the map of locales and localized descriptions, and sets the default locale.
 	*
-	* @param descriptionMap the locales and localized descriptions of this asset category
+	* @param descriptionMap the locales and localized descriptions of this asset category version
 	* @param defaultLocale the default locale
 	*/
 	@Override
@@ -681,15 +653,10 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 		model.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
-	@Override
-	public void setEntries(java.util.List<AssetEntry> entries) {
-		model.setEntries(entries);
-	}
-
 	/**
-	* Sets the external reference code of this asset category.
+	* Sets the external reference code of this asset category version.
 	*
-	* @param externalReferenceCode the external reference code of this asset category
+	* @param externalReferenceCode the external reference code of this asset category version
 	*/
 	@Override
 	public void setExternalReferenceCode(String externalReferenceCode) {
@@ -697,9 +664,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the group ID of this asset category.
+	* Sets the group ID of this asset category version.
 	*
-	* @param groupId the group ID of this asset category
+	* @param groupId the group ID of this asset category version
 	*/
 	@Override
 	public void setGroupId(long groupId) {
@@ -707,19 +674,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the head ID of this asset category.
+	* Sets the last publish date of this asset category version.
 	*
-	* @param headId the head ID of this asset category
-	*/
-	@Override
-	public void setHeadId(long headId) {
-		model.setHeadId(headId);
-	}
-
-	/**
-	* Sets the last publish date of this asset category.
-	*
-	* @param lastPublishDate the last publish date of this asset category
+	* @param lastPublishDate the last publish date of this asset category version
 	*/
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
@@ -727,9 +684,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the left category ID of this asset category.
+	* Sets the left category ID of this asset category version.
 	*
-	* @param leftCategoryId the left category ID of this asset category
+	* @param leftCategoryId the left category ID of this asset category version
 	*/
 	@Override
 	public void setLeftCategoryId(long leftCategoryId) {
@@ -737,9 +694,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the modified date of this asset category.
+	* Sets the modified date of this asset category version.
 	*
-	* @param modifiedDate the modified date of this asset category
+	* @param modifiedDate the modified date of this asset category version
 	*/
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
@@ -747,19 +704,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the mvcc version of this asset category.
+	* Sets the name of this asset category version.
 	*
-	* @param mvccVersion the mvcc version of this asset category
-	*/
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
-	* Sets the name of this asset category.
-	*
-	* @param name the name of this asset category
+	* @param name the name of this asset category version
 	*/
 	@Override
 	public void setName(String name) {
@@ -767,9 +714,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the parent category ID of this asset category.
+	* Sets the parent category ID of this asset category version.
 	*
-	* @param parentCategoryId the parent category ID of this asset category
+	* @param parentCategoryId the parent category ID of this asset category version
 	*/
 	@Override
 	public void setParentCategoryId(long parentCategoryId) {
@@ -777,9 +724,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the primary key of this asset category.
+	* Sets the primary key of this asset category version.
 	*
-	* @param primaryKey the primary key of this asset category
+	* @param primaryKey the primary key of this asset category version
 	*/
 	@Override
 	public void setPrimaryKey(long primaryKey) {
@@ -787,9 +734,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the right category ID of this asset category.
+	* Sets the right category ID of this asset category version.
 	*
-	* @param rightCategoryId the right category ID of this asset category
+	* @param rightCategoryId the right category ID of this asset category version
 	*/
 	@Override
 	public void setRightCategoryId(long rightCategoryId) {
@@ -797,9 +744,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the title of this asset category.
+	* Sets the title of this asset category version.
 	*
-	* @param title the title of this asset category
+	* @param title the title of this asset category version
 	*/
 	@Override
 	public void setTitle(String title) {
@@ -807,9 +754,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized title of this asset category in the language.
+	* Sets the localized title of this asset category version in the language.
 	*
-	* @param title the localized title of this asset category
+	* @param title the localized title of this asset category version
 	* @param locale the locale of the language
 	*/
 	@Override
@@ -818,9 +765,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized title of this asset category in the language, and sets the default locale.
+	* Sets the localized title of this asset category version in the language, and sets the default locale.
 	*
-	* @param title the localized title of this asset category
+	* @param title the localized title of this asset category version
 	* @param locale the locale of the language
 	* @param defaultLocale the default locale
 	*/
@@ -836,9 +783,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized titles of this asset category from the map of locales and localized titles.
+	* Sets the localized titles of this asset category version from the map of locales and localized titles.
 	*
-	* @param titleMap the locales and localized titles of this asset category
+	* @param titleMap the locales and localized titles of this asset category version
 	*/
 	@Override
 	public void setTitleMap(Map<java.util.Locale, String> titleMap) {
@@ -846,9 +793,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the localized titles of this asset category from the map of locales and localized titles, and sets the default locale.
+	* Sets the localized titles of this asset category version from the map of locales and localized titles, and sets the default locale.
 	*
-	* @param titleMap the locales and localized titles of this asset category
+	* @param titleMap the locales and localized titles of this asset category version
 	* @param defaultLocale the default locale
 	*/
 	@Override
@@ -858,9 +805,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the user ID of this asset category.
+	* Sets the user ID of this asset category version.
 	*
-	* @param userId the user ID of this asset category
+	* @param userId the user ID of this asset category version
 	*/
 	@Override
 	public void setUserId(long userId) {
@@ -868,9 +815,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the user name of this asset category.
+	* Sets the user name of this asset category version.
 	*
-	* @param userName the user name of this asset category
+	* @param userName the user name of this asset category version
 	*/
 	@Override
 	public void setUserName(String userName) {
@@ -878,9 +825,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the user uuid of this asset category.
+	* Sets the user uuid of this asset category version.
 	*
-	* @param userUuid the user uuid of this asset category
+	* @param userUuid the user uuid of this asset category version
 	*/
 	@Override
 	public void setUserUuid(String userUuid) {
@@ -888,9 +835,9 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the uuid of this asset category.
+	* Sets the uuid of this asset category version.
 	*
-	* @param uuid the uuid of this asset category
+	* @param uuid the uuid of this asset category version
 	*/
 	@Override
 	public void setUuid(String uuid) {
@@ -898,9 +845,19 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	/**
-	* Sets the vocabulary ID of this asset category.
+	* Sets the version of this asset category version.
 	*
-	* @param vocabularyId the vocabulary ID of this asset category
+	* @param version the version of this asset category version
+	*/
+	@Override
+	public void setVersion(int version) {
+		model.setVersion(version);
+	}
+
+	/**
+	* Sets the vocabulary ID of this asset category version.
+	*
+	* @param vocabularyId the vocabulary ID of this asset category version
 	*/
 	@Override
 	public void setVocabularyId(long vocabularyId) {
@@ -908,47 +865,28 @@ public class AssetCategoryWrapper extends BaseModelWrapper<AssetCategory>
 	}
 
 	@Override
-	public long getNestedSetsTreeNodeLeft() {
-		return model.getNestedSetsTreeNodeLeft();
+	public long getVersionedModelId() {
+		return model.getVersionedModelId();
 	}
 
 	@Override
-	public long getNestedSetsTreeNodeRight() {
-		return model.getNestedSetsTreeNodeRight();
+	public void setVersionedModelId(long id) {
+		model.setVersionedModelId(id);
 	}
 
 	@Override
-	public long getNestedSetsTreeNodeScopeId() {
-		return model.getNestedSetsTreeNodeScopeId();
+	public void populateVersionedModel(AssetCategory assetCategory) {
+		model.populateVersionedModel(assetCategory);
 	}
 
 	@Override
-	public void setNestedSetsTreeNodeLeft(long nestedSetsTreeNodeLeft) {
-		model.setNestedSetsTreeNodeLeft(nestedSetsTreeNodeLeft);
+	public AssetCategory toVersionedModel() {
+		return model.toVersionedModel();
 	}
 
 	@Override
-	public void setNestedSetsTreeNodeRight(long nestedSetsTreeNodeRight) {
-		model.setNestedSetsTreeNodeRight(nestedSetsTreeNodeRight);
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return model.getStagedModelType();
-	}
-
-	@Override
-	public boolean isHead() {
-		return model.isHead();
-	}
-
-	@Override
-	public void populateVersionModel(AssetCategoryVersion assetCategoryVersion) {
-		model.populateVersionModel(assetCategoryVersion);
-	}
-
-	@Override
-	protected AssetCategoryWrapper wrap(AssetCategory assetCategory) {
-		return new AssetCategoryWrapper(assetCategory);
+	protected AssetCategoryVersionWrapper wrap(
+		AssetCategoryVersion assetCategoryVersion) {
+		return new AssetCategoryVersionWrapper(assetCategoryVersion);
 	}
 }

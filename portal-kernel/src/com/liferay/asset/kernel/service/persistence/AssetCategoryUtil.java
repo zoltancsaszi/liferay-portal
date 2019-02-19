@@ -274,63 +274,72 @@ public class AssetCategoryUtil {
 	}
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the matching asset category
 	* @throws NoSuchCategoryException if a matching asset category could not be found
 	*/
-	public static AssetCategory findByUUID_G(String uuid, long groupId)
+	public static AssetCategory findByUUID_G(String uuid, long groupId,
+		boolean head)
 		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
-		return getPersistence().findByUUID_G(uuid, groupId);
+		return getPersistence().findByUUID_G(uuid, groupId, head);
 	}
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
-	public static AssetCategory fetchByUUID_G(String uuid, long groupId) {
-		return getPersistence().fetchByUUID_G(uuid, groupId);
+	public static AssetCategory fetchByUUID_G(String uuid, long groupId,
+		boolean head) {
+		return getPersistence().fetchByUUID_G(uuid, groupId, head);
 	}
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
 	public static AssetCategory fetchByUUID_G(String uuid, long groupId,
-		boolean retrieveFromCache) {
-		return getPersistence().fetchByUUID_G(uuid, groupId, retrieveFromCache);
+		boolean head, boolean retrieveFromCache) {
+		return getPersistence()
+				   .fetchByUUID_G(uuid, groupId, head, retrieveFromCache);
 	}
 
 	/**
-	* Removes the asset category where uuid = &#63; and groupId = &#63; from the database.
+	* Removes the asset category where uuid = &#63; and groupId = &#63; and head = &#63; from the database.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the asset category that was removed
 	*/
-	public static AssetCategory removeByUUID_G(String uuid, long groupId)
+	public static AssetCategory removeByUUID_G(String uuid, long groupId,
+		boolean head)
 		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
-		return getPersistence().removeByUUID_G(uuid, groupId);
+		return getPersistence().removeByUUID_G(uuid, groupId, head);
 	}
 
 	/**
-	* Returns the number of asset categories where uuid = &#63; and groupId = &#63;.
+	* Returns the number of asset categories where uuid = &#63; and groupId = &#63; and head = &#63;.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the number of matching asset categories
 	*/
-	public static int countByUUID_G(String uuid, long groupId) {
-		return getPersistence().countByUUID_G(uuid, groupId);
+	public static int countByUUID_G(String uuid, long groupId, boolean head) {
+		return getPersistence().countByUUID_G(uuid, groupId, head);
 	}
 
 	/**
@@ -3030,77 +3039,83 @@ public class AssetCategoryUtil {
 	}
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the matching asset category
 	* @throws NoSuchCategoryException if a matching asset category could not be found
 	*/
 	public static AssetCategory findByP_N_V(long parentCategoryId, String name,
-		long vocabularyId)
+		long vocabularyId, boolean head)
 		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
-		return getPersistence().findByP_N_V(parentCategoryId, name, vocabularyId);
+		return getPersistence()
+				   .findByP_N_V(parentCategoryId, name, vocabularyId, head);
 	}
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
 	public static AssetCategory fetchByP_N_V(long parentCategoryId,
-		String name, long vocabularyId) {
+		String name, long vocabularyId, boolean head) {
 		return getPersistence()
-				   .fetchByP_N_V(parentCategoryId, name, vocabularyId);
+				   .fetchByP_N_V(parentCategoryId, name, vocabularyId, head);
 	}
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
 	public static AssetCategory fetchByP_N_V(long parentCategoryId,
-		String name, long vocabularyId, boolean retrieveFromCache) {
+		String name, long vocabularyId, boolean head, boolean retrieveFromCache) {
 		return getPersistence()
-				   .fetchByP_N_V(parentCategoryId, name, vocabularyId,
+				   .fetchByP_N_V(parentCategoryId, name, vocabularyId, head,
 			retrieveFromCache);
 	}
 
 	/**
-	* Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; from the database.
+	* Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; from the database.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the asset category that was removed
 	*/
 	public static AssetCategory removeByP_N_V(long parentCategoryId,
-		String name, long vocabularyId)
+		String name, long vocabularyId, boolean head)
 		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
 		return getPersistence()
-				   .removeByP_N_V(parentCategoryId, name, vocabularyId);
+				   .removeByP_N_V(parentCategoryId, name, vocabularyId, head);
 	}
 
 	/**
-	* Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63;.
+	* Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63;.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the number of matching asset categories
 	*/
 	public static int countByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) {
+		long vocabularyId, boolean head) {
 		return getPersistence()
-				   .countByP_N_V(parentCategoryId, name, vocabularyId);
+				   .countByP_N_V(parentCategoryId, name, vocabularyId, head);
 	}
 
 	/**
@@ -3480,6 +3495,61 @@ public class AssetCategoryUtil {
 	*/
 	public static int countByC_ERC(long companyId, String externalReferenceCode) {
 		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
+	}
+
+	/**
+	* Returns the asset category where headId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	*
+	* @param headId the head ID
+	* @return the matching asset category
+	* @throws NoSuchCategoryException if a matching asset category could not be found
+	*/
+	public static AssetCategory findByHeadId(long headId)
+		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
+		return getPersistence().findByHeadId(headId);
+	}
+
+	/**
+	* Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param headId the head ID
+	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	*/
+	public static AssetCategory fetchByHeadId(long headId) {
+		return getPersistence().fetchByHeadId(headId);
+	}
+
+	/**
+	* Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param headId the head ID
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	*/
+	public static AssetCategory fetchByHeadId(long headId,
+		boolean retrieveFromCache) {
+		return getPersistence().fetchByHeadId(headId, retrieveFromCache);
+	}
+
+	/**
+	* Removes the asset category where headId = &#63; from the database.
+	*
+	* @param headId the head ID
+	* @return the asset category that was removed
+	*/
+	public static AssetCategory removeByHeadId(long headId)
+		throws com.liferay.asset.kernel.exception.NoSuchCategoryException {
+		return getPersistence().removeByHeadId(headId);
+	}
+
+	/**
+	* Returns the number of asset categories where headId = &#63;.
+	*
+	* @param headId the head ID
+	* @return the number of matching asset categories
+	*/
+	public static int countByHeadId(long headId) {
+		return getPersistence().countByHeadId(headId);
 	}
 
 	/**

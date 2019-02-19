@@ -18,12 +18,31 @@ create index IX_C7F39FCA on AssetCategory (groupId, name[$COLUMN_LENGTH:75$], vo
 create index IX_852EA801 on AssetCategory (groupId, parentCategoryId, name[$COLUMN_LENGTH:75$], vocabularyId);
 create index IX_87603842 on AssetCategory (groupId, parentCategoryId, vocabularyId);
 create index IX_2008FACB on AssetCategory (groupId, vocabularyId);
+create unique index IX_B73CC003 on AssetCategory (headId);
 create index IX_D61ABE08 on AssetCategory (name[$COLUMN_LENGTH:75$], vocabularyId);
-create unique index IX_BE4DF2BF on AssetCategory (parentCategoryId, name[$COLUMN_LENGTH:75$], vocabularyId);
+create unique index IX_86E6C953 on AssetCategory (parentCategoryId, name[$COLUMN_LENGTH:75$], vocabularyId, head);
 create index IX_B185E980 on AssetCategory (parentCategoryId, vocabularyId);
 create index IX_BBAF6928 on AssetCategory (uuid_[$COLUMN_LENGTH:75$], companyId);
-create unique index IX_E8D019AA on AssetCategory (uuid_[$COLUMN_LENGTH:75$], groupId);
+create unique index IX_40CD3FE on AssetCategory (uuid_[$COLUMN_LENGTH:75$], groupId, head);
 create index IX_287B1F89 on AssetCategory (vocabularyId);
+
+create unique index IX_6817716B on AssetCategoryVersion (categoryId, version);
+create index IX_F6F18543 on AssetCategoryVersion (companyId, externalReferenceCode[$COLUMN_LENGTH:75$], version);
+create index IX_975B229A on AssetCategoryVersion (groupId, name[$COLUMN_LENGTH:75$], vocabularyId, version);
+create index IX_821AD943 on AssetCategoryVersion (groupId, parentCategoryId, name[$COLUMN_LENGTH:75$], vocabularyId, version);
+create index IX_F3773C17 on AssetCategoryVersion (groupId, parentCategoryId, version);
+create index IX_6565C722 on AssetCategoryVersion (groupId, parentCategoryId, vocabularyId, version);
+create index IX_26D256EE on AssetCategoryVersion (groupId, version);
+create index IX_DD919DB9 on AssetCategoryVersion (groupId, vocabularyId, version);
+create index IX_A6F2E864 on AssetCategoryVersion (name[$COLUMN_LENGTH:75$], vocabularyId, version);
+create index IX_1EEDFCC2 on AssetCategoryVersion (parentCategoryId, name[$COLUMN_LENGTH:75$], version);
+create unique index IX_DF9C808D on AssetCategoryVersion (parentCategoryId, name[$COLUMN_LENGTH:75$], vocabularyId, version);
+create index IX_58F9EC61 on AssetCategoryVersion (parentCategoryId, version);
+create index IX_D1E12DEC on AssetCategoryVersion (parentCategoryId, vocabularyId, version);
+create index IX_1B774A44 on AssetCategoryVersion (uuid_[$COLUMN_LENGTH:75$], companyId, version);
+create unique index IX_1050D502 on AssetCategoryVersion (uuid_[$COLUMN_LENGTH:75$], groupId, version);
+create index IX_D2270124 on AssetCategoryVersion (uuid_[$COLUMN_LENGTH:75$], version);
+create index IX_54BC0303 on AssetCategoryVersion (vocabularyId, version);
 
 create index IX_A188F560 on AssetEntries_AssetCategories (categoryId);
 create index IX_38A65B55 on AssetEntries_AssetCategories (companyId);

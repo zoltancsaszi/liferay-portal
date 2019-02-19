@@ -20,8 +20,10 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
+import com.liferay.portal.kernel.model.version.VersionedModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -40,7 +42,8 @@ import java.util.Map;
  */
 @ProviderType
 public interface AssetCategoryModel extends BaseModel<AssetCategory>,
-	LocalizedModel, ShardedModel, StagedGroupedModel {
+	LocalizedModel, MVCCModel, ShardedModel, StagedGroupedModel,
+	VersionedModel<AssetCategoryVersion> {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -52,6 +55,7 @@ public interface AssetCategoryModel extends BaseModel<AssetCategory>,
 	 *
 	 * @return the primary key of this asset category
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -59,7 +63,24 @@ public interface AssetCategoryModel extends BaseModel<AssetCategory>,
 	 *
 	 * @param primaryKey the primary key of this asset category
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this asset category.
+	 *
+	 * @return the mvcc version of this asset category
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this asset category.
+	 *
+	 * @param mvccVersion the mvcc version of this asset category
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the uuid of this asset category.
@@ -92,6 +113,22 @@ public interface AssetCategoryModel extends BaseModel<AssetCategory>,
 	 * @param externalReferenceCode the external reference code of this asset category
 	 */
 	public void setExternalReferenceCode(String externalReferenceCode);
+
+	/**
+	 * Returns the head ID of this asset category.
+	 *
+	 * @return the head ID of this asset category
+	 */
+	@Override
+	public long getHeadId();
+
+	/**
+	 * Sets the head ID of this asset category.
+	 *
+	 * @param headId the head ID of this asset category
+	 */
+	@Override
+	public void setHeadId(long headId);
 
 	/**
 	 * Returns the category ID of this asset category.

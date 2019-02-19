@@ -23,20 +23,21 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services, specifically {@link com.liferay.portlet.asset.service.http.AssetCategoryServiceSoap}.
+ * This class is used by SOAP remote services.
  *
  * @author Brian Wing Shun Chan
  * @generated
  */
 @ProviderType
-public class AssetCategorySoap implements Serializable {
-	public static AssetCategorySoap toSoapModel(AssetCategory model) {
-		AssetCategorySoap soapModel = new AssetCategorySoap();
+public class AssetCategoryVersionSoap implements Serializable {
+	public static AssetCategoryVersionSoap toSoapModel(
+		AssetCategoryVersion model) {
+		AssetCategoryVersionSoap soapModel = new AssetCategoryVersionSoap();
 
-		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setAssetCategoryVersionId(model.getAssetCategoryVersionId());
+		soapModel.setVersion(model.getVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
-		soapModel.setHeadId(model.getHeadId());
 		soapModel.setCategoryId(model.getCategoryId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -56,8 +57,9 @@ public class AssetCategorySoap implements Serializable {
 		return soapModel;
 	}
 
-	public static AssetCategorySoap[] toSoapModels(AssetCategory[] models) {
-		AssetCategorySoap[] soapModels = new AssetCategorySoap[models.length];
+	public static AssetCategoryVersionSoap[] toSoapModels(
+		AssetCategoryVersion[] models) {
+		AssetCategoryVersionSoap[] soapModels = new AssetCategoryVersionSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -66,14 +68,15 @@ public class AssetCategorySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static AssetCategorySoap[][] toSoapModels(AssetCategory[][] models) {
-		AssetCategorySoap[][] soapModels = null;
+	public static AssetCategoryVersionSoap[][] toSoapModels(
+		AssetCategoryVersion[][] models) {
+		AssetCategoryVersionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new AssetCategorySoap[models.length][models[0].length];
+			soapModels = new AssetCategoryVersionSoap[models.length][models[0].length];
 		}
 		else {
-			soapModels = new AssetCategorySoap[0][0];
+			soapModels = new AssetCategoryVersionSoap[0][0];
 		}
 
 		for (int i = 0; i < models.length; i++) {
@@ -83,33 +86,42 @@ public class AssetCategorySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static AssetCategorySoap[] toSoapModels(List<AssetCategory> models) {
-		List<AssetCategorySoap> soapModels = new ArrayList<AssetCategorySoap>(models.size());
+	public static AssetCategoryVersionSoap[] toSoapModels(
+		List<AssetCategoryVersion> models) {
+		List<AssetCategoryVersionSoap> soapModels = new ArrayList<AssetCategoryVersionSoap>(models.size());
 
-		for (AssetCategory model : models) {
+		for (AssetCategoryVersion model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new AssetCategorySoap[soapModels.size()]);
+		return soapModels.toArray(new AssetCategoryVersionSoap[soapModels.size()]);
 	}
 
-	public AssetCategorySoap() {
+	public AssetCategoryVersionSoap() {
 	}
 
 	public long getPrimaryKey() {
-		return _categoryId;
+		return _assetCategoryVersionId;
 	}
 
 	public void setPrimaryKey(long pk) {
-		setCategoryId(pk);
+		setAssetCategoryVersionId(pk);
 	}
 
-	public long getMvccVersion() {
-		return _mvccVersion;
+	public long getAssetCategoryVersionId() {
+		return _assetCategoryVersionId;
 	}
 
-	public void setMvccVersion(long mvccVersion) {
-		_mvccVersion = mvccVersion;
+	public void setAssetCategoryVersionId(long assetCategoryVersionId) {
+		_assetCategoryVersionId = assetCategoryVersionId;
+	}
+
+	public int getVersion() {
+		return _version;
+	}
+
+	public void setVersion(int version) {
+		_version = version;
 	}
 
 	public String getUuid() {
@@ -126,14 +138,6 @@ public class AssetCategorySoap implements Serializable {
 
 	public void setExternalReferenceCode(String externalReferenceCode) {
 		_externalReferenceCode = externalReferenceCode;
-	}
-
-	public long getHeadId() {
-		return _headId;
-	}
-
-	public void setHeadId(long headId) {
-		_headId = headId;
 	}
 
 	public long getCategoryId() {
@@ -256,10 +260,10 @@ public class AssetCategorySoap implements Serializable {
 		_lastPublishDate = lastPublishDate;
 	}
 
-	private long _mvccVersion;
+	private long _assetCategoryVersionId;
+	private int _version;
 	private String _uuid;
 	private String _externalReferenceCode;
-	private long _headId;
 	private long _categoryId;
 	private long _groupId;
 	private long _companyId;

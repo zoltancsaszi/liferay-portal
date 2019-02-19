@@ -81,9 +81,34 @@ create table AnnouncementsFlag (
 );
 
 create table AssetCategory (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
+	headId LONG,
 	categoryId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	parentCategoryId LONG,
+	leftCategoryId LONG,
+	rightCategoryId LONG,
+	name VARCHAR(75) null,
+	title STRING null,
+	description STRING null,
+	vocabularyId LONG,
+	lastPublishDate DATE null,
+	head BOOLEAN
+);
+
+create table AssetCategoryVersion (
+	assetCategoryVersionId LONG not null primary key,
+	version INTEGER,
+	uuid_ VARCHAR(75) null,
+	externalReferenceCode VARCHAR(75) null,
+	categoryId LONG,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,

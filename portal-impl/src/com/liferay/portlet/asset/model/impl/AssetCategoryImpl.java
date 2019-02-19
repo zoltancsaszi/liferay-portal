@@ -15,8 +15,10 @@
 package com.liferay.portlet.asset.model.impl;
 
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -47,6 +49,12 @@ public class AssetCategoryImpl extends AssetCategoryBaseImpl {
 		}
 
 		return categories;
+	}
+
+	@Override
+	public List<AssetEntry> getEntries() {
+		return AssetEntryLocalServiceUtil.getAssetCategoryAssetEntries(
+			getCategoryId());
 	}
 
 	@Override
@@ -116,6 +124,12 @@ public class AssetCategoryImpl extends AssetCategoryBaseImpl {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void setEntries(List<AssetEntry> entries) {
+		AssetEntryLocalServiceUtil.addAssetCategoryAssetEntries(
+			getCategoryId(), entries);
 	}
 
 }

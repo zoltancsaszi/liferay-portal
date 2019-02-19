@@ -106,19 +106,29 @@ public class AssetCategoryLocalServiceUtil {
 		getService().addCategoryResources(category, modelPermissions);
 	}
 
+	public static com.liferay.asset.kernel.model.AssetCategory checkout(
+		com.liferay.asset.kernel.model.AssetCategory publishedAssetCategory,
+		int version) throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().checkout(publishedAssetCategory, version);
+	}
+
 	public static void clearAssetEntryAssetCategories(long entryId) {
 		getService().clearAssetEntryAssetCategories(entryId);
 	}
 
 	/**
-	* Creates a new asset category with the primary key. Does not add the asset category to the database.
+	* Creates a new asset category. Does not add the asset category to the database.
 	*
-	* @param categoryId the primary key for the new asset category
 	* @return the new asset category
 	*/
-	public static com.liferay.asset.kernel.model.AssetCategory createAssetCategory(
-		long categoryId) {
-		return getService().createAssetCategory(categoryId);
+	public static com.liferay.asset.kernel.model.AssetCategory create() {
+		return getService().create();
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory delete(
+		com.liferay.asset.kernel.model.AssetCategory publishedAssetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().delete(publishedAssetCategory);
 	}
 
 	/**
@@ -195,6 +205,12 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().deleteCategory(categoryId);
 	}
 
+	public static com.liferay.asset.kernel.model.AssetCategory deleteDraft(
+		com.liferay.asset.kernel.model.AssetCategory draftAssetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteDraft(draftAssetCategory);
+	}
+
 	/**
 	* @throws PortalException
 	*/
@@ -202,6 +218,12 @@ public class AssetCategoryLocalServiceUtil {
 		com.liferay.portal.kernel.model.PersistedModel persistedModel)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategoryVersion deleteVersion(
+		com.liferay.asset.kernel.model.AssetCategoryVersion assetCategoryVersion)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteVersion(assetCategoryVersion);
 	}
 
 	public static void deleteVocabularyCategories(long vocabularyId)
@@ -327,6 +349,31 @@ public class AssetCategoryLocalServiceUtil {
 		long groupId, long parentCategoryId, String name, long vocabularyId) {
 		return getService()
 				   .fetchCategory(groupId, parentCategoryId, name, vocabularyId);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory fetchDraft(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory) {
+		return getService().fetchDraft(assetCategory);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory fetchDraft(
+		long primaryKey) {
+		return getService().fetchDraft(primaryKey);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategoryVersion fetchLatestVersion(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory) {
+		return getService().fetchLatestVersion(assetCategory);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory fetchPublished(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory) {
+		return getService().fetchPublished(assetCategory);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory fetchPublished(
+		long primaryKey) {
+		return getService().fetchPublished(primaryKey);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
@@ -515,6 +562,18 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getDescendantCategories(category);
 	}
 
+	public static com.liferay.asset.kernel.model.AssetCategory getDraft(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getDraft(assetCategory);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory getDraft(
+		long primaryKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getDraft(primaryKey);
+	}
+
 	public static java.util.List<com.liferay.asset.kernel.model.AssetCategory> getEntryCategories(
 		long entryId) {
 		return getService().getEntryCategories(entryId);
@@ -546,6 +605,17 @@ public class AssetCategoryLocalServiceUtil {
 
 	public static java.util.List<Long> getSubcategoryIds(long parentCategoryId) {
 		return getService().getSubcategoryIds(parentCategoryId);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategoryVersion getVersion(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory, int version)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getVersion(assetCategory, version);
+	}
+
+	public static java.util.List<com.liferay.asset.kernel.model.AssetCategoryVersion> getVersions(
+		com.liferay.asset.kernel.model.AssetCategory assetCategory) {
+		return getService().getVersions(assetCategory);
 	}
 
 	public static long[] getViewableCategoryIds(String className, long classPK,
@@ -609,8 +679,19 @@ public class AssetCategoryLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static com.liferay.asset.kernel.model.AssetCategory publishDraft(
+		com.liferay.asset.kernel.model.AssetCategory draftAssetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().publishDraft(draftAssetCategory);
+	}
+
 	public static void rebuildTree(long groupId, boolean force) {
 		getService().rebuildTree(groupId, force);
+	}
+
+	public static void registerListener(
+		com.liferay.portal.kernel.service.version.VersionServiceListener<com.liferay.asset.kernel.model.AssetCategory, com.liferay.asset.kernel.model.AssetCategoryVersion> versionServiceListener) {
+		getService().registerListener(versionServiceListener);
 	}
 
 	public static java.util.List<com.liferay.asset.kernel.model.AssetCategory> search(
@@ -661,6 +742,11 @@ public class AssetCategoryLocalServiceUtil {
 		getService().setAssetEntryAssetCategories(entryId, categoryIds);
 	}
 
+	public static void unregisterListener(
+		com.liferay.portal.kernel.service.version.VersionServiceListener<com.liferay.asset.kernel.model.AssetCategory, com.liferay.asset.kernel.model.AssetCategoryVersion> versionServiceListener) {
+		getService().unregisterListener(versionServiceListener);
+	}
+
 	/**
 	* Updates the asset category in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
@@ -668,8 +754,9 @@ public class AssetCategoryLocalServiceUtil {
 	* @return the asset category that was updated
 	*/
 	public static com.liferay.asset.kernel.model.AssetCategory updateAssetCategory(
-		com.liferay.asset.kernel.model.AssetCategory assetCategory) {
-		return getService().updateAssetCategory(assetCategory);
+		com.liferay.asset.kernel.model.AssetCategory draftAssetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateAssetCategory(draftAssetCategory);
 	}
 
 	public static com.liferay.asset.kernel.model.AssetCategory updateCategory(
@@ -683,6 +770,12 @@ public class AssetCategoryLocalServiceUtil {
 				   .updateCategory(userId, categoryId, parentCategoryId,
 			titleMap, descriptionMap, vocabularyId, categoryProperties,
 			serviceContext);
+	}
+
+	public static com.liferay.asset.kernel.model.AssetCategory updateDraft(
+		com.liferay.asset.kernel.model.AssetCategory draftAssetCategory)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateDraft(draftAssetCategory);
 	}
 
 	public static AssetCategoryLocalService getService() {

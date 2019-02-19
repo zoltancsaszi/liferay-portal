@@ -19,6 +19,9 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+
 /**
  * The extended model base implementation for the AssetCategory service. Represents a row in the &quot;AssetCategory&quot; database table, with each column mapped to a property of this class.
  *
@@ -45,7 +48,12 @@ public abstract class AssetCategoryBaseImpl extends AssetCategoryModelImpl
 			AssetCategoryLocalServiceUtil.addAssetCategory(this);
 		}
 		else {
-			AssetCategoryLocalServiceUtil.updateAssetCategory(this);
+			try {
+				AssetCategoryLocalServiceUtil.updateAssetCategory(this);
+			}
+			catch (PortalException pe) {
+				throw new SystemException(pe);
+			}
 		}
 	}
 }

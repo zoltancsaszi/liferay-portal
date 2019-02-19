@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryFinder;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
+import com.liferay.asset.kernel.service.persistence.AssetCategoryVersionPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetEntryFinder;
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetVocabularyFinder;
@@ -302,6 +303,25 @@ public abstract class AssetCategoryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the asset category version persistence.
+	 *
+	 * @return the asset category version persistence
+	 */
+	public AssetCategoryVersionPersistence getAssetCategoryVersionPersistence() {
+		return assetCategoryVersionPersistence;
+	}
+
+	/**
+	 * Sets the asset category version persistence.
+	 *
+	 * @param assetCategoryVersionPersistence the asset category version persistence
+	 */
+	public void setAssetCategoryVersionPersistence(
+		AssetCategoryVersionPersistence assetCategoryVersionPersistence) {
+		this.assetCategoryVersionPersistence = assetCategoryVersionPersistence;
+	}
+
+	/**
 	 * Returns the asset entry local service.
 	 *
 	 * @return the asset entry local service
@@ -526,6 +546,8 @@ public abstract class AssetCategoryServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = AssetCategoryVersionPersistence.class)
+	protected AssetCategoryVersionPersistence assetCategoryVersionPersistence;
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)

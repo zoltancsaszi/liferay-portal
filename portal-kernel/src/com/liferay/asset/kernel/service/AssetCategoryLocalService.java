@@ -17,6 +17,7 @@ package com.liferay.asset.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetCategoryVersion;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 
@@ -39,6 +40,9 @@ import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
+import com.liferay.portal.kernel.service.version.VersionService;
+import com.liferay.portal.kernel.service.version.VersionServiceListener;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -61,11 +65,14 @@ import java.util.Map;
  * @see AssetCategoryLocalServiceUtil
  * @generated
  */
+@OSGiBeanProperties(property =  {
+	"model.class.name=com.liferay.asset.kernel.model.AssetCategory", "version.model.class.name=com.liferay.asset.kernel.model.AssetCategoryVersion"})
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
 public interface AssetCategoryLocalService extends BaseLocalService,
-	PersistedModelLocalService {
+	PersistedModelLocalService,
+	VersionService<AssetCategory, AssetCategoryVersion> {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -109,16 +116,26 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	public void addCategoryResources(AssetCategory category,
 		ModelPermissions modelPermissions) throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory checkout(AssetCategory publishedAssetCategory,
+		int version) throws PortalException;
+
 	public void clearAssetEntryAssetCategories(long entryId);
 
 	/**
-	* Creates a new asset category with the primary key. Does not add the asset category to the database.
+	* Creates a new asset category. Does not add the asset category to the database.
 	*
-	* @param categoryId the primary key for the new asset category
 	* @return the new asset category
 	*/
 	@Transactional(enabled = false)
-	public AssetCategory createAssetCategory(long categoryId);
+	@Override
+	public AssetCategory create();
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public AssetCategory delete(AssetCategory publishedAssetCategory)
+		throws PortalException;
 
 	/**
 	* Deletes the asset category from the database. Also notifies the appropriate model listeners.
@@ -166,12 +183,21 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	public AssetCategory deleteCategory(long categoryId)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public AssetCategory deleteDraft(AssetCategory draftAssetCategory)
+		throws PortalException;
+
 	/**
 	* @throws PortalException
 	*/
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Override
+	public AssetCategoryVersion deleteVersion(
+		AssetCategoryVersion assetCategoryVersion) throws PortalException;
 
 	public void deleteVocabularyCategories(long vocabularyId)
 		throws PortalException;
@@ -272,6 +298,26 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetCategory fetchCategory(long groupId, long parentCategoryId,
 		String name, long vocabularyId);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory fetchDraft(AssetCategory assetCategory);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory fetchDraft(long primaryKey);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategoryVersion fetchLatestVersion(AssetCategory assetCategory);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory fetchPublished(AssetCategory assetCategory);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory fetchPublished(long primaryKey);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -416,6 +462,15 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetCategory> getDescendantCategories(AssetCategory category);
 
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory getDraft(AssetCategory assetCategory)
+		throws PortalException;
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategory getDraft(long primaryKey) throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetCategory> getEntryCategories(long entryId);
 
@@ -440,6 +495,15 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Long> getSubcategoryIds(long parentCategoryId);
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetCategoryVersion getVersion(AssetCategory assetCategory,
+		int version) throws PortalException;
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetCategoryVersion> getVersions(AssetCategory assetCategory);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getViewableCategoryIds(String className, long classPK,
@@ -479,7 +543,16 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 		long vocabularyId, ServiceContext serviceContext)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory publishDraft(AssetCategory draftAssetCategory)
+		throws PortalException;
+
 	public void rebuildTree(long groupId, boolean force);
+
+	@Override
+	public void registerListener(
+		VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetCategory> search(long groupId, String name,
@@ -509,6 +582,10 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 
 	public void setAssetEntryAssetCategories(long entryId, long[] categoryIds);
 
+	@Override
+	public void unregisterListener(
+		VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener);
+
 	/**
 	* Updates the asset category in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
@@ -516,12 +593,18 @@ public interface AssetCategoryLocalService extends BaseLocalService,
 	* @return the asset category that was updated
 	*/
 	@Indexable(type = IndexableType.REINDEX)
-	public AssetCategory updateAssetCategory(AssetCategory assetCategory);
+	public AssetCategory updateAssetCategory(AssetCategory draftAssetCategory)
+		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
 	public AssetCategory updateCategory(long userId, long categoryId,
 		long parentCategoryId, Map<Locale, String> titleMap,
 		Map<Locale, String> descriptionMap, long vocabularyId,
 		String[] categoryProperties, ServiceContext serviceContext)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory updateDraft(AssetCategory draftAssetCategory)
 		throws PortalException;
 }

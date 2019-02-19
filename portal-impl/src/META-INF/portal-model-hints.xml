@@ -74,8 +74,10 @@
 		<field name="value" type="int" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetCategory">
+		<field name="mvccVersion" type="long" />
 		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
+		<field name="headId" type="long" />
 		<field name="categoryId" type="long" />
 		<field name="groupId" type="long" />
 		<field name="companyId" type="long" />
@@ -107,6 +109,32 @@
 		<field name="categoryId" type="long" />
 		<field name="key" type="String" />
 		<field name="value" type="String" />
+	</model>
+	<model name="com.liferay.asset.kernel.model.AssetCategoryVersion">
+		<field name="assetCategoryVersionId" type="long" />
+		<field name="version" type="int" />
+		<field name="uuid" type="String" />
+		<field name="externalReferenceCode" type="String" />
+		<field name="categoryId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="parentCategoryId" type="long" />
+		<field name="leftCategoryId" type="long" />
+		<field name="rightCategoryId" type="long" />
+		<field name="name" type="String" />
+		<field localized="true" name="title" type="String">
+			<validator name="required" />
+		</field>
+		<field localized="true" name="description" type="String">
+			<hint-collection name="TEXTAREA" />
+			<hint name="display-width">350</hint>
+		</field>
+		<field name="vocabularyId" type="long" />
+		<field name="lastPublishDate" type="Date" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetEntry">
 		<field name="entryId" type="long" />

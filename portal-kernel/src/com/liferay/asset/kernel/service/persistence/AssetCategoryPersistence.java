@@ -172,54 +172,59 @@ public interface AssetCategoryPersistence extends BasePersistence<AssetCategory>
 	public int countByUuid(String uuid);
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the matching asset category
 	* @throws NoSuchCategoryException if a matching asset category could not be found
 	*/
-	public AssetCategory findByUUID_G(String uuid, long groupId)
+	public AssetCategory findByUUID_G(String uuid, long groupId, boolean head)
 		throws NoSuchCategoryException;
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
-	public AssetCategory fetchByUUID_G(String uuid, long groupId);
+	public AssetCategory fetchByUUID_G(String uuid, long groupId, boolean head);
 
 	/**
-	* Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	* Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
-	public AssetCategory fetchByUUID_G(String uuid, long groupId,
+	public AssetCategory fetchByUUID_G(String uuid, long groupId, boolean head,
 		boolean retrieveFromCache);
 
 	/**
-	* Removes the asset category where uuid = &#63; and groupId = &#63; from the database.
+	* Removes the asset category where uuid = &#63; and groupId = &#63; and head = &#63; from the database.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the asset category that was removed
 	*/
-	public AssetCategory removeByUUID_G(String uuid, long groupId)
+	public AssetCategory removeByUUID_G(String uuid, long groupId, boolean head)
 		throws NoSuchCategoryException;
 
 	/**
-	* Returns the number of asset categories where uuid = &#63; and groupId = &#63;.
+	* Returns the number of asset categories where uuid = &#63; and groupId = &#63; and head = &#63;.
 	*
 	* @param uuid the uuid
 	* @param groupId the group ID
+	* @param head the head
 	* @return the number of matching asset categories
 	*/
-	public int countByUUID_G(String uuid, long groupId);
+	public int countByUUID_G(String uuid, long groupId, boolean head);
 
 	/**
 	* Returns all the asset categories where uuid = &#63; and companyId = &#63;.
@@ -2423,61 +2428,66 @@ public interface AssetCategoryPersistence extends BasePersistence<AssetCategory>
 		long[] vocabularyIds);
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the matching asset category
 	* @throws NoSuchCategoryException if a matching asset category could not be found
 	*/
 	public AssetCategory findByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) throws NoSuchCategoryException;
+		long vocabularyId, boolean head) throws NoSuchCategoryException;
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
 	public AssetCategory fetchByP_N_V(long parentCategoryId, String name,
-		long vocabularyId);
+		long vocabularyId, boolean head);
 
 	/**
-	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	* Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @param retrieveFromCache whether to retrieve from the finder cache
 	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	*/
 	public AssetCategory fetchByP_N_V(long parentCategoryId, String name,
-		long vocabularyId, boolean retrieveFromCache);
+		long vocabularyId, boolean head, boolean retrieveFromCache);
 
 	/**
-	* Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; from the database.
+	* Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; from the database.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the asset category that was removed
 	*/
 	public AssetCategory removeByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) throws NoSuchCategoryException;
+		long vocabularyId, boolean head) throws NoSuchCategoryException;
 
 	/**
-	* Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63;.
+	* Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63;.
 	*
 	* @param parentCategoryId the parent category ID
 	* @param name the name
 	* @param vocabularyId the vocabulary ID
+	* @param head the head
 	* @return the number of matching asset categories
 	*/
 	public int countByP_N_V(long parentCategoryId, String name,
-		long vocabularyId);
+		long vocabularyId, boolean head);
 
 	/**
 	* Returns all the asset categories where groupId = &#63; and parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63;.
@@ -2785,6 +2795,50 @@ public interface AssetCategoryPersistence extends BasePersistence<AssetCategory>
 	* @return the number of matching asset categories
 	*/
 	public int countByC_ERC(long companyId, String externalReferenceCode);
+
+	/**
+	* Returns the asset category where headId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	*
+	* @param headId the head ID
+	* @return the matching asset category
+	* @throws NoSuchCategoryException if a matching asset category could not be found
+	*/
+	public AssetCategory findByHeadId(long headId)
+		throws NoSuchCategoryException;
+
+	/**
+	* Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param headId the head ID
+	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	*/
+	public AssetCategory fetchByHeadId(long headId);
+
+	/**
+	* Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param headId the head ID
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	*/
+	public AssetCategory fetchByHeadId(long headId, boolean retrieveFromCache);
+
+	/**
+	* Removes the asset category where headId = &#63; from the database.
+	*
+	* @param headId the head ID
+	* @return the asset category that was removed
+	*/
+	public AssetCategory removeByHeadId(long headId)
+		throws NoSuchCategoryException;
+
+	/**
+	* Returns the number of asset categories where headId = &#63;.
+	*
+	* @param headId the head ID
+	* @return the number of matching asset categories
+	*/
+	public int countByHeadId(long headId);
 
 	/**
 	* Caches the asset category in the entity cache if it is enabled.

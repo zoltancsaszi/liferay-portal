@@ -17,9 +17,11 @@ package com.liferay.portlet.asset.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetCategoryVersion;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryFinder;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
+import com.liferay.asset.kernel.service.persistence.AssetCategoryVersionPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetEntryFinder;
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetVocabularyFinder;
@@ -54,13 +56,18 @@ import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
+import com.liferay.portal.kernel.service.version.VersionService;
+import com.liferay.portal.kernel.service.version.VersionServiceListener;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -78,7 +85,8 @@ import javax.sql.DataSource;
 @ProviderType
 public abstract class AssetCategoryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements AssetCategoryLocalService,
-		IdentifiableOSGiService {
+		IdentifiableOSGiService,
+		VersionService<AssetCategory, AssetCategoryVersion> {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -100,15 +108,20 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Creates a new asset category with the primary key. Does not add the asset category to the database.
+	 * Creates a new asset category. Does not add the asset category to the database.
 	 *
-	 * @param categoryId the primary key for the new asset category
 	 * @return the new asset category
 	 */
 	@Override
 	@Transactional(enabled = false)
-	public AssetCategory createAssetCategory(long categoryId) {
-		return assetCategoryPersistence.create(categoryId);
+	public AssetCategory create() {
+		long primaryKey = counterLocalService.increment(AssetCategory.class.getName());
+
+		AssetCategory draftAssetCategory = assetCategoryPersistence.create(primaryKey);
+
+		draftAssetCategory.setHeadId(primaryKey);
+
+		return draftAssetCategory;
 	}
 
 	/**
@@ -122,7 +135,13 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	@Override
 	public AssetCategory deleteAssetCategory(long categoryId)
 		throws PortalException {
-		return assetCategoryPersistence.remove(categoryId);
+		AssetCategory assetCategory = assetCategoryPersistence.fetchByPrimaryKey(categoryId);
+
+		if (assetCategory != null) {
+			delete(assetCategory);
+		}
+
+		return assetCategory;
 	}
 
 	/**
@@ -134,7 +153,14 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AssetCategory deleteAssetCategory(AssetCategory assetCategory) {
-		return assetCategoryPersistence.remove(assetCategory);
+		try {
+			delete(assetCategory);
+
+			return assetCategory;
+		}
+		catch (PortalException pe) {
+			throw new SystemException(pe);
+		}
 	}
 
 	@Override
@@ -223,33 +249,6 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	@Override
 	public AssetCategory fetchAssetCategory(long categoryId) {
 		return assetCategoryPersistence.fetchByPrimaryKey(categoryId);
-	}
-
-	/**
-	 * Returns the asset category matching the UUID and group.
-	 *
-	 * @param uuid the asset category's UUID
-	 * @param groupId the primary key of the group
-	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
-	 */
-	@Override
-	public AssetCategory fetchAssetCategoryByUuidAndGroupId(String uuid,
-		long groupId) {
-		return assetCategoryPersistence.fetchByUUID_G(uuid, groupId);
-	}
-
-	/**
-	 * Returns the asset category with the matching external reference code and company.
-	 *
-	 * @param companyId the primary key of the company
-	 * @param externalReferenceCode the asset category's external reference code
-	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
-	 */
-	@Override
-	public AssetCategory fetchAssetCategoryByReferenceCode(long companyId,
-		String externalReferenceCode) {
-		return assetCategoryPersistence.fetchByC_ERC(companyId,
-			externalReferenceCode);
 	}
 
 	/**
@@ -369,51 +368,6 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns all the asset categories matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the asset categories
-	 * @param companyId the primary key of the company
-	 * @return the matching asset categories, or an empty list if no matches were found
-	 */
-	@Override
-	public List<AssetCategory> getAssetCategoriesByUuidAndCompanyId(
-		String uuid, long companyId) {
-		return assetCategoryPersistence.findByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of asset categories matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the asset categories
-	 * @param companyId the primary key of the company
-	 * @param start the lower bound of the range of asset categories
-	 * @param end the upper bound of the range of asset categories (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the range of matching asset categories, or an empty list if no matches were found
-	 */
-	@Override
-	public List<AssetCategory> getAssetCategoriesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<AssetCategory> orderByComparator) {
-		return assetCategoryPersistence.findByUuid_C(uuid, companyId, start,
-			end, orderByComparator);
-	}
-
-	/**
-	 * Returns the asset category matching the UUID and group.
-	 *
-	 * @param uuid the asset category's UUID
-	 * @param groupId the primary key of the group
-	 * @return the matching asset category
-	 * @throws PortalException if a matching asset category could not be found
-	 */
-	@Override
-	public AssetCategory getAssetCategoryByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException {
-		return assetCategoryPersistence.findByUUID_G(uuid, groupId);
-	}
-
-	/**
 	 * Returns a range of all the asset categories.
 	 *
 	 * <p>
@@ -447,8 +401,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public AssetCategory updateAssetCategory(AssetCategory assetCategory) {
-		return assetCategoryPersistence.update(assetCategory);
+	public AssetCategory updateAssetCategory(AssetCategory draftAssetCategory)
+		throws PortalException {
+		return updateDraft(draftAssetCategory);
 	}
 
 	/**
@@ -769,6 +724,25 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the asset category version persistence.
+	 *
+	 * @return the asset category version persistence
+	 */
+	public AssetCategoryVersionPersistence getAssetCategoryVersionPersistence() {
+		return assetCategoryVersionPersistence;
+	}
+
+	/**
+	 * Sets the asset category version persistence.
+	 *
+	 * @param assetCategoryVersionPersistence the asset category version persistence
+	 */
+	public void setAssetCategoryVersionPersistence(
+		AssetCategoryVersionPersistence assetCategoryVersionPersistence) {
+		this.assetCategoryVersionPersistence = assetCategoryVersionPersistence;
+	}
+
+	/**
 	 * Returns the asset entry local service.
 	 *
 	 * @return the asset entry local service
@@ -891,6 +865,340 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 			"com.liferay.asset.kernel.model.AssetCategory");
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory checkout(AssetCategory publishedAssetCategory,
+		int version) throws PortalException {
+		if (!publishedAssetCategory.isHead()) {
+			throw new IllegalArgumentException(
+				"Unable to checkout with unpublished changes " +
+				publishedAssetCategory.getHeadId());
+		}
+
+		AssetCategory draftAssetCategory = assetCategoryPersistence.fetchByHeadId(publishedAssetCategory.getPrimaryKey());
+
+		if (draftAssetCategory != null) {
+			throw new IllegalArgumentException(
+				"Unable to checkout with unpublished changes " +
+				publishedAssetCategory.getPrimaryKey());
+		}
+
+		AssetCategoryVersion assetCategoryVersion = getVersion(publishedAssetCategory,
+				version);
+
+		draftAssetCategory = _createDraft(publishedAssetCategory);
+
+		assetCategoryVersion.populateVersionedModel(draftAssetCategory);
+
+		draftAssetCategory = assetCategoryPersistence.update(draftAssetCategory);
+
+		for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+			versionServiceListener.afterCheckout(draftAssetCategory, version);
+		}
+
+		return draftAssetCategory;
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public AssetCategory delete(AssetCategory publishedAssetCategory)
+		throws PortalException {
+		if (!publishedAssetCategory.isHead()) {
+			throw new IllegalArgumentException("AssetCategory is a draft " +
+				publishedAssetCategory.getPrimaryKey());
+		}
+
+		AssetCategory draftAssetCategory = assetCategoryPersistence.fetchByHeadId(publishedAssetCategory.getPrimaryKey());
+
+		if (draftAssetCategory != null) {
+			deleteDraft(draftAssetCategory);
+		}
+
+		for (AssetCategoryVersion assetCategoryVersion : getVersions(
+				publishedAssetCategory)) {
+			assetCategoryVersionPersistence.remove(assetCategoryVersion);
+		}
+
+		assetCategoryPersistence.remove(publishedAssetCategory);
+
+		for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+			versionServiceListener.afterDelete(publishedAssetCategory);
+		}
+
+		return publishedAssetCategory;
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public AssetCategory deleteDraft(AssetCategory draftAssetCategory)
+		throws PortalException {
+		if (draftAssetCategory.isHead()) {
+			throw new IllegalArgumentException("AssetCategory is not a draft " +
+				draftAssetCategory.getPrimaryKey());
+		}
+
+		assetCategoryPersistence.remove(draftAssetCategory);
+
+		for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+			versionServiceListener.afterDeleteDraft(draftAssetCategory);
+		}
+
+		return draftAssetCategory;
+	}
+
+	@Override
+	public AssetCategoryVersion deleteVersion(
+		AssetCategoryVersion assetCategoryVersion) throws PortalException {
+		AssetCategoryVersion latestAssetCategoryVersion = assetCategoryVersionPersistence.findByCategoryId_First(assetCategoryVersion.getVersionedModelId(),
+				null);
+
+		if (latestAssetCategoryVersion.getVersion() == assetCategoryVersion.getVersion()) {
+			throw new IllegalArgumentException(
+				"Unable to delete latest version " +
+				assetCategoryVersion.getVersion());
+		}
+
+		assetCategoryVersion = assetCategoryVersionPersistence.remove(assetCategoryVersion);
+
+		for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+			versionServiceListener.afterDeleteVersion(assetCategoryVersion);
+		}
+
+		return assetCategoryVersion;
+	}
+
+	@Override
+	public AssetCategory fetchDraft(AssetCategory assetCategory) {
+		if (assetCategory.isHead()) {
+			return assetCategoryPersistence.fetchByHeadId(assetCategory.getPrimaryKey());
+		}
+
+		return assetCategory;
+	}
+
+	@Override
+	public AssetCategory fetchDraft(long primaryKey) {
+		return assetCategoryPersistence.fetchByHeadId(primaryKey);
+	}
+
+	@Override
+	public AssetCategoryVersion fetchLatestVersion(AssetCategory assetCategory) {
+		long primaryKey = assetCategory.getHeadId();
+
+		if (assetCategory.isHead()) {
+			primaryKey = assetCategory.getPrimaryKey();
+		}
+
+		return assetCategoryVersionPersistence.fetchByCategoryId_First(primaryKey,
+			null);
+	}
+
+	@Override
+	public AssetCategory fetchPublished(AssetCategory assetCategory) {
+		if (assetCategory.isHead()) {
+			return assetCategory;
+		}
+
+		if (assetCategory.getHeadId() == assetCategory.getPrimaryKey()) {
+			return null;
+		}
+
+		return assetCategoryPersistence.fetchByPrimaryKey(assetCategory.getHeadId());
+	}
+
+	@Override
+	public AssetCategory fetchPublished(long primaryKey) {
+		AssetCategory assetCategory = assetCategoryPersistence.fetchByPrimaryKey(primaryKey);
+
+		if ((assetCategory == null) ||
+				(assetCategory.getHeadId() == assetCategory.getPrimaryKey())) {
+			return null;
+		}
+
+		return assetCategory;
+	}
+
+	@Override
+	public AssetCategory getDraft(AssetCategory assetCategory)
+		throws PortalException {
+		if (!assetCategory.isHead()) {
+			return assetCategory;
+		}
+
+		AssetCategory draftAssetCategory = assetCategoryPersistence.fetchByHeadId(assetCategory.getPrimaryKey());
+
+		if (draftAssetCategory == null) {
+			draftAssetCategory = assetCategoryLocalService.updateDraft(_createDraft(
+						assetCategory));
+		}
+
+		return draftAssetCategory;
+	}
+
+	@Override
+	public AssetCategory getDraft(long primaryKey) throws PortalException {
+		AssetCategory draftAssetCategory = assetCategoryPersistence.fetchByHeadId(primaryKey);
+
+		if (draftAssetCategory == null) {
+			AssetCategory assetCategory = assetCategoryPersistence.findByPrimaryKey(primaryKey);
+
+			draftAssetCategory = assetCategoryLocalService.updateDraft(_createDraft(
+						assetCategory));
+		}
+
+		return draftAssetCategory;
+	}
+
+	@Override
+	public AssetCategoryVersion getVersion(AssetCategory assetCategory,
+		int version) throws PortalException {
+		long primaryKey = assetCategory.getHeadId();
+
+		if (assetCategory.isHead()) {
+			primaryKey = assetCategory.getPrimaryKey();
+		}
+
+		return assetCategoryVersionPersistence.findByCategoryId_Version(primaryKey,
+			version);
+	}
+
+	@Override
+	public List<AssetCategoryVersion> getVersions(AssetCategory assetCategory) {
+		long primaryKey = assetCategory.getPrimaryKey();
+
+		if (!assetCategory.isHead()) {
+			if (assetCategory.getHeadId() == assetCategory.getPrimaryKey()) {
+				return Collections.emptyList();
+			}
+
+			primaryKey = assetCategory.getHeadId();
+		}
+
+		return assetCategoryVersionPersistence.findByCategoryId(primaryKey);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory publishDraft(AssetCategory draftAssetCategory)
+		throws PortalException {
+		if (draftAssetCategory.isHead()) {
+			throw new IllegalArgumentException("Can only publish drafts " +
+				draftAssetCategory.getPrimaryKey());
+		}
+
+		AssetCategory headAssetCategory = null;
+
+		int version = 1;
+
+		if (draftAssetCategory.getHeadId() == draftAssetCategory.getPrimaryKey()) {
+			headAssetCategory = create();
+
+			draftAssetCategory.setHeadId(headAssetCategory.getPrimaryKey());
+		}
+		else {
+			headAssetCategory = assetCategoryPersistence.findByPrimaryKey(draftAssetCategory.getHeadId());
+
+			AssetCategoryVersion latestAssetCategoryVersion = assetCategoryVersionPersistence.findByCategoryId_First(draftAssetCategory.getHeadId(),
+					null);
+
+			version = latestAssetCategoryVersion.getVersion() + 1;
+		}
+
+		AssetCategoryVersion assetCategoryVersion = assetCategoryVersionPersistence.create(counterLocalService.increment(
+					AssetCategoryVersion.class.getName()));
+
+		assetCategoryVersion.setVersion(version);
+		assetCategoryVersion.setVersionedModelId(headAssetCategory.getPrimaryKey());
+
+		draftAssetCategory.populateVersionModel(assetCategoryVersion);
+
+		assetCategoryVersionPersistence.update(assetCategoryVersion);
+
+		assetCategoryVersion.populateVersionedModel(headAssetCategory);
+
+		headAssetCategory.setHeadId(-headAssetCategory.getPrimaryKey());
+
+		headAssetCategory = assetCategoryPersistence.update(headAssetCategory);
+
+		for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+			versionServiceListener.afterPublishDraft(draftAssetCategory, version);
+		}
+
+		deleteDraft(draftAssetCategory);
+
+		return headAssetCategory;
+	}
+
+	@Override
+	public void registerListener(
+		VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener) {
+		_versionServiceListeners.add(versionServiceListener);
+	}
+
+	@Override
+	public void unregisterListener(
+		VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener) {
+		_versionServiceListeners.remove(versionServiceListener);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AssetCategory updateDraft(AssetCategory draftAssetCategory)
+		throws PortalException {
+		if (draftAssetCategory.isHead()) {
+			throw new IllegalArgumentException("Can only update draft entries " +
+				draftAssetCategory.getPrimaryKey());
+		}
+
+		AssetCategory previousAssetCategory = assetCategoryPersistence.fetchByPrimaryKey(draftAssetCategory.getPrimaryKey());
+
+		draftAssetCategory = assetCategoryPersistence.update(draftAssetCategory);
+
+		if (previousAssetCategory == null) {
+			for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+				versionServiceListener.afterCreateDraft(draftAssetCategory);
+			}
+		}
+		else {
+			for (VersionServiceListener<AssetCategory, AssetCategoryVersion> versionServiceListener : _versionServiceListeners) {
+				versionServiceListener.afterUpdateDraft(draftAssetCategory);
+			}
+		}
+
+		return draftAssetCategory;
+	}
+
+	private AssetCategory _createDraft(AssetCategory publishedAssetCategory)
+		throws PortalException {
+		AssetCategory draftAssetCategory = create();
+
+		draftAssetCategory.setUuid(publishedAssetCategory.getUuid());
+		draftAssetCategory.setExternalReferenceCode(publishedAssetCategory.getExternalReferenceCode());
+		draftAssetCategory.setHeadId(publishedAssetCategory.getPrimaryKey());
+		draftAssetCategory.setGroupId(publishedAssetCategory.getGroupId());
+		draftAssetCategory.setCompanyId(publishedAssetCategory.getCompanyId());
+		draftAssetCategory.setUserId(publishedAssetCategory.getUserId());
+		draftAssetCategory.setUserName(publishedAssetCategory.getUserName());
+		draftAssetCategory.setCreateDate(publishedAssetCategory.getCreateDate());
+		draftAssetCategory.setModifiedDate(publishedAssetCategory.getModifiedDate());
+		draftAssetCategory.setParentCategoryId(publishedAssetCategory.getParentCategoryId());
+		draftAssetCategory.setLeftCategoryId(publishedAssetCategory.getLeftCategoryId());
+		draftAssetCategory.setRightCategoryId(publishedAssetCategory.getRightCategoryId());
+		draftAssetCategory.setName(publishedAssetCategory.getName());
+		draftAssetCategory.setTitle(publishedAssetCategory.getTitle());
+		draftAssetCategory.setDescription(publishedAssetCategory.getDescription());
+		draftAssetCategory.setVocabularyId(publishedAssetCategory.getVocabularyId());
+		draftAssetCategory.setLastPublishDate(publishedAssetCategory.getLastPublishDate());
+		draftAssetCategory.setEntries(publishedAssetCategory.getEntries());
+
+		draftAssetCategory.resetOriginalValues();
+
+		return draftAssetCategory;
+	}
+
+	private final Set<VersionServiceListener<AssetCategory, AssetCategoryVersion>> _versionServiceListeners =
+		Collections.newSetFromMap(new ConcurrentHashMap<VersionServiceListener<AssetCategory, AssetCategoryVersion>, Boolean>());
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -953,6 +1261,8 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = AssetCategoryVersionPersistence.class)
+	protected AssetCategoryVersionPersistence assetCategoryVersionPersistence;
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
 	@BeanReference(type = AssetEntryPersistence.class)

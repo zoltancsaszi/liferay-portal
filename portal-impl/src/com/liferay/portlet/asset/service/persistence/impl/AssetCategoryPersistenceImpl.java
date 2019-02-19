@@ -629,20 +629,21 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	private FinderPath _finderPathCountByUUID_G;
 
 	/**
-	 * Returns the asset category where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	 * Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
+	 * @param head the head
 	 * @return the matching asset category
 	 * @throws NoSuchCategoryException if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory findByUUID_G(String uuid, long groupId)
+	public AssetCategory findByUUID_G(String uuid, long groupId, boolean head)
 		throws NoSuchCategoryException {
-		AssetCategory assetCategory = fetchByUUID_G(uuid, groupId);
+		AssetCategory assetCategory = fetchByUUID_G(uuid, groupId, head);
 
 		if (assetCategory == null) {
-			StringBundler msg = new StringBundler(6);
+			StringBundler msg = new StringBundler(8);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -651,6 +652,9 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 			msg.append(", groupId=");
 			msg.append(groupId);
+
+			msg.append(", head=");
+			msg.append(head);
 
 			msg.append("}");
 
@@ -665,31 +669,33 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	}
 
 	/**
-	 * Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
+	 * @param head the head
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory fetchByUUID_G(String uuid, long groupId) {
-		return fetchByUUID_G(uuid, groupId, true);
+	public AssetCategory fetchByUUID_G(String uuid, long groupId, boolean head) {
+		return fetchByUUID_G(uuid, groupId, head, true);
 	}
 
 	/**
-	 * Returns the asset category where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the asset category where uuid = &#63; and groupId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
+	 * @param head the head
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory fetchByUUID_G(String uuid, long groupId,
+	public AssetCategory fetchByUUID_G(String uuid, long groupId, boolean head,
 		boolean retrieveFromCache) {
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] { uuid, groupId, head };
 
 		Object result = null;
 
@@ -702,13 +708,14 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			AssetCategory assetCategory = (AssetCategory)result;
 
 			if (!Objects.equals(uuid, assetCategory.getUuid()) ||
-					(groupId != assetCategory.getGroupId())) {
+					(groupId != assetCategory.getGroupId()) ||
+					(head != assetCategory.isHead())) {
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler query = new StringBundler(5);
 
 			query.append(_SQL_SELECT_ASSETCATEGORY_WHERE);
 
@@ -724,6 +731,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			}
 
 			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_UUID_G_HEAD_2);
 
 			String sql = query.toString();
 
@@ -741,6 +750,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				}
 
 				qPos.add(groupId);
+
+				qPos.add(head);
 
 				List<AssetCategory> list = q.list();
 
@@ -776,40 +787,42 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	}
 
 	/**
-	 * Removes the asset category where uuid = &#63; and groupId = &#63; from the database.
+	 * Removes the asset category where uuid = &#63; and groupId = &#63; and head = &#63; from the database.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
+	 * @param head the head
 	 * @return the asset category that was removed
 	 */
 	@Override
-	public AssetCategory removeByUUID_G(String uuid, long groupId)
+	public AssetCategory removeByUUID_G(String uuid, long groupId, boolean head)
 		throws NoSuchCategoryException {
-		AssetCategory assetCategory = findByUUID_G(uuid, groupId);
+		AssetCategory assetCategory = findByUUID_G(uuid, groupId, head);
 
 		return remove(assetCategory);
 	}
 
 	/**
-	 * Returns the number of asset categories where uuid = &#63; and groupId = &#63;.
+	 * Returns the number of asset categories where uuid = &#63; and groupId = &#63; and head = &#63;.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
+	 * @param head the head
 	 * @return the number of matching asset categories
 	 */
 	@Override
-	public int countByUUID_G(String uuid, long groupId) {
+	public int countByUUID_G(String uuid, long groupId, boolean head) {
 		uuid = Objects.toString(uuid, "");
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] { uuid, groupId, head };
 
 		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
 				this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler query = new StringBundler(4);
 
 			query.append(_SQL_COUNT_ASSETCATEGORY_WHERE);
 
@@ -825,6 +838,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			}
 
 			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_UUID_G_HEAD_2);
 
 			String sql = query.toString();
 
@@ -842,6 +857,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				}
 
 				qPos.add(groupId);
+
+				qPos.add(head);
 
 				count = (Long)q.uniqueResult();
 
@@ -862,7 +879,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "assetCategory.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(assetCategory.uuid IS NULL OR assetCategory.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "assetCategory.groupId = ?";
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "assetCategory.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_HEAD_2 = "assetCategory.head = ?";
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -9824,22 +9842,23 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	private FinderPath _finderPathCountByP_N_V;
 
 	/**
-	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	 *
 	 * @param parentCategoryId the parent category ID
 	 * @param name the name
 	 * @param vocabularyId the vocabulary ID
+	 * @param head the head
 	 * @return the matching asset category
 	 * @throws NoSuchCategoryException if a matching asset category could not be found
 	 */
 	@Override
 	public AssetCategory findByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) throws NoSuchCategoryException {
+		long vocabularyId, boolean head) throws NoSuchCategoryException {
 		AssetCategory assetCategory = fetchByP_N_V(parentCategoryId, name,
-				vocabularyId);
+				vocabularyId, head);
 
 		if (assetCategory == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler msg = new StringBundler(10);
 
 			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -9851,6 +9870,9 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 			msg.append(", vocabularyId=");
 			msg.append(vocabularyId);
+
+			msg.append(", head=");
+			msg.append(head);
 
 			msg.append("}");
 
@@ -9865,34 +9887,38 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	}
 
 	/**
-	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param parentCategoryId the parent category ID
 	 * @param name the name
 	 * @param vocabularyId the vocabulary ID
+	 * @param head the head
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
 	public AssetCategory fetchByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) {
-		return fetchByP_N_V(parentCategoryId, name, vocabularyId, true);
+		long vocabularyId, boolean head) {
+		return fetchByP_N_V(parentCategoryId, name, vocabularyId, head, true);
 	}
 
 	/**
-	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param parentCategoryId the parent category ID
 	 * @param name the name
 	 * @param vocabularyId the vocabulary ID
+	 * @param head the head
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
 	public AssetCategory fetchByP_N_V(long parentCategoryId, String name,
-		long vocabularyId, boolean retrieveFromCache) {
+		long vocabularyId, boolean head, boolean retrieveFromCache) {
 		name = Objects.toString(name, "");
 
-		Object[] finderArgs = new Object[] { parentCategoryId, name, vocabularyId };
+		Object[] finderArgs = new Object[] {
+				parentCategoryId, name, vocabularyId, head
+			};
 
 		Object result = null;
 
@@ -9906,13 +9932,14 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 			if ((parentCategoryId != assetCategory.getParentCategoryId()) ||
 					!Objects.equals(name, assetCategory.getName()) ||
-					(vocabularyId != assetCategory.getVocabularyId())) {
+					(vocabularyId != assetCategory.getVocabularyId()) ||
+					(head != assetCategory.isHead())) {
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler query = new StringBundler(6);
 
 			query.append(_SQL_SELECT_ASSETCATEGORY_WHERE);
 
@@ -9930,6 +9957,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			}
 
 			query.append(_FINDER_COLUMN_P_N_V_VOCABULARYID_2);
+
+			query.append(_FINDER_COLUMN_P_N_V_HEAD_2);
 
 			String sql = query.toString();
 
@@ -9949,6 +9978,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				}
 
 				qPos.add(vocabularyId);
+
+				qPos.add(head);
 
 				List<AssetCategory> list = q.list();
 
@@ -9983,44 +10014,48 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	}
 
 	/**
-	 * Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; from the database.
+	 * Removes the asset category where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63; from the database.
 	 *
 	 * @param parentCategoryId the parent category ID
 	 * @param name the name
 	 * @param vocabularyId the vocabulary ID
+	 * @param head the head
 	 * @return the asset category that was removed
 	 */
 	@Override
 	public AssetCategory removeByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) throws NoSuchCategoryException {
+		long vocabularyId, boolean head) throws NoSuchCategoryException {
 		AssetCategory assetCategory = findByP_N_V(parentCategoryId, name,
-				vocabularyId);
+				vocabularyId, head);
 
 		return remove(assetCategory);
 	}
 
 	/**
-	 * Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63;.
+	 * Returns the number of asset categories where parentCategoryId = &#63; and name = &#63; and vocabularyId = &#63; and head = &#63;.
 	 *
 	 * @param parentCategoryId the parent category ID
 	 * @param name the name
 	 * @param vocabularyId the vocabulary ID
+	 * @param head the head
 	 * @return the number of matching asset categories
 	 */
 	@Override
 	public int countByP_N_V(long parentCategoryId, String name,
-		long vocabularyId) {
+		long vocabularyId, boolean head) {
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathCountByP_N_V;
 
-		Object[] finderArgs = new Object[] { parentCategoryId, name, vocabularyId };
+		Object[] finderArgs = new Object[] {
+				parentCategoryId, name, vocabularyId, head
+			};
 
 		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
 				this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler query = new StringBundler(5);
 
 			query.append(_SQL_COUNT_ASSETCATEGORY_WHERE);
 
@@ -10038,6 +10073,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			}
 
 			query.append(_FINDER_COLUMN_P_N_V_VOCABULARYID_2);
+
+			query.append(_FINDER_COLUMN_P_N_V_HEAD_2);
 
 			String sql = query.toString();
 
@@ -10057,6 +10094,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				}
 
 				qPos.add(vocabularyId);
+
+				qPos.add(head);
 
 				count = (Long)q.uniqueResult();
 
@@ -10078,7 +10117,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	private static final String _FINDER_COLUMN_P_N_V_PARENTCATEGORYID_2 = "assetCategory.parentCategoryId = ? AND ";
 	private static final String _FINDER_COLUMN_P_N_V_NAME_2 = "assetCategory.name = ? AND ";
 	private static final String _FINDER_COLUMN_P_N_V_NAME_3 = "(assetCategory.name IS NULL OR assetCategory.name = '') AND ";
-	private static final String _FINDER_COLUMN_P_N_V_VOCABULARYID_2 = "assetCategory.vocabularyId = ?";
+	private static final String _FINDER_COLUMN_P_N_V_VOCABULARYID_2 = "assetCategory.vocabularyId = ? AND ";
+	private static final String _FINDER_COLUMN_P_N_V_HEAD_2 = "assetCategory.head = ?";
 	private FinderPath _finderPathWithPaginationFindByG_P_N_V;
 	private FinderPath _finderPathWithoutPaginationFindByG_P_N_V;
 	private FinderPath _finderPathCountByG_P_N_V;
@@ -11436,6 +11476,198 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 = "assetCategory.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 = "assetCategory.externalReferenceCode = ?";
 	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 = "(assetCategory.externalReferenceCode IS NULL OR assetCategory.externalReferenceCode = '')";
+	private FinderPath _finderPathFetchByHeadId;
+	private FinderPath _finderPathCountByHeadId;
+
+	/**
+	 * Returns the asset category where headId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	 *
+	 * @param headId the head ID
+	 * @return the matching asset category
+	 * @throws NoSuchCategoryException if a matching asset category could not be found
+	 */
+	@Override
+	public AssetCategory findByHeadId(long headId)
+		throws NoSuchCategoryException {
+		AssetCategory assetCategory = fetchByHeadId(headId);
+
+		if (assetCategory == null) {
+			StringBundler msg = new StringBundler(4);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("headId=");
+			msg.append(headId);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchCategoryException(msg.toString());
+		}
+
+		return assetCategory;
+	}
+
+	/**
+	 * Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param headId the head ID
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
+	@Override
+	public AssetCategory fetchByHeadId(long headId) {
+		return fetchByHeadId(headId, true);
+	}
+
+	/**
+	 * Returns the asset category where headId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param headId the head ID
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
+	@Override
+	public AssetCategory fetchByHeadId(long headId, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { headId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(_finderPathFetchByHeadId,
+					finderArgs, this);
+		}
+
+		if (result instanceof AssetCategory) {
+			AssetCategory assetCategory = (AssetCategory)result;
+
+			if ((headId != assetCategory.getHeadId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_SELECT_ASSETCATEGORY_WHERE);
+
+			query.append(_FINDER_COLUMN_HEADID_HEADID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(headId);
+
+				List<AssetCategory> list = q.list();
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(_finderPathFetchByHeadId,
+						finderArgs, list);
+				}
+				else {
+					AssetCategory assetCategory = list.get(0);
+
+					result = assetCategory;
+
+					cacheResult(assetCategory);
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(_finderPathFetchByHeadId,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (AssetCategory)result;
+		}
+	}
+
+	/**
+	 * Removes the asset category where headId = &#63; from the database.
+	 *
+	 * @param headId the head ID
+	 * @return the asset category that was removed
+	 */
+	@Override
+	public AssetCategory removeByHeadId(long headId)
+		throws NoSuchCategoryException {
+		AssetCategory assetCategory = findByHeadId(headId);
+
+		return remove(assetCategory);
+	}
+
+	/**
+	 * Returns the number of asset categories where headId = &#63;.
+	 *
+	 * @param headId the head ID
+	 * @return the number of matching asset categories
+	 */
+	@Override
+	public int countByHeadId(long headId) {
+		FinderPath finderPath = _finderPathCountByHeadId;
+
+		Object[] finderArgs = new Object[] { headId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_ASSETCATEGORY_WHERE);
+
+			query.append(_FINDER_COLUMN_HEADID_HEADID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(headId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_HEADID_HEADID_2 = "assetCategory.headId = ?";
 
 	public AssetCategoryPersistenceImpl() {
 		setModelClass(AssetCategory.class);
@@ -11457,13 +11689,15 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			assetCategory);
 
 		FinderCacheUtil.putResult(_finderPathFetchByUUID_G,
-			new Object[] { assetCategory.getUuid(), assetCategory.getGroupId() },
-			assetCategory);
+			new Object[] {
+				assetCategory.getUuid(), assetCategory.getGroupId(),
+				assetCategory.isHead()
+			}, assetCategory);
 
 		FinderCacheUtil.putResult(_finderPathFetchByP_N_V,
 			new Object[] {
 				assetCategory.getParentCategoryId(), assetCategory.getName(),
-				assetCategory.getVocabularyId()
+				assetCategory.getVocabularyId(), assetCategory.isHead()
 			}, assetCategory);
 
 		FinderCacheUtil.putResult(_finderPathFetchByC_ERC,
@@ -11471,6 +11705,9 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				assetCategory.getCompanyId(),
 				assetCategory.getExternalReferenceCode()
 			}, assetCategory);
+
+		FinderCacheUtil.putResult(_finderPathFetchByHeadId,
+			new Object[] { assetCategory.getHeadId() }, assetCategory);
 
 		assetCategory.resetOriginalValues();
 	}
@@ -11545,7 +11782,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 		AssetCategoryModelImpl assetCategoryModelImpl) {
 		Object[] args = new Object[] {
 				assetCategoryModelImpl.getUuid(),
-				assetCategoryModelImpl.getGroupId()
+				assetCategoryModelImpl.getGroupId(),
+				assetCategoryModelImpl.isHead()
 			};
 
 		FinderCacheUtil.putResult(_finderPathCountByUUID_G, args,
@@ -11556,7 +11794,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 		args = new Object[] {
 				assetCategoryModelImpl.getParentCategoryId(),
 				assetCategoryModelImpl.getName(),
-				assetCategoryModelImpl.getVocabularyId()
+				assetCategoryModelImpl.getVocabularyId(),
+				assetCategoryModelImpl.isHead()
 			};
 
 		FinderCacheUtil.putResult(_finderPathCountByP_N_V, args,
@@ -11573,6 +11812,13 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			Long.valueOf(1), false);
 		FinderCacheUtil.putResult(_finderPathFetchByC_ERC, args,
 			assetCategoryModelImpl, false);
+
+		args = new Object[] { assetCategoryModelImpl.getHeadId() };
+
+		FinderCacheUtil.putResult(_finderPathCountByHeadId, args,
+			Long.valueOf(1), false);
+		FinderCacheUtil.putResult(_finderPathFetchByHeadId, args,
+			assetCategoryModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
@@ -11580,7 +11826,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 		if (clearCurrent) {
 			Object[] args = new Object[] {
 					assetCategoryModelImpl.getUuid(),
-					assetCategoryModelImpl.getGroupId()
+					assetCategoryModelImpl.getGroupId(),
+					assetCategoryModelImpl.isHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUUID_G, args);
@@ -11591,7 +11838,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
 			Object[] args = new Object[] {
 					assetCategoryModelImpl.getOriginalUuid(),
-					assetCategoryModelImpl.getOriginalGroupId()
+					assetCategoryModelImpl.getOriginalGroupId(),
+					assetCategoryModelImpl.getOriginalHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUUID_G, args);
@@ -11602,7 +11850,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			Object[] args = new Object[] {
 					assetCategoryModelImpl.getParentCategoryId(),
 					assetCategoryModelImpl.getName(),
-					assetCategoryModelImpl.getVocabularyId()
+					assetCategoryModelImpl.getVocabularyId(),
+					assetCategoryModelImpl.isHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByP_N_V, args);
@@ -11614,7 +11863,8 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			Object[] args = new Object[] {
 					assetCategoryModelImpl.getOriginalParentCategoryId(),
 					assetCategoryModelImpl.getOriginalName(),
-					assetCategoryModelImpl.getOriginalVocabularyId()
+					assetCategoryModelImpl.getOriginalVocabularyId(),
+					assetCategoryModelImpl.getOriginalHead()
 				};
 
 			FinderCacheUtil.removeResult(_finderPathCountByP_N_V, args);
@@ -11640,6 +11890,23 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 
 			FinderCacheUtil.removeResult(_finderPathCountByC_ERC, args);
 			FinderCacheUtil.removeResult(_finderPathFetchByC_ERC, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] { assetCategoryModelImpl.getHeadId() };
+
+			FinderCacheUtil.removeResult(_finderPathCountByHeadId, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByHeadId, args);
+		}
+
+		if ((assetCategoryModelImpl.getColumnBitmask() &
+				_finderPathFetchByHeadId.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					assetCategoryModelImpl.getOriginalHeadId()
+				};
+
+			FinderCacheUtil.removeResult(_finderPathCountByHeadId, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByHeadId, args);
 		}
 	}
 
@@ -13128,14 +13395,21 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				AssetCategoryModelImpl.FINDER_CACHE_ENABLED,
 				AssetCategoryImpl.class, FINDER_CLASS_NAME_ENTITY,
 				"fetchByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() },
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				},
 				AssetCategoryModelImpl.UUID_COLUMN_BITMASK |
-				AssetCategoryModelImpl.GROUPID_COLUMN_BITMASK);
+				AssetCategoryModelImpl.GROUPID_COLUMN_BITMASK |
+				AssetCategoryModelImpl.HEAD_COLUMN_BITMASK);
 
 		_finderPathCountByUUID_G = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
 				AssetCategoryModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() });
+				new String[] {
+					String.class.getName(), Long.class.getName(),
+					Boolean.class.getName()
+				});
 
 		_finderPathWithPaginationFindByUuid_C = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
 				AssetCategoryModelImpl.FINDER_CACHE_ENABLED,
@@ -13423,18 +13697,19 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				"fetchByP_N_V",
 				new String[] {
 					Long.class.getName(), String.class.getName(),
-					Long.class.getName()
+					Long.class.getName(), Boolean.class.getName()
 				},
 				AssetCategoryModelImpl.PARENTCATEGORYID_COLUMN_BITMASK |
 				AssetCategoryModelImpl.NAME_COLUMN_BITMASK |
-				AssetCategoryModelImpl.VOCABULARYID_COLUMN_BITMASK);
+				AssetCategoryModelImpl.VOCABULARYID_COLUMN_BITMASK |
+				AssetCategoryModelImpl.HEAD_COLUMN_BITMASK);
 
 		_finderPathCountByP_N_V = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
 				AssetCategoryModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByP_N_V",
 				new String[] {
 					Long.class.getName(), String.class.getName(),
-					Long.class.getName()
+					Long.class.getName(), Boolean.class.getName()
 				});
 
 		_finderPathWithPaginationFindByG_P_N_V = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
@@ -13482,6 +13757,17 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 				AssetCategoryModelImpl.FINDER_CACHE_ENABLED, Long.class,
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
 				new String[] { Long.class.getName(), String.class.getName() });
+
+		_finderPathFetchByHeadId = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
+				AssetCategoryModelImpl.FINDER_CACHE_ENABLED,
+				AssetCategoryImpl.class, FINDER_CLASS_NAME_ENTITY,
+				"fetchByHeadId", new String[] { Long.class.getName() },
+				AssetCategoryModelImpl.HEADID_COLUMN_BITMASK);
+
+		_finderPathCountByHeadId = new FinderPath(AssetCategoryModelImpl.ENTITY_CACHE_ENABLED,
+				AssetCategoryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByHeadId",
+				new String[] { Long.class.getName() });
 	}
 
 	public void destroy() {
