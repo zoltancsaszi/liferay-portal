@@ -395,7 +395,8 @@ public class AssetCategoryLocalServiceImpl
 	 */
 	@Override
 	public AssetCategory getAssetCategoryByUuidAndGroupId(
-		String uuid, long groupId) throws PortalException {
+			String uuid, long groupId)
+		throws PortalException {
 
 		return assetCategoryPersistence.findByUUID_G(uuid, groupId, true);
 	}
