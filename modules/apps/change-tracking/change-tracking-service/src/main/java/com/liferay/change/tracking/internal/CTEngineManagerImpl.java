@@ -371,6 +371,39 @@ public class CTEngineManagerImpl implements CTEngineManager {
 	}
 
 	@Override
+	public List<CTCollection> getRecentCTCollections(
+		long companyId, long userId) {
+
+		if (!isChangeTrackingEnabled(companyId)) {
+			return Collections.emptyList();
+		}
+
+		User user = _userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			return Collections.emptyList();
+		}
+
+		PortalPreferences portalPreferences =
+			PortletPreferencesFactoryUtil.getPortalPreferences(
+				userId, !user.isDefaultUser());
+
+		long[] recentCollectionIds = GetterUtil.getLongValues(
+			portalPreferences.getValues(
+				CTPortletKeys.CHANGE_LISTS, _RECENT_CT_COLLECTION_IDS));
+
+		List<CTCollection> ctCollections = new ArrayList<>();
+
+		for (long recentCollectionId : recentCollectionIds) {
+			ctCollections.add(
+				_ctCollectionLocalService.fetchCTCollection(
+					recentCollectionId));
+		}
+
+		return ctCollections;
+	}
+
+	@Override
 	public boolean isChangeTrackingEnabled(long companyId) {
 		Optional<CTCollection> productionCTCollection =
 			getProductionCTCollectionOptional(companyId);

@@ -178,6 +178,17 @@ public interface CTEngineManager {
 		long companyId);
 
 	/**
+	 * Returns the recently used change tracking collections associated with
+	 * the given company and user.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param userId the primary key of the user
+	 * @return the list of change tracking collections
+	 */
+	public List<CTCollection> getRecentCTCollections(
+		long companyId, long userId);
+
+	/**
 	 * Returns <code>true</code> if the change tracking is enabled in the scope
 	 * of the given company or <code>false</code> if not.
 	 *
