@@ -28,4 +28,6 @@ public interface CTConstants {
 	public static final String CT_COLLECTION_NAME_PRODUCTION =
 		"productionCTCollectionName";
 
+	public static final int RECENT_COLLECTIONS_LIMIT = 5;
+
 }

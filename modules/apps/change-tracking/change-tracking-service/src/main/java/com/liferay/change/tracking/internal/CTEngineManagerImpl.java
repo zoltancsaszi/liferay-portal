@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -53,6 +54,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -582,6 +585,45 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		portalPreferences.setValue(
 			CTPortletKeys.CHANGE_LISTS, _RECENT_CT_COLLECTION_ID,
 			String.valueOf(ctCollectionId));
+
+		CTCollection ctCollection = _ctCollectionLocalService.fetchCTCollection(
+			ctCollectionId);
+
+		// Update recent collections list
+
+		if ((ctCollection != null) && ctCollection.isProduction()) {
+			return;
+		}
+
+		String[] recentCollectionIds = portalPreferences.getValues(
+			CTPortletKeys.CHANGE_LISTS, _RECENT_CT_COLLECTION_IDS,
+			new String[0]);
+
+		Queue<String> recentCollectionQueue = new ArrayBlockingQueue<>(
+			CTConstants.RECENT_COLLECTIONS_LIMIT);
+
+		for (String recentCollectionId : recentCollectionIds) {
+			try {
+				recentCollectionQueue.add(recentCollectionId);
+			}
+			catch (IllegalStateException ise) {
+				break;
+			}
+		}
+
+		while (recentCollectionQueue.size() >=
+					CTConstants.RECENT_COLLECTIONS_LIMIT) {
+
+			recentCollectionQueue.poll();
+		}
+
+		recentCollectionQueue.add(String.valueOf(ctCollectionId));
+
+		recentCollectionIds = ArrayUtil.toStringArray(recentCollectionQueue);
+
+		portalPreferences.setValues(
+			CTPortletKeys.CHANGE_LISTS, _RECENT_CT_COLLECTION_IDS,
+			recentCollectionIds);
 	}
 
 	private String _wildcard(String value) {
@@ -590,6 +632,9 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 	private static final String _RECENT_CT_COLLECTION_ID =
 		"recentCTCollectionId";
+
+	private static final String _RECENT_CT_COLLECTION_IDS =
+		"recentCTCollectionIds";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTEngineManagerImpl.class);
