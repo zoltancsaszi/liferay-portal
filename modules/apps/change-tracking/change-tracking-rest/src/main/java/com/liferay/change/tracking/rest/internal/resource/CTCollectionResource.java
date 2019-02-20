@@ -216,6 +216,30 @@ public class CTCollectionResource {
 		);
 	}
 
+	@GET
+	@Path("/recent")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<CTCollectionModel> getRecentCTCollectionModels(
+			@QueryParam("companyId") long companyId,
+			@QueryParam("userId") long userId)
+		throws CTJaxRsException {
+
+		List<CTCollection> ctCollections = new ArrayList<>();
+
+		CTJaxRsUtil.checkCompany(companyId);
+
+		ctCollections = _ctEngineManager.getRecentCTCollections(
+			companyId, CTConstants.RECENT_CT_COLLECTIONS_LIMIT);
+
+		Stream<CTCollection> ctCollectionStream = ctCollections.stream();
+
+		return ctCollectionStream.map(
+			this::_getCTCollectionModel
+		).collect(
+			Collectors.toList()
+		);
+	}
+
 	@Path("/{ctCollectionId}/publish")
 	@POST
 	public Response publishCTCollection(
