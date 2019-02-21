@@ -47,6 +47,8 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
@@ -85,6 +87,9 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 			return;
 		}
+
+		_ctCollectionLocalService.updateCTCollection(
+			ctCollectionOptional.get());
 
 		try {
 			TransactionInvokerUtil.invoke(
@@ -365,6 +370,30 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		}
 
 		return Optional.ofNullable(_productionCTCollection);
+	}
+
+	@Override
+	public List<CTCollection> getRecentCTCollections(
+		long companyId, int limit) {
+
+		if (!isChangeTrackingEnabled(companyId)) {
+			return Collections.emptyList();
+		}
+
+		OrderByComparator<CTCollection> orderByComparator =
+			OrderByComparatorFactoryUtil.create(
+				"CTCollection", "modifiedDate", false);
+
+		DynamicQuery query = _ctCollectionLocalService.dynamicQuery();
+
+		query.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+
+		query.add(
+			RestrictionsFactoryUtil.ne(
+				"name", CTConstants.CT_COLLECTION_NAME_PRODUCTION));
+
+		return _ctCollectionLocalService.dynamicQuery(
+			query, 0, limit, orderByComparator);
 	}
 
 	@Override
