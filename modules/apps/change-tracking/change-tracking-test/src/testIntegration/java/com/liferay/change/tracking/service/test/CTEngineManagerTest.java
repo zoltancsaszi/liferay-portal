@@ -52,6 +52,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -806,6 +807,57 @@ public class CTEngineManagerTest {
 		Assert.assertFalse(
 			"Production change tracking collection must be null",
 			productionCTCollectionOptional.isPresent());
+	}
+
+	@Test
+	public void testRecentCollectionsList() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		List<CTCollection> ctCollections = new ArrayList<>();
+
+		for (int i = 0; i < CTConstants.RECENT_COLLECTIONS_LIMIT + 1; i++) {
+			Optional<CTCollection> ctCollectionOptional =
+				_ctEngineManager.createCTCollection(
+					TestPropsValues.getUserId(),
+					"Test Change Tracking Collection " + i, StringPool.BLANK);
+
+			CTCollection ctCollection = ctCollectionOptional.get();
+
+			_ctEngineManager.checkoutCTCollection(
+				_user.getUserId(), ctCollection.getCtCollectionId());
+
+			ctCollections.add(ctCollection);
+		}
+
+		PortalPreferences portalPreferences =
+			PortletPreferencesFactoryUtil.getPortalPreferences(
+				_user.getUserId(), !_user.isDefaultUser());
+
+		long[] recentCTCollectionIds = GetterUtil.getLongValues(
+			portalPreferences.getValues(
+				CTPortletKeys.CHANGE_LISTS, "recentCTCollectionIds",
+				new String[0]));
+
+		long[] expectedCTCollectionIds =
+			new long[CTConstants.RECENT_COLLECTIONS_LIMIT];
+
+		for (int i = 0; i < ctCollections.size(); i++) {
+			CTCollection ctCollection = ctCollections.get(i);
+
+			if (i > 0) {
+				expectedCTCollectionIds[i - 1] =
+					ctCollection.getCtCollectionId();
+			}
+
+			_ctEngineManager.deleteCTCollection(
+				ctCollection.getCtCollectionId());
+		}
+
+		Assert.assertArrayEquals(
+			"Users's recent change tracking collection list must be properly " +
+				"set",
+			expectedCTCollectionIds, recentCTCollectionIds);
 	}
 
 	@Inject
