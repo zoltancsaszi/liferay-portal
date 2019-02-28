@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
  */
 @ProviderType
 public abstract class LayoutBaseImpl extends LayoutModelImpl implements Layout {
-
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -55,5 +54,4 @@ public abstract class LayoutBaseImpl extends LayoutModelImpl implements Layout {
 			}
 		}
 	}
-
 }

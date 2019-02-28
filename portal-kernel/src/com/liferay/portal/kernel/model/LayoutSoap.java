@@ -30,7 +30,6 @@ import java.util.List;
  */
 @ProviderType
 public class LayoutSoap implements Serializable {
-
 	public static LayoutSoap toSoapModel(Layout model) {
 		LayoutSoap soapModel = new LayoutSoap();
 
@@ -66,10 +65,8 @@ public class LayoutSoap implements Serializable {
 		soapModel.setCss(model.getCss());
 		soapModel.setPriority(model.getPriority());
 		soapModel.setLayoutPrototypeUuid(model.getLayoutPrototypeUuid());
-		soapModel.setLayoutPrototypeLinkEnabled(
-			model.isLayoutPrototypeLinkEnabled());
-		soapModel.setSourcePrototypeLayoutUuid(
-			model.getSourcePrototypeLayoutUuid());
+		soapModel.setLayoutPrototypeLinkEnabled(model.isLayoutPrototypeLinkEnabled());
+		soapModel.setSourcePrototypeLayoutUuid(model.getSourcePrototypeLayoutUuid());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -401,7 +398,6 @@ public class LayoutSoap implements Serializable {
 
 	public void setLayoutPrototypeLinkEnabled(
 		boolean layoutPrototypeLinkEnabled) {
-
 		_layoutPrototypeLinkEnabled = layoutPrototypeLinkEnabled;
 	}
 
@@ -456,5 +452,4 @@ public class LayoutSoap implements Serializable {
 	private boolean _layoutPrototypeLinkEnabled;
 	private String _sourcePrototypeLayoutUuid;
 	private Date _lastPublishDate;
-
 }

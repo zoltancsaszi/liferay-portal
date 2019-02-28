@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.model.LayoutVersionModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
-import com.liferay.portal.kernel.model.version.VersionedModelInvocationHandler;
+import com.liferay.portal.kernel.model.impl.LayoutImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -42,8 +42,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
-
-import java.lang.reflect.Method;
 
 import java.sql.Types;
 
@@ -401,14 +399,14 @@ public class LayoutVersionModelImpl extends BaseModelImpl<LayoutVersion>
 
 	@Override
 	public Layout toVersionedModel() {
-		if (_layout == null) {
-			_layout = (Layout)ProxyUtil.newProxyInstance(_classLoader,
-					_versionedModelInterfaces,
-					new VersionedModelInvocationHandler(this,
-						_versionedModelMethodsMap));
-		}
+		Layout layout = new LayoutImpl();
 
-		return _layout;
+		layout.setPrimaryKey(getVersionedModelId());
+		layout.setHeadId(-getVersionedModelId());
+
+		populateVersionedModel(layout);
+
+		return layout;
 	}
 
 	@Override
@@ -2084,146 +2082,6 @@ public class LayoutVersionModelImpl extends BaseModelImpl<LayoutVersion>
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			LayoutVersion.class, ModelWrapper.class
 		};
-	private static final Map<Method, Method> _versionedModelMethodsMap = new HashMap<Method, Method>();
-	private static final Class<?>[] _versionedModelInterfaces = new Class<?>[] {
-			Layout.class
-		};
-
-	static {
-		try {
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getPrimaryKey"),
-				LayoutVersion.class.getMethod("getVersionedModelId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getUuid"),
-				LayoutVersion.class.getMethod("getUuid"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getPlid"),
-				LayoutVersion.class.getMethod("getPlid"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getGroupId"),
-				LayoutVersion.class.getMethod("getGroupId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getCompanyId"),
-				LayoutVersion.class.getMethod("getCompanyId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getUserId"),
-				LayoutVersion.class.getMethod("getUserId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getUserName"),
-				LayoutVersion.class.getMethod("getUserName"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getCreateDate"),
-				LayoutVersion.class.getMethod("getCreateDate"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getModifiedDate"),
-				LayoutVersion.class.getMethod("getModifiedDate"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getParentPlid"),
-				LayoutVersion.class.getMethod("getParentPlid"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getLeftPlid"),
-				LayoutVersion.class.getMethod("getLeftPlid"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getRightPlid"),
-				LayoutVersion.class.getMethod("getRightPlid"));
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"isPrivateLayout"),
-				LayoutVersion.class.getMethod("isPrivateLayout"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getPrivateLayout"),
-				LayoutVersion.class.getMethod("getPrivateLayout"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getLayoutId"),
-				LayoutVersion.class.getMethod("getLayoutId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getParentLayoutId"),
-				LayoutVersion.class.getMethod("getParentLayoutId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getName"),
-				LayoutVersion.class.getMethod("getName"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getTitle"),
-				LayoutVersion.class.getMethod("getTitle"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getDescription"),
-				LayoutVersion.class.getMethod("getDescription"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getKeywords"),
-				LayoutVersion.class.getMethod("getKeywords"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getRobots"),
-				LayoutVersion.class.getMethod("getRobots"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getType"),
-				LayoutVersion.class.getMethod("getType"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getTypeSettings"),
-				LayoutVersion.class.getMethod("getTypeSettings"));
-			_versionedModelMethodsMap.put(Layout.class.getMethod("isHidden"),
-				LayoutVersion.class.getMethod("isHidden"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getHidden"),
-				LayoutVersion.class.getMethod("getHidden"));
-			_versionedModelMethodsMap.put(Layout.class.getMethod("isSystem"),
-				LayoutVersion.class.getMethod("isSystem"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getSystem"),
-				LayoutVersion.class.getMethod("getSystem"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getFriendlyURL"),
-				LayoutVersion.class.getMethod("getFriendlyURL"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getIconImageId"),
-				LayoutVersion.class.getMethod("getIconImageId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getThemeId"),
-				LayoutVersion.class.getMethod("getThemeId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getColorSchemeId"),
-				LayoutVersion.class.getMethod("getColorSchemeId"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getCss"),
-				LayoutVersion.class.getMethod("getCss"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod("getPriority"),
-				LayoutVersion.class.getMethod("getPriority"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getLayoutPrototypeUuid"),
-				LayoutVersion.class.getMethod("getLayoutPrototypeUuid"));
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"isLayoutPrototypeLinkEnabled"),
-				LayoutVersion.class.getMethod("isLayoutPrototypeLinkEnabled"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getLayoutPrototypeLinkEnabled"),
-				LayoutVersion.class.getMethod("getLayoutPrototypeLinkEnabled"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getSourcePrototypeLayoutUuid"),
-				LayoutVersion.class.getMethod("getSourcePrototypeLayoutUuid"));
-
-			_versionedModelMethodsMap.put(Layout.class.getMethod(
-					"getLastPublishDate"),
-				LayoutVersion.class.getMethod("getLastPublishDate"));
-		}
-		catch (ReflectiveOperationException roe) {
-			throw new ExceptionInInitializerError(roe);
-		}
-	}
-
-	private volatile Layout _layout;
 	private long _layoutVersionId;
 	private int _version;
 	private int _originalVersion;
