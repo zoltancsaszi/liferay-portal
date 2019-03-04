@@ -41,6 +41,7 @@
 	]}
 	{@param? _handleClickPublish: any}
 	{@param? _handleClickRecentCollections: any}
+	{@param? _handleClickTrash: any}
 
 	{let $headerButtonLabel kind="text"}
 		{msg desc=""}publish{/msg}
@@ -99,6 +100,7 @@
 						{param spritemap: $spritemap /}
 						{param _handleClickPublish: $_handleClickPublish /}
 						{param _handleClickRecentCollections: $_handleClickRecentCollections /}
+						{param _handleClickTrash: $_handleClickTrash /}
 					{/call}
 				</div>
 
@@ -198,6 +200,7 @@
 	{@param? urlSelectChangeList: string}
 	{@param? _handleClickPublish: any}
 	{@param? _handleClickRecentCollections: any}
+	{@param? _handleClickTrash: any}
 
 	<div class="overview-card-sheet {$cardStateColor}">
 		{call .overviewCardHeader}
@@ -213,6 +216,7 @@
 			{param spritemap: $spritemap /}
 			{param _handleClickPublish: $_handleClickPublish /}
 			{param _handleClickRecentCollections: $_handleClickRecentCollections /}
+			{param _handleClickTrash: $_handleClickTrash /}
 		{/call}
 
 		{if not $cardEmpty}
@@ -258,6 +262,7 @@
 	{@param? urlSelectChangeList: string}
 	{@param? _handleClickPublish: any}
 	{@param? _handleClickRecentCollections: any}
+	{@param? _handleClickTrash: any}
 
 	{let $twoColumns: $headerButton /}
 
@@ -318,7 +323,7 @@
 								</div>
 							{/if}
 							<div class="btn-group-item">
-								<button class="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-xs" data-qa-id="headerTrash" type="button">
+								<button class="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-xs" data-qa-id="headerTrash" onclick="{$_handleClickTrash}" type="button">
 									<svg class="icon-monospaced lexicon-icon lexicon-icon-trash" focusable="false" role="presentation">
 										<use xlink:href="{$spritemap}#trash" />
 									</svg>

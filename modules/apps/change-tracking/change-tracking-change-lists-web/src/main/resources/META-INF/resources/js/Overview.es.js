@@ -18,6 +18,67 @@ class Overview extends PortletBase {
 		this._fetchProductionCollection();
 	}
 
+	_checkoutCollection(ctCollectionId, render) {
+
+		if (render == 'undefined') {
+			render = true;
+		}
+
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let body = {
+			credentials: 'include',
+			headers,
+			method: 'POST'
+		};
+
+		let url = this.urlCollectionsBase + '/' + ctCollectionId + "/checkout?userId=" + Liferay.ThemeDisplay.getUserId();
+
+		fetch(url, body)
+			.then(
+				response => {
+					if (response.status === 202) {
+						if (render) {
+							this._render();
+						}
+						else {
+							this.initialFetch = true;
+						}
+					}
+					else if (response.status === 400) {
+						response.json()
+							.then(
+								data => {
+									openToast(
+										{
+											message: Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out-x'), this.changeListName, data.message),
+											title: Liferay.Language.get('error'),
+											type: 'danger'
+										}
+									);
+								}
+							);
+					}
+				}
+			)
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out'), this.changeListName);
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
+
 	_fetchProductionCollection() {
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
@@ -147,35 +208,46 @@ class Overview extends PortletBase {
 
 		let collectionId = event.target.getAttribute('data-collection-id');
 
-		let url = this.urlCollectionsBase + '/' + collectionId + '/checkout?userId=' + Liferay.ThemeDisplay.getUserId();
+		this._checkoutCollection(collectionId);
+	}
+
+	_handleClickTrash() {
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let body = {
+			credentials: 'include',
+			headers,
+			method: 'DELETE'
+		};
+
+		let url = this.urlCollectionsBase + '/' + this.activeCTCollectionId;
 
 		fetch(url, body)
 			.then(
 				response => {
-					if (response.status === 202) {
-						this._render();
+					if (response.status === 204) {
+						this._checkoutCollection(this.productionCTCollectionId, false);
 					}
-					else if (response.status === 400) {
-						response.json()
-							.then(
-								data => {
-									openToast(
-										{
-											message: Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out-x'), this.changeListName, data.message),
-											title: Liferay.Language.get('error'),
-											type: 'danger'
-										}
-									);
-								}
-							);
+					else if (response.status === 404) {
+						openToast(
+							{
+								message: Liferay.Util.sub(Liferay.Language.get('cannot-delete-x-no-such-change-list-found'), this.changeListName),
+								title: Liferay.Language.get('error'),
+								type: 'danger'
+							}
+						);
 					}
 				}
-			)
-			.catch(
+			).then(
+			response => {
+					Liferay.Util.navigate(this.urlSelectChangeList);
+				}
+			).catch(
 				error => {
 					const message = typeof error === 'string' ?
 						error :
-						Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out'), this.changeListName);
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-delete-x-out'), this.changeListName);
 
 					openToast(
 						{
@@ -248,6 +320,7 @@ class Overview extends PortletBase {
 	_populateFields(requestResult) {
 		let activeCollection = requestResult[0];
 		let productionInformation = requestResult[1];
+		this.activeCTCollectionId = activeCollection.ctCollectionId;
 
 		let foundEntriesLink = activeCollection.links.find(
 			function(link) {
