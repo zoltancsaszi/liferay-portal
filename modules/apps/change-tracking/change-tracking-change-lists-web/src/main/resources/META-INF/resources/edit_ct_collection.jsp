@@ -32,7 +32,12 @@ if (ctCollection != null) {
 }
 %>
 
-<liferay-portlet:actionURL name="/change_lists/edit_ct_collection" var="actionURL" />
+<liferay-portlet:renderURL var="portletURL" />
+
+<liferay-portlet:actionURL name="/change_lists/edit_ct_collection" var="actionURL">
+	<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/view" />
+	<liferay-portlet:param name="redirect" value="<%= portletURL.toString() %>" />
+</liferay-portlet:actionURL>
 
 <div class="custom-sheet sheet sheet-lg">
 	<aui:form action='<%= actionURL.toString() + "&etag=0&strip=0" %>' cssClass="lfr-export-dialog" method="post" name="addChangeListFm">
