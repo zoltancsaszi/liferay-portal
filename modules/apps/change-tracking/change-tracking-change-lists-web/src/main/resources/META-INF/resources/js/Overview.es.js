@@ -19,7 +19,6 @@ class Overview extends PortletBase {
 	}
 
 	_checkoutCollection(ctCollectionId, render) {
-
 		if (render == 'undefined') {
 			render = true;
 		}
@@ -33,7 +32,7 @@ class Overview extends PortletBase {
 			method: 'POST'
 		};
 
-		let url = this.urlCollectionsBase + '/' + ctCollectionId + "/checkout?userId=" + Liferay.ThemeDisplay.getUserId();
+		let url = this.urlCollectionsBase + '/' + ctCollectionId + '/checkout?userId=' + Liferay.ThemeDisplay.getUserId();
 
 		fetch(url, body)
 			.then(
@@ -93,9 +92,11 @@ class Overview extends PortletBase {
 
 		fetch(url, init)
 			.then(r => r.json())
-			.then(response => {
-				this.productionCTCollectionId = response[0].ctCollectionId;
-			});
+			.then(
+				response => {
+					this.productionCTCollectionId = response[0].ctCollectionId;
+				}
+			);
 	}
 
 	_fetchAll(urls, init) {
@@ -197,18 +198,9 @@ class Overview extends PortletBase {
 	}
 
 	_handleClickRecentCollections(event) {
-		let headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-
-		let body = {
-			credentials: 'include',
-			headers,
-			method: 'POST'
-		};
-
 		let collectionId = event.target.getAttribute('data-collection-id');
 
-		this._checkoutCollection(collectionId);
+		this._checkoutCollection(collectionId, true);
 	}
 
 	_handleClickTrash() {
@@ -240,7 +232,7 @@ class Overview extends PortletBase {
 					}
 				}
 			).then(
-			response => {
+				() => {
 					Liferay.Util.navigate(this.urlSelectChangeList);
 				}
 			).catch(
