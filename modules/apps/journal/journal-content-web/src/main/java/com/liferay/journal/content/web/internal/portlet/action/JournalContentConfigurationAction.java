@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTCollectionModel;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -199,8 +200,7 @@ public class JournalContentConfigurationAction
 			WebKeys.THEME_DISPLAY);
 
 		Optional<CTCollection> activeCTCollectionOptional =
-			_ctEngineManager.getActiveCTCollectionOptional(
-				themeDisplay.getUserId());
+			_ctManager.getActiveCTCollectionOptional(themeDisplay.getUserId());
 
 		return activeCTCollectionOptional.map(
 			CTCollectionModel::getCtCollectionId
@@ -228,6 +228,9 @@ public class JournalContentConfigurationAction
 
 	@Reference
 	private CTEngineManager _ctEngineManager;
+
+	@Reference
+	private CTManager _ctManager;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMTemplate)"
