@@ -45,7 +45,7 @@ public class JournalCTConfigurationRegistrar {
 			_builder.setContentType(
 				"Web Content"
 			).setContentTypeLanguageKey(
-				"journal"
+				"journal-article"
 			).setEntityClasses(
 				JournalArticleResource.class, JournalArticle.class
 			).setResourceEntitiesByCompanyIdFunction(
