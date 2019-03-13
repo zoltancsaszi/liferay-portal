@@ -51,11 +51,12 @@ public class CTEntryWrapper
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("classNameId", getClassNameId());
-		attributes.put("classPK", getClassPK());
-		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("modelClassNameId", getModelClassNameId());
+		attributes.put("modelClassPK", getModelClassPK());
+		attributes.put("modelResourcePrimKey", getModelResourcePrimKey());
 		attributes.put("changeType", getChangeType());
 		attributes.put("status", getStatus());
+		attributes.put("originalCollectionId", getOriginalCollectionId());
 
 		return attributes;
 	}
@@ -98,22 +99,23 @@ public class CTEntryWrapper
 			setModifiedDate(modifiedDate);
 		}
 
-		Long classNameId = (Long)attributes.get("classNameId");
+		Long modelClassNameId = (Long)attributes.get("modelClassNameId");
 
-		if (classNameId != null) {
-			setClassNameId(classNameId);
+		if (modelClassNameId != null) {
+			setModelClassNameId(modelClassNameId);
 		}
 
-		Long classPK = (Long)attributes.get("classPK");
+		Long modelClassPK = (Long)attributes.get("modelClassPK");
 
-		if (classPK != null) {
-			setClassPK(classPK);
+		if (modelClassPK != null) {
+			setModelClassPK(modelClassPK);
 		}
 
-		Long resourcePrimKey = (Long)attributes.get("resourcePrimKey");
+		Long modelResourcePrimKey = (Long)attributes.get(
+			"modelResourcePrimKey");
 
-		if (resourcePrimKey != null) {
-			setResourcePrimKey(resourcePrimKey);
+		if (modelResourcePrimKey != null) {
+			setModelResourcePrimKey(modelResourcePrimKey);
 		}
 
 		Integer changeType = (Integer)attributes.get("changeType");
@@ -127,6 +129,13 @@ public class CTEntryWrapper
 		if (status != null) {
 			setStatus(status);
 		}
+
+		Long originalCollectionId = (Long)attributes.get(
+			"originalCollectionId");
+
+		if (originalCollectionId != null) {
+			setOriginalCollectionId(originalCollectionId);
+		}
 	}
 
 	/**
@@ -137,36 +146,6 @@ public class CTEntryWrapper
 	@Override
 	public int getChangeType() {
 		return model.getChangeType();
-	}
-
-	/**
-	 * Returns the fully qualified class name of this ct entry.
-	 *
-	 * @return the fully qualified class name of this ct entry
-	 */
-	@Override
-	public String getClassName() {
-		return model.getClassName();
-	}
-
-	/**
-	 * Returns the class name ID of this ct entry.
-	 *
-	 * @return the class name ID of this ct entry
-	 */
-	@Override
-	public long getClassNameId() {
-		return model.getClassNameId();
-	}
-
-	/**
-	 * Returns the class pk of this ct entry.
-	 *
-	 * @return the class pk of this ct entry
-	 */
-	@Override
-	public long getClassPK() {
-		return model.getClassPK();
 	}
 
 	/**
@@ -205,6 +184,36 @@ public class CTEntryWrapper
 	}
 
 	/**
+	 * Returns the model class name ID of this ct entry.
+	 *
+	 * @return the model class name ID of this ct entry
+	 */
+	@Override
+	public long getModelClassNameId() {
+		return model.getModelClassNameId();
+	}
+
+	/**
+	 * Returns the model class pk of this ct entry.
+	 *
+	 * @return the model class pk of this ct entry
+	 */
+	@Override
+	public long getModelClassPK() {
+		return model.getModelClassPK();
+	}
+
+	/**
+	 * Returns the model resource prim key of this ct entry.
+	 *
+	 * @return the model resource prim key of this ct entry
+	 */
+	@Override
+	public long getModelResourcePrimKey() {
+		return model.getModelResourcePrimKey();
+	}
+
+	/**
 	 * Returns the modified date of this ct entry.
 	 *
 	 * @return the modified date of this ct entry
@@ -215,6 +224,16 @@ public class CTEntryWrapper
 	}
 
 	/**
+	 * Returns the original collection ID of this ct entry.
+	 *
+	 * @return the original collection ID of this ct entry
+	 */
+	@Override
+	public long getOriginalCollectionId() {
+		return model.getOriginalCollectionId();
+	}
+
+	/**
 	 * Returns the primary key of this ct entry.
 	 *
 	 * @return the primary key of this ct entry
@@ -222,16 +241,6 @@ public class CTEntryWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
-	}
-
-	/**
-	 * Returns the resource prim key of this ct entry.
-	 *
-	 * @return the resource prim key of this ct entry
-	 */
-	@Override
-	public long getResourcePrimKey() {
-		return model.getResourcePrimKey();
 	}
 
 	/**
@@ -280,11 +289,6 @@ public class CTEntryWrapper
 	}
 
 	@Override
-	public boolean isResourceMain() {
-		return model.isResourceMain();
-	}
-
-	@Override
 	public void persist() {
 		model.persist();
 	}
@@ -297,31 +301,6 @@ public class CTEntryWrapper
 	@Override
 	public void setChangeType(int changeType) {
 		model.setChangeType(changeType);
-	}
-
-	@Override
-	public void setClassName(String className) {
-		model.setClassName(className);
-	}
-
-	/**
-	 * Sets the class name ID of this ct entry.
-	 *
-	 * @param classNameId the class name ID of this ct entry
-	 */
-	@Override
-	public void setClassNameId(long classNameId) {
-		model.setClassNameId(classNameId);
-	}
-
-	/**
-	 * Sets the class pk of this ct entry.
-	 *
-	 * @param classPK the class pk of this ct entry
-	 */
-	@Override
-	public void setClassPK(long classPK) {
-		model.setClassPK(classPK);
 	}
 
 	/**
@@ -355,6 +334,36 @@ public class CTEntryWrapper
 	}
 
 	/**
+	 * Sets the model class name ID of this ct entry.
+	 *
+	 * @param modelClassNameId the model class name ID of this ct entry
+	 */
+	@Override
+	public void setModelClassNameId(long modelClassNameId) {
+		model.setModelClassNameId(modelClassNameId);
+	}
+
+	/**
+	 * Sets the model class pk of this ct entry.
+	 *
+	 * @param modelClassPK the model class pk of this ct entry
+	 */
+	@Override
+	public void setModelClassPK(long modelClassPK) {
+		model.setModelClassPK(modelClassPK);
+	}
+
+	/**
+	 * Sets the model resource prim key of this ct entry.
+	 *
+	 * @param modelResourcePrimKey the model resource prim key of this ct entry
+	 */
+	@Override
+	public void setModelResourcePrimKey(long modelResourcePrimKey) {
+		model.setModelResourcePrimKey(modelResourcePrimKey);
+	}
+
+	/**
 	 * Sets the modified date of this ct entry.
 	 *
 	 * @param modifiedDate the modified date of this ct entry
@@ -365,6 +374,16 @@ public class CTEntryWrapper
 	}
 
 	/**
+	 * Sets the original collection ID of this ct entry.
+	 *
+	 * @param originalCollectionId the original collection ID of this ct entry
+	 */
+	@Override
+	public void setOriginalCollectionId(long originalCollectionId) {
+		model.setOriginalCollectionId(originalCollectionId);
+	}
+
+	/**
 	 * Sets the primary key of this ct entry.
 	 *
 	 * @param primaryKey the primary key of this ct entry
@@ -372,16 +391,6 @@ public class CTEntryWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
-	}
-
-	/**
-	 * Sets the resource prim key of this ct entry.
-	 *
-	 * @param resourcePrimKey the resource prim key of this ct entry
-	 */
-	@Override
-	public void setResourcePrimKey(long resourcePrimKey) {
-		model.setResourcePrimKey(resourcePrimKey);
 	}
 
 	/**

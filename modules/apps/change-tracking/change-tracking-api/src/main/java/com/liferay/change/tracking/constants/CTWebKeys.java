@@ -12,22 +12,21 @@
  * details.
  */
 
-package com.liferay.journal.util;
+package com.liferay.change.tracking.constants;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.kernel.util.WebKeys;
 
 /**
- * Provides Change Tracking related information about Journal entities.
- *
  * @author Zoltan Csaszi
  */
-@ProviderType
-public interface JournalChangeTrackingHelper {
+public interface CTWebKeys extends WebKeys {
 
-	public String getJournalArticleCTCollectionName(long userId, long classPK);
+	public static final String CT_COLLECTION = "ctCollection";
 
-	public boolean hasActiveCTCollection(long companyId, long userId);
+	public static final String CT_COLLECTION_ID = "ctCollectionId";
 
-	public boolean isJournalArticleInChangeList(long userId, long classPK);
+	public static final String CT_PROCESS = "ctProcess";
+
+	public static final String CT_PROCESS_ID = "ctProcessId";
 
 }

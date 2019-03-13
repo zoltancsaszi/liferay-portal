@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -254,7 +255,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 		for (CTEntry ctEntry : sourceCTEntries) {
 			Optional<CTEntry> latestTargetCTEntryOptional = _getLatestCTEntry(
-				targetCTCollectionId, ctEntry.getResourcePrimKey());
+				targetCTCollectionId, ctEntry.getModelResourcePrimKey());
 
 			if (!latestTargetCTEntryOptional.isPresent()) {
 				continue;
@@ -303,8 +304,9 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		}
 
 		return _ctEntryLocalService.getCTCollectionCTEntries(
-			ctCollectionId, queryDefinition.getStart(),
-			queryDefinition.getEnd(), queryDefinition.getOrderByComparator());
+			ctCollectionId, queryDefinition.getStatus(),
+			queryDefinition.getStart(), queryDefinition.getEnd(),
+			queryDefinition.getOrderByComparator());
 	}
 
 	@Override
@@ -440,6 +442,14 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		DynamicQuery dynamicQuery = _ctCollectionLocalService.dynamicQuery();
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.ne(
+				"name", CTConstants.CT_COLLECTION_NAME_PRODUCTION));
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.ne(
+				"status", WorkflowConstants.STATUS_APPROVED));
 
 		Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
 
@@ -670,7 +680,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 	}
 
 	private boolean _isColliding(CTEntry ctEntry, CTEntry productionCTEntry) {
-		if (ctEntry.getClassPK() < productionCTEntry.getClassPK()) {
+		if (ctEntry.getModelClassPK() < productionCTEntry.getModelClassPK()) {
 			return true;
 		}
 

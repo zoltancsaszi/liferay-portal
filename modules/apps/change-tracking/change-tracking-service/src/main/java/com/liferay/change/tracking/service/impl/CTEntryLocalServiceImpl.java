@@ -39,14 +39,16 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 
 	@Override
 	public CTEntry addCTEntry(
-			long userId, long classNameId, long classPK, long resourcePrimKey,
-			int changeType, long ctCollectionId, ServiceContext serviceContext)
+			long userId, long modelClassNameId, long modelClassPK,
+			long resourcePrimKey, int changeType, long ctCollectionId,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		boolean force = GetterUtil.getBoolean(
 			serviceContext.getAttribute("force"));
 
-		CTEntry ctEntry = ctEntryPersistence.fetchByC_C(classNameId, classPK);
+		CTEntry ctEntry = ctEntryPersistence.fetchByC_C(
+			modelClassNameId, modelClassPK);
 
 		_validate(ctEntry, changeType, ctCollectionId, force);
 
@@ -57,7 +59,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 		}
 
 		return _addCTEntry(
-			user, classNameId, classPK, resourcePrimKey, changeType,
+			user, modelClassNameId, modelClassPK, resourcePrimKey, changeType,
 			ctCollectionId, serviceContext);
 	}
 
@@ -78,15 +80,16 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	@Override
-	public CTEntry fetchCTEntry(long classNameId, long classPK) {
-		return ctEntryPersistence.fetchByC_C(classNameId, classPK);
+	public CTEntry fetchCTEntry(long modelClassNameId, long modelClassPK) {
+		return ctEntryPersistence.fetchByC_C(modelClassNameId, modelClassPK);
 	}
 
 	@Override
 	public CTEntry fetchCTEntry(
-		long ctCollectionId, long classNameId, long classPK) {
+		long ctCollectionId, long modelClassNameId, long modelClassPK) {
 
-		return ctEntryFinder.findByC_C_C(ctCollectionId, classNameId, classPK);
+		return ctEntryFinder.findByC_C_C(
+			ctCollectionId, modelClassNameId, modelClassPK);
 	}
 
 	@Override
@@ -102,19 +105,21 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	@Override
 	public List<CTEntry> getCTCollectionCTEntries(long ctCollectionId) {
 		return getCTCollectionCTEntries(
-			ctCollectionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+			ctCollectionId, WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	@Override
 	public List<CTEntry> getCTCollectionCTEntries(
 		long ctCollectionId, int start, int end) {
 
-		return getCTCollectionCTEntries(ctCollectionId, start, end, null);
+		return getCTCollectionCTEntries(
+			ctCollectionId, WorkflowConstants.STATUS_DRAFT, start, end, null);
 	}
 
 	@Override
 	public List<CTEntry> getCTCollectionCTEntries(
-		long ctCollectionId, int start, int end,
+		long ctCollectionId, int status, int start, int end,
 		OrderByComparator<CTEntry> orderByComparator) {
 
 		if (_isProductionCTCollectionId(ctCollectionId)) {
@@ -127,7 +132,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 		queryDefinition.setEnd(end);
 		queryDefinition.setOrderByComparator(orderByComparator);
 		queryDefinition.setStart(start);
-		queryDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
+		queryDefinition.setStatus(status);
 
 		return ctEntryFinder.findByCTCollectionId(
 			ctCollectionId, queryDefinition);
@@ -169,8 +174,9 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	private CTEntry _addCTEntry(
-		User user, long classNameId, long classPK, long resourcePrimKey,
-		int changeType, long ctCollectionId, ServiceContext serviceContext) {
+		User user, long modelClassNameId, long modelClassPK,
+		long resourcePrimKey, int changeType, long ctCollectionId,
+		ServiceContext serviceContext) {
 
 		long ctEntryId = counterLocalService.increment();
 
@@ -185,15 +191,18 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 		ctEntry.setCreateDate(serviceContext.getCreateDate(now));
 		ctEntry.setModifiedDate(serviceContext.getModifiedDate(now));
 
-		ctEntry.setClassNameId(classNameId);
-		ctEntry.setClassPK(classPK);
-		ctEntry.setResourcePrimKey(resourcePrimKey);
+		ctEntry.setModelClassNameId(modelClassNameId);
+		ctEntry.setModelClassPK(modelClassPK);
+		ctEntry.setModelResourcePrimKey(resourcePrimKey);
 		ctEntry.setChangeType(changeType);
 
 		int status = WorkflowConstants.STATUS_DRAFT;
 
 		if (_isProductionCTCollectionId(ctCollectionId)) {
 			status = WorkflowConstants.STATUS_APPROVED;
+		}
+		else {
+			ctEntry.setOriginalCollectionId(ctCollectionId);
 		}
 
 		ctEntry.setStatus(status);

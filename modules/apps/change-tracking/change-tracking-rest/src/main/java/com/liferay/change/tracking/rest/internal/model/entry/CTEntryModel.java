@@ -36,26 +36,29 @@ public class CTEntryModel {
 		return builder.setChangeType(
 			ctEntry.getChangeType()
 		).setClassNameId(
-			ctEntry.getClassNameId()
+			ctEntry.getModelClassNameId()
 		).setClassPK(
-			ctEntry.getClassPK()
+			ctEntry.getModelClassPK()
+		).setContentType(
+			CTConfigurationRegistryUtil.getVersionEntityContentTypeLanguageKey(
+				ctEntry.getModelClassNameId())
 		).setCTEntryId(
 			ctEntry.getCtEntryId()
 		).setModifiedDate(
 			ctEntry.getModifiedDate()
 		).setResourcePrimKey(
-			ctEntry.getResourcePrimKey()
+			ctEntry.getModelResourcePrimKey()
 		).setSiteName(
 			CTConfigurationRegistryUtil.getVersionEntitySiteName(
-				ctEntry.getClassNameId(), ctEntry.getClassPK())
+				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK())
 		).setTitle(
 			CTConfigurationRegistryUtil.getVersionEntityTitle(
-				ctEntry.getClassNameId(), ctEntry.getClassPK())
+				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK())
 		).setUserName(
 			ctEntry.getUserName()
 		).setVersion(
 			CTConfigurationRegistryUtil.getVersionEntityVersion(
-				ctEntry.getClassNameId(), ctEntry.getClassPK())
+				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK())
 		).build();
 	}
 
@@ -76,7 +79,7 @@ public class CTEntryModel {
 
 	@XmlElement
 	public String getContentType() {
-		return "Web Content";
+		return _contentType;
 	}
 
 	@XmlElement
@@ -138,6 +141,12 @@ public class CTEntryModel {
 			return this;
 		}
 
+		public CTEntryModel.Builder setContentType(String contentType) {
+			_ctEntryModel._contentType = contentType;
+
+			return this;
+		}
+
 		public CTEntryModel.Builder setCTEntryId(long ctEntryId) {
 			_ctEntryModel._ctEntryId = ctEntryId;
 
@@ -194,6 +203,7 @@ public class CTEntryModel {
 	private int _changeType;
 	private long _classNameId;
 	private long _classPK;
+	private String _contentType;
 	private long _ctEntryId;
 	private Date _modifiedDate;
 	private long _resourcePrimKey;

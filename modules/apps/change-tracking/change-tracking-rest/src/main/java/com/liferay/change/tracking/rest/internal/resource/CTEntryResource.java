@@ -20,6 +20,7 @@ import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.rest.internal.model.entry.CTEntryModel;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
@@ -81,6 +82,7 @@ public class CTEntryResource {
 			if (pagination != null) {
 				queryDefinition.setEnd(pagination.getEndPosition());
 				queryDefinition.setStart(pagination.getStartPosition());
+				queryDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
 			}
 
 			ctEntries = _ctEngineManager.getCTEntries(
