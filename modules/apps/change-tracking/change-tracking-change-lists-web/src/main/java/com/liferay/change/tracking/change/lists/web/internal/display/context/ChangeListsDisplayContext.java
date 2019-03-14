@@ -69,6 +69,8 @@ public class ChangeListsDisplayContext {
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_ctEngineManager = _serviceTracker.getService();
 	}
 
 	public SoyContext getChangeListsContext() {
@@ -186,13 +188,19 @@ public class ChangeListsDisplayContext {
 		return _orderByType;
 	}
 
+	public CTCollection getProductionCTCollection() {
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				_themeDisplay.getCompanyId());
+
+		return productionCTCollectionOptional.orElse(null);
+	}
+
 	public SearchContainer<CTCollection> getSearchContainer() {
 		SearchContainer<CTCollection> searchContainer = new SearchContainer<>(
 			_renderRequest, new DisplayTerms(_renderRequest), null,
 			SearchContainer.DEFAULT_CUR_PARAM, 0, SearchContainer.DEFAULT_DELTA,
 			_getIteratorURL(), null, "there-are-no-change-lists");
-
-		CTEngineManager ctEngineManager = _serviceTracker.getService();
 
 		QueryDefinition<CTCollection> queryDefinition = new QueryDefinition<>();
 
@@ -210,7 +218,7 @@ public class ChangeListsDisplayContext {
 		queryDefinition.setOrderByComparator(orderByComparator);
 
 		Optional<CTCollection> productionCTCollection =
-			ctEngineManager.getProductionCTCollectionOptional(
+			_ctEngineManager.getProductionCTCollectionOptional(
 				_themeDisplay.getCompanyId());
 
 		List<CTCollection> ctCollections = new ArrayList<>();
@@ -220,7 +228,7 @@ public class ChangeListsDisplayContext {
 		}
 
 		ctCollections.addAll(
-			ctEngineManager.searchByKeywords(
+			_ctEngineManager.searchByKeywords(
 				_themeDisplay.getCompanyId(), queryDefinition));
 
 		searchContainer.setResults(ctCollections);
@@ -399,6 +407,7 @@ public class ChangeListsDisplayContext {
 		_serviceTracker = serviceTracker;
 	}
 
+	private final CTEngineManager _ctEngineManager;
 	private String _displayStyle;
 	private String _filterByStatus;
 	private final HttpServletRequest _httpServletRequest;
