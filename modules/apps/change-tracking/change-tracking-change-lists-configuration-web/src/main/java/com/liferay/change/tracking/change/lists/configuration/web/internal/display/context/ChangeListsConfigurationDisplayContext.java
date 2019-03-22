@@ -56,6 +56,14 @@ public class ChangeListsConfigurationDisplayContext {
 				"/o/change-tracking/configurations/" +
 					_themeDisplay.getCompanyId());
 
+		PortletURL configurationPortletURL = PortletURLFactoryUtil.create(
+			_httpServletRequest, CTPortletKeys.CHANGE_LISTS_CONFIGURATION,
+			PortletRequest.RENDER_PHASE);
+
+		configurationPortletURL.setParameter("configurationSaved", "true");
+
+		soyContext.put("urlConfiguration", configurationPortletURL.toString());
+
 		PortletURL overviewPortletURL = PortletURLFactoryUtil.create(
 			_httpServletRequest, CTPortletKeys.CHANGE_LISTS,
 			PortletRequest.RENDER_PHASE);
