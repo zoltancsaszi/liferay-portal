@@ -43,7 +43,9 @@ if (ctCollection != null) {
 			<aui:validator name="required" />
 		</aui:input>
 
-		<aui:input label="description" name="description" placeholder="change-list-description-placeholder" value="<%= description %>" />
+		<aui:input label="description" name="description" placeholder="change-list-description-placeholder" value="<%= description %>">
+			<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(CTCollection.class.getName(), "description") %></aui:validator>
+		</aui:input>
 
 		<aui:button-row>
 			<aui:button id="saveButton" type="submit" value='<%= LanguageUtil.get(request, "save") %>' />

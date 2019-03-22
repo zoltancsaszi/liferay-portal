@@ -15,6 +15,7 @@
 package com.liferay.change.tracking.service.impl;
 
 import com.liferay.change.tracking.constants.CTConstants;
+import com.liferay.change.tracking.exception.CTCollectionDescriptionException;
 import com.liferay.change.tracking.exception.CTCollectionNameException;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
@@ -48,7 +49,7 @@ public class CTCollectionLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(name);
+		_validate(name, description);
 
 		long ctCollectionId = counterLocalService.increment();
 
@@ -204,7 +205,9 @@ public class CTCollectionLocalServiceImpl
 		return ctCollectionPersistence.update(ctCollection);
 	}
 
-	private void _validate(String name) throws CTCollectionNameException {
+	private void _validate(String name, String description)
+		throws PortalException {
+
 		if (Validator.isNull(name)) {
 			throw new CTCollectionNameException();
 		}
@@ -214,6 +217,16 @@ public class CTCollectionLocalServiceImpl
 
 		if (name.length() > nameMaxLength) {
 			throw new CTCollectionNameException("Name is too long");
+		}
+
+		int descriptionMaxLength = ModelHintsUtil.getMaxLength(
+			CTCollection.class.getName(), "description");
+
+		if ((description != null) &&
+			(description.length() > descriptionMaxLength)) {
+
+			throw new CTCollectionDescriptionException(
+				"Description is too long");
 		}
 	}
 
