@@ -208,6 +208,8 @@ SearchContainer<CTCollection> ctCollectionSearchContainer = changeListsDisplayCo
 
 						<%
 						boolean productionCollection = CTConstants.CT_COLLECTION_NAME_PRODUCTION.equals(curCTCollection.getName());
+
+						Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 						%>
 
 						<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutCollectionURL">
@@ -237,7 +239,10 @@ SearchContainer<CTCollection> ctCollectionSearchContainer = changeListsDisplayCo
 												<span class="card-h4"><liferay-ui:message key="created-by" /> & <liferay-ui:message key="modified-date" /></span>
 
 												<div class="card-text" data-qa-id="created-by-modified-date">
-													<%= curCTCollection.getUserName() + " - " + curCTCollection.getModifiedDate() %>
+													<%= curCTCollection.getUserName() + " - " %>
+													<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= HtmlUtil.escapeJS(dateFormatDateTime.format(curCTCollection.getModifiedDate())) %>')">
+														<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - curCTCollection.getModifiedDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
+													</span>
 												</div>
 											</div>
 

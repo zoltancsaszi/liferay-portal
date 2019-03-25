@@ -20,6 +20,63 @@ class Overview extends PortletBase {
 		this._fetchProductionCollection();
 	}
 
+	_elapsedTime(milliseconds) {
+		const SECOND = 1000;
+
+		const MINUTE = 60 * SECOND;
+
+		const HOUR = 60 * MINUTE;
+
+		const DAY = 24 * HOUR;
+
+		const MONTH = 30 * DAY;
+
+		const YEAR = 365 * DAY;
+
+		let s = '';
+		let x = 0;
+
+		if (milliseconds <= 0) {
+			s = '0 Second';
+		}
+		else if (milliseconds < MINUTE) {
+			x = Math.round(milliseconds / SECOND);
+
+			s = x + ' Second';
+		}
+		else if (milliseconds < HOUR) {
+			x = Math.round(milliseconds / MINUTE);
+
+			s = x + ' Minute';
+		}
+		else if (milliseconds < DAY) {
+			x = Math.round(milliseconds / HOUR);
+
+			s = x + ' Hour';
+		}
+		else if (milliseconds < MONTH) {
+			x = Math.round(milliseconds / DAY);
+
+			s = x + ' Day';
+		}
+		else if (milliseconds < YEAR) {
+			x = Math.round(milliseconds / MONTH);
+
+			s = x + ' Month';
+		}
+		else if (milliseconds >= YEAR) {
+			x = Math.round(milliseconds / YEAR);
+
+			s = x + ' Year';
+		}
+
+		if ((x == 0) || (x > 1)) {
+			s += 's';
+		}
+
+		return s;
+	}
+
 	_fetchProductionCollection() {
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
@@ -258,20 +315,17 @@ class Overview extends PortletBase {
 						entityNameTranslation.key == changeEntry.contentType
 				);
 
+				let modifiedDate = new Date(changeEntry.modifiedDate).getTime();
+				let systemDate = new Date().getTime();
+
+				let lastEdited = Liferay.Util.sub(Liferay.Language.get('x-ago'), this._elapsedTime(systemDate - modifiedDate));
+
 				this.changeEntries.push(
 					{
 						changeType: changeTypeStr,
 						conflict: false,
 						contentType: entityNameTranslation.translation,
-						lastEdited: new Intl.DateTimeFormat(
-							Liferay.ThemeDisplay.getBCP47LanguageId(),
-							{
-								day: 'numeric',
-								hour: 'numeric',
-								minute: 'numeric',
-								month: 'numeric',
-								year: 'numeric'
-							}).format(new Date(changeEntry.modifiedDate)),
+						lastEdited: lastEdited,
 						site: changeEntry.siteName,
 						title: changeEntry.title,
 						userName: changeEntry.userName,
@@ -491,7 +545,12 @@ Overview.STATE = {
 	descriptionProductionInformation: Config.string(),
 
 	/**
-	 * TODO:
+	 * Contains a json array of translation properties
+	 * @default
+	 * @instance
+	 * @memberOf Overview
+	 * @review
+	 * @type {object}
 	 */
 	entityNameTranslations: Config.arrayOf(
 		Config.shapeOf(
