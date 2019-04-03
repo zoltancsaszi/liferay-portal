@@ -76,6 +76,10 @@ public class StagingModelListenerImpl<T extends BaseModel<T>>
 	}
 
 	private boolean _checkVersionedModel(T model) {
+		if (model == null) {
+			return false;
+		}
+
 		boolean checkedModel = false;
 
 		if (model instanceof VersionedModel) {

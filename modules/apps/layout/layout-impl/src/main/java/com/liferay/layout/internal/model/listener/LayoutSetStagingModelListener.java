@@ -34,10 +34,6 @@ public class LayoutSetStagingModelListener
 	public void onAfterCreate(LayoutSet layoutSet)
 		throws ModelListenerException {
 
-		if (!layoutSet.isHead()) {
-			return;
-		}
-
 		_stagingModelListener.onAfterCreate(layoutSet);
 	}
 
@@ -45,20 +41,12 @@ public class LayoutSetStagingModelListener
 	public void onAfterRemove(LayoutSet layoutSet)
 		throws ModelListenerException {
 
-		if (!layoutSet.isHead()) {
-			return;
-		}
-
 		_stagingModelListener.onAfterRemove(layoutSet);
 	}
 
 	@Override
 	public void onAfterUpdate(LayoutSet layoutSet)
 		throws ModelListenerException {
-
-		if (!layoutSet.isHead()) {
-			return;
-		}
 
 		_stagingModelListener.onAfterUpdate(layoutSet);
 	}
