@@ -31,35 +31,24 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterCreate(Layout layout) {
-		if (!layout.isHead()) {
-			return;
-		}
-
 		clearCache(layout);
 	}
 
 	@Override
 	public void onAfterRemove(Layout layout) {
-		if (!layout.isHead()) {
-			return;
-		}
-
 		clearCache(layout);
 	}
 
 	@Override
 	public void onAfterUpdate(Layout layout) {
-		if (!layout.isHead()) {
-			return;
-		}
-
 		clearCache(layout);
 	}
 
 	@Override
 	public void onBeforeRemove(Layout layout) throws ModelListenerException {
 		try {
-			if (!LayoutStagingUtil.isBranchingLayout(layout) ||
+			if ((layout == null) ||
+				!LayoutStagingUtil.isBranchingLayout(layout) ||
 				!layout.isHead()) {
 
 				return;
@@ -84,6 +73,10 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	protected void clearCache(Layout layout) {
 		if (layout == null) {
+			return;
+		}
+
+		if (!layout.isHead()) {
 			return;
 		}
 
