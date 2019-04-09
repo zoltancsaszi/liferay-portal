@@ -18,6 +18,7 @@ import com.liferay.change.tracking.CTEngineManager;
 import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.configuration.CTConfigurationRegistry;
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.exception.CTEntryException;
 import com.liferay.change.tracking.exception.CTException;
 import com.liferay.change.tracking.exception.DuplicateCTEntryException;
@@ -434,10 +435,15 @@ public class CTManagerImpl implements CTManager {
 		try {
 			ctEntryOptional = TransactionInvokerUtil.invoke(
 				_transactionConfig,
-				() -> _registerModelChange(
-					userId, modelClassNameId, modelClassPK,
-					modelResourcePrimKey, changeType, force, companyId,
-					ctCollection));
+				() -> {
+					final int localChangeType = _getChangeType(
+						modelResourcePrimKey, changeType, companyId);
+
+					return _registerModelChange(
+						userId, modelClassNameId, modelClassPK,
+						modelResourcePrimKey, localChangeType, force, companyId,
+						ctCollection);
+				});
 		}
 		catch (Throwable t) {
 			if (t instanceof CTException) {
@@ -606,6 +612,42 @@ public class CTManagerImpl implements CTManager {
 				ctEntryAggregate.getCtEntryAggregateId()));
 
 		return ctEntryAggregateCopy;
+	}
+
+	private int _getChangeType(
+			long modelResourcePrimKey, int changeType, long companyId)
+		throws CTException {
+
+		final int localChangeType;
+
+		if (changeType == CTConstants.CT_CHANGE_TYPE_RESTORE_FROM_TRASH) {
+			Optional<CTCollection> productionCTCollectionOptional =
+				_ctEngineManager.getProductionCTCollectionOptional(companyId);
+
+			if (!productionCTCollectionOptional.isPresent()) {
+				throw new CTException(
+					companyId, "Production Change List not exists");
+			}
+
+			CTCollection productionCTCollection =
+				productionCTCollectionOptional.get();
+
+			long productionCTEntriesCount = _ctEntryLocalService.countCTEntries(
+				productionCTCollection.getCtCollectionId(),
+				modelResourcePrimKey);
+
+			if (productionCTEntriesCount > 0) {
+				localChangeType = CTConstants.CT_CHANGE_TYPE_MODIFICATION;
+			}
+			else {
+				localChangeType = CTConstants.CT_CHANGE_TYPE_ADDITION;
+			}
+		}
+		else {
+			localChangeType = changeType;
+		}
+
+		return localChangeType;
 	}
 
 	private long _getCompanyId(long userId) {
