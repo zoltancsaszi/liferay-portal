@@ -94,6 +94,11 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	@Override
+	public long countCTEntries(long ctCollectionId, long modelResourcePrimKey) {
+		return ctEntryFinder.countByC_R(ctCollectionId, modelResourcePrimKey);
+	}
+
+	@Override
 	public List<CTEntry> fetchCTEntries(long modelClassNameId) {
 		return ctEntryPersistence.findByModelClassNameId(modelClassNameId);
 	}
