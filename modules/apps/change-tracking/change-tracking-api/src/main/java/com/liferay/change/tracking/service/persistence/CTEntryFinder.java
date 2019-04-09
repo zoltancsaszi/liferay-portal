@@ -28,6 +28,8 @@ public interface CTEntryFinder {
 		com.liferay.portal.kernel.dao.orm.QueryDefinition
 			<com.liferay.change.tracking.model.CTEntry> queryDefinition);
 
+	public long countByC_R(long ctCollectionId, long modelResourcePrimKey);
+
 	public java.util.List<com.liferay.change.tracking.model.CTEntry>
 		findByCTCollectionId(
 			long ctCollectionId,

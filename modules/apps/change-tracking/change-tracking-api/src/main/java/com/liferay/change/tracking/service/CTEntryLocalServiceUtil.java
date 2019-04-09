@@ -125,6 +125,13 @@ public class CTEntryLocalServiceUtil {
 		getService().clearCTEntryAggregateCTEntries(ctEntryAggregateId);
 	}
 
+	public static long countCTEntries(
+		long ctCollectionId, long modelResourcePrimKey) {
+
+		return getService().countCTEntries(
+			ctCollectionId, modelResourcePrimKey);
+	}
+
 	/**
 	 * Creates a new ct entry with the primary key. Does not add the ct entry to the database.
 	 *
