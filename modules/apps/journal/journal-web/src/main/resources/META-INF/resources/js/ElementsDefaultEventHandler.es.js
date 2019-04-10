@@ -44,6 +44,14 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 		}
 	}
 
+	deleteHistoryVersion(itemData) {
+		let message = Liferay.Language.get('are-you-sure-you-want-to-delete-this');
+
+		if (confirm(message)) {
+			this._send(itemData.deleteURL);
+		}
+	}
+
 	expireArticles(itemData) {
 		this._send(itemData.expireURL);
 	}
