@@ -49,8 +49,6 @@ public class CTDLAppHelperLocalServiceWrapper
 		super(dlAppHelperLocalServiceWrapper);
 	}
 
-	//TODO: move from/to trash, restore must be implemented
-
 	@Override
 	public FileEntry moveFileEntryToTrash(long userId, FileEntry fileEntry)
 		throws PortalException {
@@ -62,6 +60,7 @@ public class CTDLAppHelperLocalServiceWrapper
 		return fileEntry;
 	}
 
+	@Override
 	public void restoreFileEntryFromTrash(long userId, FileEntry fileEntry)
 		throws PortalException {
 

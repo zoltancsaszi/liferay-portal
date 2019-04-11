@@ -132,12 +132,6 @@ public class CTEntryLocalServiceWrapper
 		_ctEntryLocalService.clearCTEntryAggregateCTEntries(ctEntryAggregateId);
 	}
 
-	@Override
-	public long countCTEntries(long ctCollectionId, long modelResourcePrimKey) {
-		return _ctEntryLocalService.countCTEntries(
-			ctCollectionId, modelResourcePrimKey);
-	}
-
 	/**
 	 * Creates a new ct entry with the primary key. Does not add the ct entry to the database.
 	 *
@@ -490,6 +484,14 @@ public class CTEntryLocalServiceWrapper
 	@Override
 	public int getCTEntriesCount() {
 		return _ctEntryLocalService.getCTEntriesCount();
+	}
+
+	@Override
+	public long getCTEntriesCount(
+		long ctCollectionId, long modelResourcePrimKey) {
+
+		return _ctEntryLocalService.getCTEntriesCount(
+			ctCollectionId, modelResourcePrimKey);
 	}
 
 	/**

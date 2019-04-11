@@ -105,8 +105,6 @@ public interface CTEntryLocalService
 
 	public void clearCTEntryAggregateCTEntries(long ctEntryAggregateId);
 
-	public long countCTEntries(long ctCollectionId, long modelResourcePrimKey);
-
 	/**
 	 * Creates a new ct entry with the primary key. Does not add the ct entry to the database.
 	 *
@@ -308,6 +306,10 @@ public interface CTEntryLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCTEntriesCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getCTEntriesCount(
+		long ctCollectionId, long modelResourcePrimKey);
 
 	/**
 	 * Returns the ct entry with the primary key.
