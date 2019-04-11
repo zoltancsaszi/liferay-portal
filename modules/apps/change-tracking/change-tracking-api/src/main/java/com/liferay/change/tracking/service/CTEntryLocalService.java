@@ -307,6 +307,10 @@ public interface CTEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCTEntriesCount();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getCTEntriesCount(
+		long ctCollectionId, long modelResourcePrimKey);
+
 	/**
 	 * Returns the ct entry with the primary key.
 	 *
@@ -384,14 +388,14 @@ public interface CTEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CTEntry> search(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, boolean collision,
-		long otherCTCollectionId, QueryDefinition<CTEntry> queryDefinition);
+		long[] classNameIds, int[] changeTypes, Boolean collision,
+		QueryDefinition<CTEntry> queryDefinition);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long searchCount(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, boolean collision,
-		long otherCTCollectionId, QueryDefinition<CTEntry> queryDefinition);
+		long[] classNameIds, int[] changeTypes, Boolean collision,
+		QueryDefinition<CTEntry> queryDefinition);
 
 	public void setCTCollectionCTEntries(
 		long ctCollectionId, long[] ctEntryIds);

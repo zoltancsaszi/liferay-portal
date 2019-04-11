@@ -18,6 +18,7 @@ import com.liferay.change.tracking.CTEngineManager;
 import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.configuration.CTConfigurationRegistry;
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.exception.CTEntryException;
 import com.liferay.change.tracking.exception.CTException;
 import com.liferay.change.tracking.exception.DuplicateCTEntryException;
@@ -159,7 +160,7 @@ public class CTManagerImpl implements CTManager {
 
 		long companyId = _getCompanyId(userId);
 
-		CTEntry ctEntry = _getCTentry(
+		CTEntry ctEntry = _getCTEntry(
 			companyId, ctCollectionId, modelClassNameId, modelClassPK);
 
 		return Optional.ofNullable(ctEntry);
@@ -365,7 +366,7 @@ public class CTManagerImpl implements CTManager {
 			0L
 		);
 
-		CTEntry ctEntry = _getCTentry(
+		CTEntry ctEntry = _getCTEntry(
 			companyId, ctCollectionId, modelClassNameId, modelClassPK);
 
 		return Optional.ofNullable(ctEntry);
@@ -436,8 +437,10 @@ public class CTManagerImpl implements CTManager {
 				_transactionConfig,
 				() -> _registerModelChange(
 					userId, modelClassNameId, modelClassPK,
-					modelResourcePrimKey, changeType, force, companyId,
-					ctCollection));
+					modelResourcePrimKey,
+					_checkChangeType(
+						modelResourcePrimKey, changeType, companyId),
+					force, companyId, ctCollection));
 		}
 		catch (Throwable t) {
 			if (t instanceof CTException) {
@@ -554,6 +557,35 @@ public class CTManagerImpl implements CTManager {
 		return ctEntryAggregate;
 	}
 
+	private int _checkChangeType(
+		long modelResourcePrimKey, int changeType, long companyId) {
+
+		if (changeType != CTConstants.CT_CHANGE_TYPE_RESTORE_FROM_TRASH) {
+			return changeType;
+		}
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(companyId);
+
+		long productionCTCollectionId = productionCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		long productionCTEntriesCount = _ctEntryLocalService.getCTEntriesCount(
+			productionCTCollectionId, modelResourcePrimKey);
+
+		if (productionCTEntriesCount > 0) {
+			changeType = CTConstants.CT_CHANGE_TYPE_MODIFICATION;
+		}
+		else {
+			changeType = CTConstants.CT_CHANGE_TYPE_ADDITION;
+		}
+
+		return changeType;
+	}
+
 	private void _checkCollisions(CTCollection ctCollection, CTEntry ctEntry) {
 		if (!ctCollection.isProduction()) {
 			return;
@@ -629,7 +661,7 @@ public class CTManagerImpl implements CTManager {
 		return companyId;
 	}
 
-	private CTEntry _getCTentry(
+	private CTEntry _getCTEntry(
 		long companyId, long ctCollectionId, long modelClassNameId,
 		long modelClassPK) {
 

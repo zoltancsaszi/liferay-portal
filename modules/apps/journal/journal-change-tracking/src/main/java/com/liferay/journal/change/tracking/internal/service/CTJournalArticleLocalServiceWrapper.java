@@ -1346,7 +1346,8 @@ public class CTJournalArticleLocalServiceWrapper
 			userId, article);
 
 		_registerChange(
-			journalArticle, CTConstants.CT_CHANGE_TYPE_MODIFICATION);
+			journalArticle, CTConstants.CT_CHANGE_TYPE_RESTORE_FROM_TRASH,
+			true);
 
 		return journalArticle;
 	}

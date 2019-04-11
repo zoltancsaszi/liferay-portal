@@ -40,6 +40,9 @@ public class CTEntryFinderImpl
 	public static final String COUNT_BY_RELATED_CT_ENTRIES =
 		CTEntryFinder.class.getName() + ".countByRelatedCTEntries";
 
+	public static final String COUNT_BY_CT_COLLECTION_ID =
+		CTEntryFinder.class.getName() + ".countByCTCollectionId";
+
 	public static final String FIND_BY_CT_COLLECTION_ID =
 		CTEntryFinder.class.getName() + ".findByCTCollectionId";
 
@@ -84,6 +87,52 @@ public class CTEntryFinderImpl
 
 			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
 				qPos.add(queryDefinition.getStatus());
+			}
+
+			Iterator<Long> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Long count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+
+			return 0;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	@Override
+	public long countByC_R(long ctCollectionId, long modelResourcePrimKey) {
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = _customSQL.get(getClass(), COUNT_BY_CT_COLLECTION_ID);
+
+			if (modelResourcePrimKey > 0) {
+				sql = _customSQL.appendCriteria(
+					sql, "AND (CTEntry.modelResourcePrimKey = ?)");
+			}
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(ctCollectionId);
+
+			if (modelResourcePrimKey > 0) {
+				qPos.add(modelResourcePrimKey);
 			}
 
 			Iterator<Long> itr = q.iterate();

@@ -397,7 +397,7 @@ public class JournalArticleActionDropdownItemsProvider {
 		deleteURL.setParameter("articleId", articleId);
 
 		return dropdownItem -> {
-			dropdownItem.putData("action", "delete");
+			dropdownItem.putData("action", "deleteHistoryVersion");
 			dropdownItem.putData("deleteURL", deleteURL.toString());
 			dropdownItem.setLabel(LanguageUtil.get(_request, "delete"));
 		};
