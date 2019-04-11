@@ -160,7 +160,7 @@ public class CTManagerImpl implements CTManager {
 
 		long companyId = _getCompanyId(userId);
 
-		CTEntry ctEntry = _getCTentry(
+		CTEntry ctEntry = _getCTEntry(
 			companyId, ctCollectionId, modelClassNameId, modelClassPK);
 
 		return Optional.ofNullable(ctEntry);
@@ -366,7 +366,7 @@ public class CTManagerImpl implements CTManager {
 			0L
 		);
 
-		CTEntry ctEntry = _getCTentry(
+		CTEntry ctEntry = _getCTEntry(
 			companyId, ctCollectionId, modelClassNameId, modelClassPK);
 
 		return Optional.ofNullable(ctEntry);
@@ -435,15 +435,12 @@ public class CTManagerImpl implements CTManager {
 		try {
 			ctEntryOptional = TransactionInvokerUtil.invoke(
 				_transactionConfig,
-				() -> {
-					final int localChangeType = _getChangeType(
-						modelResourcePrimKey, changeType, companyId);
-
-					return _registerModelChange(
-						userId, modelClassNameId, modelClassPK,
-						modelResourcePrimKey, localChangeType, force, companyId,
-						ctCollection);
-				});
+				() -> _registerModelChange(
+					userId, modelClassNameId, modelClassPK,
+					modelResourcePrimKey,
+					_checkChangeType(
+						modelResourcePrimKey, changeType, companyId),
+					force, companyId, ctCollection));
 		}
 		catch (Throwable t) {
 			if (t instanceof CTException) {
@@ -560,6 +557,35 @@ public class CTManagerImpl implements CTManager {
 		return ctEntryAggregate;
 	}
 
+	private int _checkChangeType(
+		long modelResourcePrimKey, int changeType, long companyId) {
+
+		if (changeType != CTConstants.CT_CHANGE_TYPE_RESTORE_FROM_TRASH) {
+			return changeType;
+		}
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(companyId);
+
+		long productionCTCollectionId = productionCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		long productionCTEntriesCount = _ctEntryLocalService.getCTEntriesCount(
+			productionCTCollectionId, modelResourcePrimKey);
+
+		if (productionCTEntriesCount > 0) {
+			changeType = CTConstants.CT_CHANGE_TYPE_MODIFICATION;
+		}
+		else {
+			changeType = CTConstants.CT_CHANGE_TYPE_ADDITION;
+		}
+
+		return changeType;
+	}
+
 	private void _checkCollisions(CTCollection ctCollection, CTEntry ctEntry) {
 		if (!ctCollection.isProduction()) {
 			return;
@@ -614,42 +640,6 @@ public class CTManagerImpl implements CTManager {
 		return ctEntryAggregateCopy;
 	}
 
-	private int _getChangeType(
-			long modelResourcePrimKey, int changeType, long companyId)
-		throws CTException {
-
-		final int localChangeType;
-
-		if (changeType == CTConstants.CT_CHANGE_TYPE_RESTORE_FROM_TRASH) {
-			Optional<CTCollection> productionCTCollectionOptional =
-				_ctEngineManager.getProductionCTCollectionOptional(companyId);
-
-			if (!productionCTCollectionOptional.isPresent()) {
-				throw new CTException(
-					companyId, "Production Change List not exists");
-			}
-
-			CTCollection productionCTCollection =
-				productionCTCollectionOptional.get();
-
-			long productionCTEntriesCount = _ctEntryLocalService.countCTEntries(
-				productionCTCollection.getCtCollectionId(),
-				modelResourcePrimKey);
-
-			if (productionCTEntriesCount > 0) {
-				localChangeType = CTConstants.CT_CHANGE_TYPE_MODIFICATION;
-			}
-			else {
-				localChangeType = CTConstants.CT_CHANGE_TYPE_ADDITION;
-			}
-		}
-		else {
-			localChangeType = changeType;
-		}
-
-		return localChangeType;
-	}
-
 	private long _getCompanyId(long userId) {
 		long companyId = 0;
 
@@ -671,7 +661,7 @@ public class CTManagerImpl implements CTManager {
 		return companyId;
 	}
 
-	private CTEntry _getCTentry(
+	private CTEntry _getCTEntry(
 		long companyId, long ctCollectionId, long modelClassNameId,
 		long modelClassPK) {
 
