@@ -40,7 +40,8 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 
 	@Override
 	public CTProcess addCTProcess(
-			long userId, long ctCollectionId, ServiceContext serviceContext)
+			long userId, long ctCollectionId, boolean collisionIgnored,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_validate(ctCollectionId);
@@ -58,7 +59,8 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 		ctProcess.setCtCollectionId(ctCollectionId);
 
 		long backgroundTaskId = _addBackgroundTask(
-			user, ctCollectionId, ctProcessId, serviceContext);
+			user, ctCollectionId, ctProcessId, collisionIgnored,
+			serviceContext);
 
 		ctProcess.setBackgroundTaskId(backgroundTaskId);
 
@@ -110,13 +112,14 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 
 	private long _addBackgroundTask(
 			User user, long ctCollectionId, long ctProcessId,
-			ServiceContext serviceContext)
+			boolean collisionIgnored, ServiceContext serviceContext)
 		throws PortalException {
 
 		Company company = companyLocalService.getCompany(user.getCompanyId());
 
 		Map<String, Serializable> taskContextMap = new HashMap<>();
 
+		taskContextMap.put("collisionIgnored", collisionIgnored);
 		taskContextMap.put("ctCollectionId", ctCollectionId);
 		taskContextMap.put("ctProcessId", ctProcessId);
 
