@@ -17,6 +17,7 @@ package com.liferay.change.tracking.internal;
 import com.liferay.change.tracking.CTEngineManager;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.configuration.CTConfigurationRegistry;
+import com.liferay.change.tracking.configuration.CTServiceConfigurationProvider;
 import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.exception.CTException;
@@ -369,6 +370,10 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 	@Override
 	public boolean isChangeTrackingEnabled(long companyId) {
+		if (!_ctServiceConfigurationProvider.enableChangeTracking()) {
+			return false;
+		}
+
 		Optional<CTCollection> productionCTCollection =
 			getProductionCTCollectionOptional(companyId);
 
@@ -823,6 +828,9 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 	@Reference
 	private CTProcessLocalService _ctProcessLocalService;
+
+	@Reference
+	private CTServiceConfigurationProvider _ctServiceConfigurationProvider;
 
 	@Reference
 	private Portal _portal;

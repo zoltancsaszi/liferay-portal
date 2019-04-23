@@ -14,11 +14,17 @@
 
 package com.liferay.change.tracking.my.change.lists.web.internal.product.navigation.personal.menu;
 
+import com.liferay.change.tracking.configuration.CTServiceConfigurationProvider;
 import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.product.navigation.personal.menu.BasePersonalMenuEntry;
 import com.liferay.product.navigation.personal.menu.PersonalMenuEntry;
 
+import javax.portlet.PortletRequest;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pei-Jung Lan
@@ -34,8 +40,19 @@ import org.osgi.service.component.annotations.Component;
 public class MyChangeListsPersonalMenuEntry extends BasePersonalMenuEntry {
 
 	@Override
+	public boolean isShow(
+			PortletRequest portletRequest, PermissionChecker permissionChecker)
+		throws PortalException {
+
+		return _ctServiceConfigurationProvider.enableChangeTracking();
+	}
+
+	@Override
 	protected String getPortletId() {
 		return CTPortletKeys.MY_CHANGE_LISTS;
 	}
+
+	@Reference
+	private CTServiceConfigurationProvider _ctServiceConfigurationProvider;
 
 }
