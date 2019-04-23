@@ -16,8 +16,12 @@ package com.liferay.change.tracking.my.change.lists.web.internal.application.lis
 
 import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
+import com.liferay.change.tracking.configuration.CTServiceConfigurationProvider;
 import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.PortletCategoryKeys;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,6 +46,13 @@ public class MyChangeListsPanelApp extends BasePanelApp {
 	}
 
 	@Override
+	public boolean isShow(PermissionChecker permissionChecker, Group group)
+		throws PortalException {
+
+		return _ctServiceConfigurationProvider.enableChangeTracking();
+	}
+
+	@Override
 	@Reference(
 		target = "(javax.portlet.name=" + CTPortletKeys.MY_CHANGE_LISTS + ")",
 		unbind = "-"
@@ -49,5 +60,8 @@ public class MyChangeListsPanelApp extends BasePanelApp {
 	public void setPortlet(Portlet portlet) {
 		super.setPortlet(portlet);
 	}
+
+	@Reference
+	private CTServiceConfigurationProvider _ctServiceConfigurationProvider;
 
 }

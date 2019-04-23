@@ -17,14 +17,19 @@ package com.liferay.change.tracking.change.lists.web.internal.application.list;
 import com.liferay.application.list.BasePanelCategory;
 import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
+import com.liferay.change.tracking.configuration.CTServiceConfigurationProvider;
 import com.liferay.change.tracking.constants.CTPanelCategoryKeys;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Máté Thurzó
@@ -51,5 +56,15 @@ public class ChangeListsPanelCategory extends BasePanelCategory {
 
 		return LanguageUtil.get(resourceBundle, "change-lists");
 	}
+
+	@Override
+	public boolean isShow(PermissionChecker permissionChecker, Group group)
+		throws PortalException {
+
+		return _ctServiceConfigurationProvider.enableChangeTracking();
+	}
+
+	@Reference
+	private CTServiceConfigurationProvider _ctServiceConfigurationProvider;
 
 }
