@@ -20,6 +20,9 @@
 	<div class="sheet-header">
 		<h2 class="sheet-title">Site Change Lists History</h2>
 
-		<div class="sheet-text">This is only a placeholder for what's later be added to the site change lists history screen.</div>
+		<div class="sheet-text">
+			Change Lists is currently a BETA feature and this screen is not included in the feature set yet.
+			Site Change Lists History will provide tools to manage change history for site scoped lists.
+		</div>
 	</div>
 </div>
