@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.model.BaseModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -88,6 +89,16 @@ public interface CTEngineManager {
 	 * @param userId the primary key of the user who initiated the action
 	 */
 	public void enableChangeTracking(long companyId, long userId);
+
+	/**
+	 * Counts the changes by different change types within a given change
+	 * tracking collection.
+	 *
+	 * @param ctCollectionId the primary key of the change collection
+	 * @return a map containing the change counts by change types
+	 */
+	public Map<Integer, Long> getCTCollectionChangeTypeCounts(
+		long ctCollectionId);
 
 	/**
 	 * Returns the change tracking collection identified by the primary key.
@@ -248,8 +259,10 @@ public interface CTEngineManager {
 	 *
 	 * @param userId the primary key of the user
 	 * @param ctCollectionId the primary key of the change collection
+	 * @param ignoreCollision publishing process will start anyway if true
 	 */
-	public void publishCTCollection(long userId, long ctCollectionId);
+	public void publishCTCollection(
+		long userId, long ctCollectionId, boolean ignoreCollision);
 
 	/**
 	 * Returns all the change tracking collection associated with the given

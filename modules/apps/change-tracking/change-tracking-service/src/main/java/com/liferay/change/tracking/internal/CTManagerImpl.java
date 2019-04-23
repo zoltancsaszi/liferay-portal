@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -483,18 +484,18 @@ public class CTManagerImpl implements CTManager {
 		CTConfiguration<?, V> ctConfiguration =
 			(CTConfiguration<?, V>)ctConfigurationOptional.get();
 
-		List<Function<V, ? extends BaseModel>> relatedEntityFunctions =
-			ctConfiguration.getVersionEntityRelatedEntityFunctions();
+		List<Function<V, List<? extends BaseModel>>> relatedEntitiesFunctions =
+			ctConfiguration.getVersionEntityRelatedEntitiesFunctions();
 
 		Function<Long, V> versionEntityByVersionEntityIdFunction =
 			ctConfiguration.getVersionEntityByVersionEntityIdFunction();
 
 		V versionEntity = versionEntityByVersionEntityIdFunction.apply(classPK);
 
-		relatedEntityFunctions.forEach(
-			relatedEntityFunction -> _registerRelatedChange(
+		relatedEntitiesFunctions.forEach(
+			relatedEntitiesFunction -> _registerRelatedChange(
 				userId, classNameId, classPK, versionEntity,
-				relatedEntityFunction, force));
+				relatedEntitiesFunction, force));
 	}
 
 	@Override
@@ -713,23 +714,9 @@ public class CTManagerImpl implements CTManager {
 		}
 	}
 
-	private <V extends BaseModel, R extends BaseModel> void
-		_registerRelatedChange(
-			long userId, long classNameId, long classPK, V versionEntity,
-			Function<V, R> relatedEntityFunction, boolean force) {
-
-		Optional<CTEntry> versionEntityCTEntryOptional =
-			getModelChangeCTEntryOptional(userId, classNameId, classPK);
-
-		if (!versionEntityCTEntryOptional.isPresent()) {
-			return;
-		}
-
-		R relatedEntity = relatedEntityFunction.apply(versionEntity);
-
-		if (relatedEntity == null) {
-			return;
-		}
+	private void _registerRelatedChange(
+		long userId, CTEntry versionEntityCTEntry, BaseModel relatedEntity,
+		boolean force) {
 
 		long relatedEntityClassPK = (Long)relatedEntity.getPrimaryKeyObj();
 
@@ -749,8 +736,35 @@ public class CTManagerImpl implements CTManager {
 		}
 
 		addRelatedCTEntry(
-			userId, versionEntityCTEntryOptional.get(),
-			relatedEntityCTEntryOptional.get(), force);
+			userId, versionEntityCTEntry, relatedEntityCTEntryOptional.get(),
+			force);
+	}
+
+	private <V extends BaseModel> void _registerRelatedChange(
+		long userId, long classNameId, long classPK, V versionEntity,
+		Function<V, List<? extends BaseModel>> relatedEntitiesFunction,
+		boolean force) {
+
+		Optional<CTEntry> versionEntityCTEntryOptional =
+			getModelChangeCTEntryOptional(userId, classNameId, classPK);
+
+		if (!versionEntityCTEntryOptional.isPresent()) {
+			return;
+		}
+
+		List<? extends BaseModel> relatedEntities =
+			relatedEntitiesFunction.apply(versionEntity);
+
+		Stream<? extends BaseModel> relatedEntitiesStream =
+			relatedEntities.stream();
+
+		relatedEntitiesStream.filter(
+			Objects::nonNull
+		).forEach(
+			relatedEntity -> _registerRelatedChange(
+				userId, versionEntityCTEntryOptional.get(), relatedEntity,
+				force)
+		);
 	}
 
 	private void _updateCTEntryInCTEntryAggregate(

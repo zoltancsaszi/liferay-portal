@@ -60,8 +60,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -229,6 +232,19 @@ public class CTEngineManagerImpl implements CTEngineManager {
 	}
 
 	@Override
+	public Map<Integer, Long> getCTCollectionChangeTypeCounts(
+		long ctCollectionId) {
+
+		List<CTEntry> ctEntries = getCTEntries(ctCollectionId);
+
+		Stream<CTEntry> ctEntriesStream = ctEntries.stream();
+
+		return ctEntriesStream.collect(
+			Collectors.groupingBy(
+				CTEntry::getChangeType, Collectors.counting()));
+	}
+
+	@Override
 	public Optional<CTCollection> getCTCollectionOptional(long ctCollectionId) {
 		CTCollection ctCollection = _ctCollectionLocalService.fetchCTCollection(
 			ctCollectionId);
@@ -377,7 +393,9 @@ public class CTEngineManagerImpl implements CTEngineManager {
 	}
 
 	@Override
-	public void publishCTCollection(long userId, long ctCollectionId) {
+	public void publishCTCollection(
+		long userId, long ctCollectionId, boolean ignoreCollision) {
+
 		long companyId = _getCompanyId(userId);
 
 		if (companyId <= 0) {
@@ -397,7 +415,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 
 		try {
 			_ctProcessLocalService.addCTProcess(
-				userId, ctCollectionId, new ServiceContext());
+				userId, ctCollectionId, ignoreCollision, new ServiceContext());
 		}
 		catch (Throwable t) {
 			if (_log.isWarnEnabled()) {
@@ -517,6 +535,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 				userId, ctConfiguration, ctCollection));
 	}
 
+	@SuppressWarnings("unchecked")
 	private void _generateCTEntriesForCTConfiguration(
 		long userId, CTConfiguration ctConfiguration,
 		CTCollection ctCollection) {
@@ -543,6 +562,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void _generateCTEntriesForResourceEntity(
 		long userId, CTConfiguration ctConfiguration, CTCollection ctCollection,
 		BaseModel resourceEntity, Serializable resourcePrimKey) {
@@ -588,11 +608,12 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private <V extends BaseModel, R extends BaseModel> void
 		_generateCTEntryAggregateForCTEntry(
 			long userId, CTConfiguration ctConfiguration,
 			CTCollection ctCollection, CTEntry ctEntry,
-			List<Function<V, R>> versionEntityRelatedEntityFunctions) {
+			List<Function<V, List<R>>> versionEntityRelatedEntitiesFunctions) {
 
 		Function<Long, V> versionEntityByVersionEntityIdFunction =
 			ctConfiguration.getVersionEntityByVersionEntityIdFunction();
@@ -600,24 +621,17 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		V versionEntity = versionEntityByVersionEntityIdFunction.apply(
 			ctEntry.getModelClassPK());
 
-		versionEntityRelatedEntityFunctions.forEach(
-			relatedEntityFunction -> _generateCTEntryAggregateForVersionEntity(
-				userId, ctCollection, ctEntry, versionEntity,
-				relatedEntityFunction));
+		versionEntityRelatedEntitiesFunctions.forEach(
+			relatedEntitiesFunction ->
+				_generateCTEntryAggregateForRelatedEntity(
+					userId, ctCollection, ctEntry, versionEntity,
+					relatedEntitiesFunction));
 	}
 
-	private <V extends BaseModel, R extends BaseModel> void
-		_generateCTEntryAggregateForVersionEntity(
+	private <R extends BaseModel> void
+		_generateCTEntryAggregateForRelatedEntity(
 			long userId, CTCollection ctCollection, CTEntry ctEntry,
-			V versionEntity,
-			Function<V, R> versionEntityRelatedEntityFunction) {
-
-		R relatedEntity = versionEntityRelatedEntityFunction.apply(
-			versionEntity);
-
-		if (relatedEntity == null) {
-			return;
-		}
+			R relatedEntity) {
 
 		long relatedEntityClassPK = (Long)relatedEntity.getPrimaryKeyObj();
 
@@ -663,14 +677,34 @@ public class CTEngineManagerImpl implements CTEngineManager {
 	}
 
 	private <V extends BaseModel, R extends BaseModel> void
+		_generateCTEntryAggregateForRelatedEntity(
+			long userId, CTCollection ctCollection, CTEntry ctEntry,
+			V versionEntity,
+			Function<V, List<R>> versionEntityRelatedEntityFunction) {
+
+		List<R> relatedEntities = versionEntityRelatedEntityFunction.apply(
+			versionEntity);
+
+		Stream<R> relatedEntityStream = relatedEntities.stream();
+
+		relatedEntityStream.filter(
+			Objects::nonNull
+		).forEach(
+			relatedEntity -> _generateCTEntryAggregateForRelatedEntity(
+				userId, ctCollection, ctEntry, relatedEntity)
+		);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <V extends BaseModel, R extends BaseModel> void
 		_generateCTEntryAggregatesForCTConfiguration(
 			long userId, CTConfiguration ctConfiguration,
 			CTCollection ctCollection) {
 
-		List<Function<V, R>> versionEntityRelatedEntityFunctions =
-			ctConfiguration.getVersionEntityRelatedEntityFunctions();
+		List<Function<V, List<R>>> versionEntityRelatedEntitiesFunctions =
+			ctConfiguration.getVersionEntityRelatedEntitiesFunctions();
 
-		if (ListUtil.isEmpty(versionEntityRelatedEntityFunctions)) {
+		if (ListUtil.isEmpty(versionEntityRelatedEntitiesFunctions)) {
 			return;
 		}
 
@@ -682,7 +716,7 @@ public class CTEngineManagerImpl implements CTEngineManager {
 		ctEntries.forEach(
 			ctEntry -> _generateCTEntryAggregateForCTEntry(
 				userId, ctConfiguration, ctCollection, ctEntry,
-				versionEntityRelatedEntityFunctions));
+				versionEntityRelatedEntitiesFunctions));
 	}
 
 	private long _getCompanyId(long userId) {
