@@ -18,8 +18,11 @@
 
 <div class="sheet sheet-lg site-change-lists-sheet">
 	<div class="sheet-header">
-		<h2 class="sheet-title">Site Change Lists example screen</h2>
+		<h2 class="sheet-title">Site Change Lists</h2>
 
-		<div class="sheet-text">This is only a placeholder for what's later be added to the site change lists screen.</div>
+		<div class="sheet-text">
+			Change Lists is currently a BETA feature and this screen is not included in the feature set yet.
+			Site Change Lists will provide tools to manage changes related to one site only.
+		</div>
 	</div>
 </div>

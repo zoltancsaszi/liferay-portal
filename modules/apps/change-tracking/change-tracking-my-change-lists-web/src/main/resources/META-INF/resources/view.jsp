@@ -18,8 +18,11 @@
 
 <div class="sheet sheet-lg">
 	<div class="sheet-header">
-		<h2 class="sheet-title">My Change Lists example screen</h2>
+		<h2 class="sheet-title">My Change Lists</h2>
 
-		<div class="sheet-text">This is only a placeholder for what's later be added to the my change lists screen.</div>
+		<div class="sheet-text">
+			Change Lists is currently a BETA feature and this screen is not included in the feature set yet.
+			My Change Lists will provide tools to manage changes for on a user level instead of site or global scope.
+		</div>
 	</div>
 </div>
