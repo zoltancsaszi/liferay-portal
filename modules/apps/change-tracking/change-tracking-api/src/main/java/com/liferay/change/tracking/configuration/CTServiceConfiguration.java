@@ -34,7 +34,7 @@ public interface CTServiceConfiguration {
 
 	@Meta.AD(
 		deflt = "false", description = "enable-change-tracking-help",
-		name = "enable-change-tracking"
+		name = "enable-change-tracking", required = false
 	)
 	public boolean enableChangeTracking();
 
