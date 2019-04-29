@@ -11,33 +11,31 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 package com.liferay.change.tracking.exception;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.exception.PortalException;
+
 /**
- * @author Zoltan Csaszi
+ * @author Brian Wing Shun Chan
  */
 @ProviderType
-public class CTCollectionNameException extends CTException {
+public class CTCollectionNameException extends PortalException {
 
-	public CTCollectionNameException(long companyId) {
-		super(companyId);
+	public CTCollectionNameException() {
 	}
 
-	public CTCollectionNameException(long companyId, String msg) {
-		super(companyId, msg);
+	public CTCollectionNameException(String msg) {
+		super(msg);
 	}
 
-	public CTCollectionNameException(
-		long companyId, String msg, Throwable cause) {
-
-		super(companyId, msg, cause);
+	public CTCollectionNameException(String msg, Throwable cause) {
+		super(msg, cause);
 	}
 
-	public CTCollectionNameException(long companyId, Throwable cause) {
-		super(companyId, cause);
+	public CTCollectionNameException(Throwable cause) {
+		super(cause);
 	}
 
 }

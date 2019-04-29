@@ -164,6 +164,7 @@
 	</entity>
 	<exceptions>
 		<exception>CTCollectionName</exception>
+		<exception>CTCollectionDescription</exception>
 		<exception>DuplicateCTEntry</exception>
 	</exceptions>
 </service-builder>
