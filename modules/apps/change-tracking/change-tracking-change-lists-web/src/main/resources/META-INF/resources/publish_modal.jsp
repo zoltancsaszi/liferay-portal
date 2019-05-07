@@ -50,7 +50,7 @@ if (ctCollection != null) {
 
 		<aui:input label="ignore-collision" name="ignoreCollision" type="checkbox" />
 
-		<aui:input label="schedule-publication" name="schedulePublication" type="checkbox" />
+		<aui:input disabled="<%= true %>" label="schedule-publication" name="schedulePublication" type="checkbox" />
 
 		<aui:button-row>
 			<aui:button onClick='<%= renderResponse.getNamespace() + "closeModal(true);" %>' value="cancel" />
