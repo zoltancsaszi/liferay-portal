@@ -25,10 +25,33 @@ class ChangeListsHistory extends PortletBase {
 			method: 'GET'
 		};
 
+		const firstTimeout = 3000;
+		const intervalTimeout = 60000;
+
 		let sort = '&' + this.orderByCol + ':' + this.orderByType;
 
 		let urlProcesses = this.urlProcesses + '&type=' + this.filterStatus + '&offset=0&limit=5' + sort;
 
+		this._fetchProcesses(urlProcesses, init);
+
+		let instance = this;
+
+		setTimeout(() => instance._fetchProcesses(urlProcesses, init), firstTimeout, urlProcesses, init);
+
+		setInterval(() => instance._fetchProcesses(urlProcesses, init), intervalTimeout, urlProcesses, init);
+	}
+
+	static _getState(processEntryStatus) {
+		let statusText = processEntryStatus;
+
+		if (processEntryStatus === 'successful') {
+			statusText = 'published';
+		}
+
+		return statusText;
+	}
+
+	_fetchProcesses(urlProcesses, init) {
 		fetch(urlProcesses, init)
 			.then(r => r.json())
 			.then(response => this._populateProcessEntries(response))
@@ -47,16 +70,6 @@ class ChangeListsHistory extends PortletBase {
 					);
 				}
 			);
-	}
-
-	static _getState(processEntryStatus) {
-		let statusText = processEntryStatus;
-
-		if (processEntryStatus === 'successful') {
-			statusText = 'published';
-		}
-
-		return statusText;
 	}
 
 	_populateProcessEntries(processEntries) {
