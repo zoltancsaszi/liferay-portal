@@ -240,12 +240,14 @@ class Overview extends PortletBase {
 	_populateChangeEntries(changeEntriesResult) {
 		this.changeEntries = [];
 
+		this.headerButtonDisabled = false;
+
 		if (!changeEntriesResult.items) {
 			this.headerButtonDisabled = true;
 
 			return;
 		}
-
+		
 		changeEntriesResult.items.forEach(
 			changeEntry => {
 				let changeTypeStr = Liferay.Language.get('added');
