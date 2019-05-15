@@ -31,9 +31,12 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
@@ -74,6 +77,13 @@ public class CTDDMStructureLocalServiceWrapper
 			DDMFormLayout ddmFormLayout, String storageType, int type,
 			ServiceContext serviceContext)
 		throws PortalException {
+
+		if (!_isClassNameChangeTracked(classNameId)) {
+			return super.addStructure(
+				userId, groupId, parentStructureId, classNameId, structureKey,
+				nameMap, descriptionMap, ddmForm, ddmFormLayout, storageType,
+				type, serviceContext);
+		}
 
 		DDMStructure ddmStructure = _ctManager.executeModelUpdate(
 			() -> super.addStructure(
@@ -197,7 +207,16 @@ public class CTDDMStructureLocalServiceWrapper
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure ddmStructure = _ctManager.executeModelUpdate(
+		DDMStructure ddmStructure = _ddmStructureLocalService.getDDMStructure(
+			structureId);
+
+		if (!_isClassNameChangeTracked(ddmStructure.getClassNameId())) {
+			return super.updateStructure(
+				userId, structureId, parentStructureId, nameMap, descriptionMap,
+				ddmForm, ddmFormLayout, serviceContext);
+		}
+
+		ddmStructure = _ctManager.executeModelUpdate(
 			() -> super.updateStructure(
 				userId, structureId, parentStructureId, nameMap, descriptionMap,
 				ddmForm, ddmFormLayout, serviceContext));
@@ -232,6 +251,18 @@ public class CTDDMStructureLocalServiceWrapper
 		return false;
 	}
 
+	private boolean _isClassNameChangeTracked(long classNameId) {
+		ClassName className = _classNameLocalService.fetchByClassNameId(
+			classNameId);
+
+		if (className == null) {
+			return false;
+		}
+
+		return ArrayUtil.contains(
+			_CHANGE_TRACKED_CLASS_NAMES, className.getValue());
+	}
+
 	private boolean _isRetrievable(DDMStructure ddmStructure) {
 		if (ddmStructure == null) {
 			return false;
@@ -241,6 +272,10 @@ public class CTDDMStructureLocalServiceWrapper
 				ddmStructure.getCompanyId()) ||
 			_isBasicWebContent(ddmStructure)) {
 
+			return true;
+		}
+
+		if (!_isClassNameChangeTracked(ddmStructure.getClassNameId())) {
 			return true;
 		}
 
@@ -329,14 +364,24 @@ public class CTDDMStructureLocalServiceWrapper
 		}
 	}
 
+	private static final String[] _CHANGE_TRACKED_CLASS_NAMES = {
+		JournalArticle.class.getName()
+	};
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTDDMStructureLocalServiceWrapper.class);
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private CTEngineManager _ctEngineManager;
 
 	@Reference
 	private CTManager _ctManager;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
 	private DDMStructureVersionLocalService _ddmStructureVersionLocalService;

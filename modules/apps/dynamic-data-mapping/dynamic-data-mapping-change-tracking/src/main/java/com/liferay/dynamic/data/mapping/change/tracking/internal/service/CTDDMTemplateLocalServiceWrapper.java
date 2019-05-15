@@ -20,17 +20,22 @@ import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.exception.CTEntryException;
 import com.liferay.change.tracking.exception.CTException;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceWrapper;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.io.File;
@@ -69,6 +74,14 @@ public class CTDDMTemplateLocalServiceWrapper
 			boolean cacheable, boolean smallImage, String smallImageURL,
 			File smallImageFile, ServiceContext serviceContext)
 		throws PortalException {
+
+		if (!_isClassNameChangeTracked(classNameId)) {
+			return super.addTemplate(
+				userId, groupId, classNameId, classPK, resourceClassNameId,
+				templateKey, nameMap, descriptionMap, type, mode, language,
+				script, cacheable, smallImage, smallImageURL, smallImageFile,
+				serviceContext);
+		}
 
 		DDMTemplate ddmTemplate = _ctManager.executeModelUpdate(
 			() -> super.addTemplate(
@@ -132,7 +145,17 @@ public class CTDDMTemplateLocalServiceWrapper
 			File smallImageFile, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMTemplate ddmTemplate = _ctManager.executeModelUpdate(
+		DDMTemplate ddmTemplate = _ddmTemplateLocalService.getDDMTemplate(
+			templateId);
+
+		if (!_isClassNameChangeTracked(ddmTemplate.getClassNameId())) {
+			return super.updateTemplate(
+				userId, templateId, classPK, nameMap, descriptionMap, type,
+				mode, language, script, cacheable, smallImage, smallImageURL,
+				smallImageFile, serviceContext);
+		}
+
+		ddmTemplate = _ctManager.executeModelUpdate(
 			() -> super.updateTemplate(
 				userId, templateId, classPK, nameMap, descriptionMap, type,
 				mode, language, script, cacheable, smallImage, smallImageURL,
@@ -163,6 +186,18 @@ public class CTDDMTemplateLocalServiceWrapper
 		return false;
 	}
 
+	private boolean _isClassNameChangeTracked(long classNameId) {
+		ClassName className = _classNameLocalService.fetchByClassNameId(
+			classNameId);
+
+		if (className == null) {
+			return false;
+		}
+
+		return ArrayUtil.contains(
+			_CHANGE_TRACKED_CLASS_NAMES, className.getValue());
+	}
+
 	private boolean _isRetrievable(DDMTemplate ddmTemplate) {
 		if (ddmTemplate == null) {
 			return false;
@@ -172,6 +207,10 @@ public class CTDDMTemplateLocalServiceWrapper
 				ddmTemplate.getCompanyId()) ||
 			_isBasicWebContent(ddmTemplate)) {
 
+			return true;
+		}
+
+		if (!_isClassNameChangeTracked(ddmTemplate.getClassNameId())) {
 			return true;
 		}
 
@@ -253,8 +292,15 @@ public class CTDDMTemplateLocalServiceWrapper
 		}
 	}
 
+	private static final String[] _CHANGE_TRACKED_CLASS_NAMES = {
+		DDMStructure.class.getName(), JournalArticle.class.getName()
+	};
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTDDMTemplateLocalServiceWrapper.class);
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private CTEngineManager _ctEngineManager;
