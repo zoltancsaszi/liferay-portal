@@ -59,6 +59,7 @@ renderResponse.setTitle(title);
 
 					<%
 					boolean production = CTConstants.CT_COLLECTION_NAME_PRODUCTION.equals(curCTCollection.getName());
+					boolean changeListActive = changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId());
 					%>
 
 					<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutCollectionURL">
@@ -124,10 +125,21 @@ renderResponse.setTitle(title);
 							markupView="lexicon"
 							showWhenSingleIcon="<%= true %>"
 						>
-							<liferay-ui:icon
-								message="make-active"
-								url="<%= checkoutCollectionURL %>"
-							/>
+							<c:choose>
+								<c:when test="<%= changeListActive %>">
+									<liferay-ui:icon
+										cssClass="disabled"
+										message="make-active"
+										url="#"
+									/>
+								</c:when>
+								<c:otherwise>
+									<liferay-ui:icon
+										message="make-active"
+										url="<%= checkoutCollectionURL %>"
+									/>
+								</c:otherwise>
+							</c:choose>
 
 							<c:if test="<%= !production %>">
 								<liferay-portlet:renderURL var="editCollectionURL">
@@ -190,6 +202,8 @@ renderResponse.setTitle(title);
 
 					<%
 					CTCollection productionCTCollection = changeListsDisplayContext.getProductionCTCollection();
+
+					boolean productionActive = changeListsDisplayContext.isChangeListActive(productionCTCollection.getCtCollectionId());
 					%>
 
 					<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutProductionURL">
@@ -199,7 +213,7 @@ renderResponse.setTitle(title);
 
 					<c:if test="<%= (productionCTCollection != null) && (ctCollectionSearchContainer.getCur() == 1) && Validator.isNull(displayTerms.getKeywords()) %>">
 						<div class="col-sm-4">
-							<div class="<%= changeListsDisplayContext.isChangeListActive(productionCTCollection.getCtCollectionId()) ? "border-left-green" : "border-left-gray" %> card select-card-sheet">
+							<div class="<%= productionActive ? "border-left-green" : "border-left-gray" %> card select-card-sheet">
 								<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 									<div class="card-col-content lfr-card-details-column production-details-column">
 										<a href="<%= checkoutProductionURL.toString() %>">
@@ -222,10 +236,21 @@ renderResponse.setTitle(title);
 											markupView="lexicon"
 											showWhenSingleIcon="<%= true %>"
 										>
-											<liferay-ui:icon
-												message="make-active"
-												url="<%= checkoutProductionURL %>"
-											/>
+											<c:choose>
+												<c:when test="<%= productionActive %>">
+													<liferay-ui:icon
+														cssClass="disabled"
+														message="make-active"
+														url="#"
+													/>
+												</c:when>
+												<c:otherwise>
+													<liferay-ui:icon
+														message="make-active"
+														url="<%= checkoutProductionURL %>"
+													/>
+												</c:otherwise>
+											</c:choose>
 										</liferay-ui:icon-menu>
 									</div>
 								</div>
@@ -241,6 +266,7 @@ renderResponse.setTitle(title);
 
 						<%
 						boolean production = CTConstants.CT_COLLECTION_NAME_PRODUCTION.equals(curCTCollection.getName());
+						boolean changeListActive = changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId());
 						%>
 
 						<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutCollectionURL">
@@ -250,7 +276,7 @@ renderResponse.setTitle(title);
 
 						<c:if test="<%= !production %>">
 							<div class="col-sm-4">
-								<div class="<%= changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId()) ? "border-left-blue" : "border-left-gray" %> card select-card-sheet">
+								<div class="<%= changeListActive ? "border-left-blue" : "border-left-gray" %> card select-card-sheet">
 									<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 										<div class="card-col-content lfr-card-details-column">
 											<a href="<%= checkoutCollectionURL.toString() %>">
@@ -317,10 +343,21 @@ renderResponse.setTitle(title);
 												markupView="lexicon"
 												showWhenSingleIcon="<%= true %>"
 											>
-												<liferay-ui:icon
-													message="make-active"
-													url="<%= checkoutCollectionURL %>"
-												/>
+												<c:choose>
+													<c:when test="<%= changeListActive %>">
+														<liferay-ui:icon
+															cssClass="disabled"
+															message="make-active"
+															url="#"
+														/>
+													</c:when>
+													<c:otherwise>
+														<liferay-ui:icon
+															message="make-active"
+															url="<%= checkoutCollectionURL %>"
+														/>
+													</c:otherwise>
+												</c:choose>
 
 												<liferay-portlet:renderURL var="editCollectionURL">
 													<portlet:param name="mvcRenderCommandName" value="/change_lists/edit_ct_collection" />
