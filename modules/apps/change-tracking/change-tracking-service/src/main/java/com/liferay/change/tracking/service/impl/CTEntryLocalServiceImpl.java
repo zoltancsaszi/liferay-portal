@@ -303,6 +303,19 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	@Override
+	public List<CTEntry> search(
+		CTCollection ctCollection, String keywords,
+		QueryDefinition<CTEntry> queryDefinition) {
+
+		Query query = _buildQuery(ctCollection, keywords);
+
+		SearchResponse searchResponse = _search(
+			ctCollection.getCompanyId(), query, queryDefinition);
+
+		return _getCTEntries(searchResponse);
+	}
+
+	@Override
 	public long searchCount(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
 		long[] classNameIds, int[] changeTypes, Boolean collision,
@@ -312,6 +325,19 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 			ctCollection, groupIds, userIds, classNameIds, changeTypes,
 			collision, queryDefinition.getStatus(),
 			queryDefinition.isExcludeStatus());
+
+		SearchResponse searchResponse = _search(
+			ctCollection.getCompanyId(), query, queryDefinition);
+
+		return searchResponse.getTotalHits();
+	}
+
+	@Override
+	public int searchCount(
+		CTCollection ctCollection, String keywords,
+		QueryDefinition<CTEntry> queryDefinition) {
+
+		Query query = _buildQuery(ctCollection, keywords);
 
 		SearchResponse searchResponse = _search(
 			ctCollection.getCompanyId(), query, queryDefinition);
@@ -474,6 +500,29 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 			_queries.term("affectedByCTEntryIds", ctEntryId));
 		booleanQuery.addFilterQueryClauses(
 			_queries.term("ctCollectionId", ctCollectionId));
+
+		return booleanQuery;
+	}
+
+	private Query _buildQuery(CTCollection ctCollection, String keywords) {
+		BooleanQuery booleanQuery = _queries.booleanQuery();
+
+		booleanQuery.addFilterQueryClauses(
+			_queries.term("ctCollectionId", ctCollection.getCtCollectionId()));
+		booleanQuery.addFilterQueryClauses(
+			_queries.term(
+				"originalCTCollectionId", ctCollection.getCtCollectionId()));
+		booleanQuery.addFilterQueryClauses(
+			_queries.term(Field.COMPANY_ID, ctCollection.getCompanyId()));
+
+		booleanQuery.addFilterQueryClauses(
+			_queries.term(Field.STATUS, WorkflowConstants.STATUS_APPROVED));
+
+		if (Validator.isNotNull(keywords)) {
+			booleanQuery.addMustQueryClauses(
+				_fieldQueryFactory.createQuery(
+					Field.TITLE, keywords, true, false));
+		}
 
 		return booleanQuery;
 	}
