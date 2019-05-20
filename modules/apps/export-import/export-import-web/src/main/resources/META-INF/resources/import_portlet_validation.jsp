@@ -121,7 +121,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 			var formElements = form.elements;
 
 			for (var i = 0; i < formElements.length; ++i) {
-			formElements[i].disabled = true;
+				formElements[i].disabled = true;
 			}
 		</c:if>
 	</aui:script>
