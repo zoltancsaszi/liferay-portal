@@ -36,7 +36,18 @@ else {
 }
 
 OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
+
+boolean changeTrackingEnabled = StagingUtil.isChangeTrackingEnabled(company.getCompanyId());
 %>
+
+<c:if test="<%= changeTrackingEnabled %>">
+	<liferay-staging:alert
+		dismissible="<%= true %>"
+		type="WARNING"
+	>
+		<liferay-ui:message key='<%= LanguageUtil.get(request, "export-import-change-lists-warning") %>' />
+	</liferay-staging:alert>
+</c:if>
 
 <div class="container-fluid-1280">
 	<liferay-ui:search-container
@@ -114,11 +125,13 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 						markupView="lexicon"
 						showWhenSingleIcon="<%= true %>"
 					>
-						<liferay-ui:icon-delete
-							label="<%= true %>"
-							message='<%= ((completionDate != null) && completionDate.before(new Date())) ? "clear" : "cancel" %>'
-							url="<%= deleteBackgroundTaskURL %>"
-						/>
+						<c:if test="<%= !changeTrackingEnabled %>">
+							<liferay-ui:icon-delete
+								label="<%= true %>"
+								message='<%= ((completionDate != null) && completionDate.before(new Date())) ? "clear" : "cancel" %>'
+								url="<%= deleteBackgroundTaskURL %>"
+							/>
+						</c:if>
 					</liferay-ui:icon-menu>
 				</c:if>
 			</liferay-ui:search-container-column-text>

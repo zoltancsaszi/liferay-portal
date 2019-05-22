@@ -37,7 +37,18 @@ if (liveGroup == null) {
 	liveGroup = group;
 	liveGroupId = groupId;
 }
+
+boolean changeTrackingEnabled = StagingUtil.isChangeTrackingEnabled(company.getCompanyId());
 %>
+
+<c:if test="<%= changeTrackingEnabled %>">
+	<liferay-staging:alert
+		dismissible="<%= true %>"
+		type="WARNING"
+	>
+		<liferay-ui:message key='<%= LanguageUtil.get(request, "export-import-change-lists-warning") %>' />
+	</liferay-staging:alert>
+</c:if>
 
 <liferay-util:include page="/export/export_templates/navigation.jsp" servletContext="<%= application %>" />
 
@@ -65,7 +76,7 @@ ExportTemplatesToolbarDisplayContext exportTemplatesToolbarDisplayContext = new 
 	displayContext="<%= exportTemplatesToolbarDisplayContext %>"
 	searchFormName="searchFm"
 	selectable="false"
-	showCreationMenu="<%= true %>"
+	showCreationMenu="<%= !changeTrackingEnabled %>"
 	showSearch="<%= true %>"
 />
 
