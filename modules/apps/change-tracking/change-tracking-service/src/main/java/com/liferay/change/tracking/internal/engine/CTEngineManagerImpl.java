@@ -738,8 +738,15 @@ public class CTEngineManagerImpl implements CTEngineManager {
 			V versionEntity,
 			Function<V, List<R>> versionEntityRelatedEntityFunction) {
 
-		List<R> relatedEntities = versionEntityRelatedEntityFunction.apply(
-			versionEntity);
+		List<R> relatedEntities = Collections.EMPTY_LIST;
+
+		if (versionEntity != null) {
+			relatedEntities = versionEntityRelatedEntityFunction.apply(
+				versionEntity);
+		}
+		else {
+			_log.error("HERE " + ctCollection.getName() + "-" + ctEntry.getCtEntryId() + "-" + versionEntity);
+		}
 
 		Stream<R> relatedEntityStream = relatedEntities.stream();
 
