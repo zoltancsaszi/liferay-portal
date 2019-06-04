@@ -186,17 +186,22 @@ class ChangeListsHistory extends PortletBase {
 		AUI().use('liferay-portlet-url', A => {
 			this.processEntries = [];
 
-				processEntries.forEach(
-					processEntry => {
-						const viewLink = Liferay.PortletURL.createURL(this.baseURL);
+			processEntries.forEach(processEntry => {
+				const viewLink = Liferay.PortletURL.createURL(this.baseURL);
 
-						const detailsLink = Liferay.PortletURL.createURL(this.baseURL);
+				const detailsLink = Liferay.PortletURL.createURL(this.baseURL);
 
-						detailsLink.setParameter('mvcRenderCommandName', '/change_lists_history/view_details');
-						detailsLink.setParameter('backURL', viewLink.toString());
-						detailsLink.setParameter('ctCollectionId', processEntry.ctcollection.ctCollectionId);
-						detailsLink.setParameter('orderByCol', 'title');
-						detailsLink.setParameter('orderByType', 'desc');
+				detailsLink.setParameter(
+					'mvcRenderCommandName',
+					'/change_lists_history/view_details'
+				);
+				detailsLink.setParameter('backURL', viewLink.toString());
+				detailsLink.setParameter(
+					'ctCollectionId',
+					processEntry.ctcollection.ctCollectionId
+				);
+				detailsLink.setParameter('orderByCol', 'title');
+				detailsLink.setParameter('orderByType', 'desc');
 
 				this.processEntries.push({
 					description: processEntry.ctcollection.description,
