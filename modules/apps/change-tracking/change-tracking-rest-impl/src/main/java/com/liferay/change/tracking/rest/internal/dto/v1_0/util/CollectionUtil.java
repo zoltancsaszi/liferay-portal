@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.change.tracking.rest.internal.dto.factory.v1_0;
+package com.liferay.change.tracking.rest.internal.dto.v1_0.util;
 
 import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.engine.CTEngineManager;
@@ -21,18 +21,16 @@ import com.liferay.change.tracking.rest.dto.v1_0.Collection;
 
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Máté Thurzó
  */
-@Component(immediate = true, service = CollectionFactory.class)
-public class CollectionFactory {
+public class CollectionUtil {
 
-	public Collection toCollection(CTCollection ctCollection) {
+	public static Collection toCollection(
+		CTCollection ctCollection, CTEngineManager ctEngineManager) {
+
 		Map<Integer, Long> ctEntriesChangeTypes =
-			_ctEngineManager.getCTCollectionChangeTypeCounts(
+			ctEngineManager.getCTCollectionChangeTypeCounts(
 				ctCollection.getCtCollectionId());
 
 		return new Collection() {
@@ -52,8 +50,5 @@ public class CollectionFactory {
 			}
 		};
 	}
-
-	@Reference
-	private CTEngineManager _ctEngineManager;
 
 }

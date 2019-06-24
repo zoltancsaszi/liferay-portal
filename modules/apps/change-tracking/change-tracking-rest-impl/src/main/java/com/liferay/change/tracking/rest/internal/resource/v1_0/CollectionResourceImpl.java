@@ -23,7 +23,7 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.rest.constant.v1_0.CollectionType;
 import com.liferay.change.tracking.rest.dto.v1_0.Collection;
 import com.liferay.change.tracking.rest.dto.v1_0.CollectionUpdate;
-import com.liferay.change.tracking.rest.internal.dto.factory.v1_0.CollectionFactory;
+import com.liferay.change.tracking.rest.internal.dto.v1_0.util.CollectionUtil;
 import com.liferay.change.tracking.rest.internal.jaxrs.exception.ChangeTrackingDisabledException;
 import com.liferay.change.tracking.rest.internal.jaxrs.exception.CollectionDescriptionTooLongException;
 import com.liferay.change.tracking.rest.internal.jaxrs.exception.CollectionNameTooLongException;
@@ -103,10 +103,11 @@ public class CollectionResourceImpl
 		Optional<CTCollection> ctCollectionOptional =
 			_ctEngineManager.getCTCollectionOptional(companyId, collectionId);
 
-		return _collectionFactory.toCollection(
+		return CollectionUtil.toCollection(
 			ctCollectionOptional.orElseThrow(
 				() -> new NoSuchModelException(
-					"Unable to get collection " + collectionId)));
+					"Unable to get collection " + collectionId)),
+			_ctEngineManager);
 	}
 
 	@Override
@@ -161,7 +162,9 @@ public class CollectionResourceImpl
 		}
 
 		List<Collection> collections = TransformUtil.transform(
-			ctCollections, _collectionFactory::toCollection);
+			ctCollections,
+			ctCollection -> CollectionUtil.toCollection(
+				ctCollection, _ctEngineManager));
 
 		return Page.of(collections, pagination, collections.size());
 	}
@@ -191,7 +194,8 @@ public class CollectionResourceImpl
 					collectionUpdate.getDescription());
 
 			return ctCollectionOptional.map(
-				_collectionFactory::toCollection
+				ctCollection -> CollectionUtil.toCollection(
+					ctCollection, _ctEngineManager)
 			).orElseThrow(
 				() -> new CreateCollectionException(
 					"Unable to create collection")
@@ -245,9 +249,6 @@ public class CollectionResourceImpl
 
 		return responseBuilder.build();
 	}
-
-	@Reference
-	private CollectionFactory _collectionFactory;
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
