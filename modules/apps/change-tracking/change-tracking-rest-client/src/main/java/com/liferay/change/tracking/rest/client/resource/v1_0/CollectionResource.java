@@ -289,11 +289,15 @@ public interface CollectionResource {
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.DELETE);
 
+			if (companyId != null) {
+				httpInvoker.parameter("companyId", String.valueOf(companyId));
+			}
+
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
 						"/o/change-tracking/v1.0/collections/{collectionId}",
-				companyId, collectionId);
+				collectionId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -340,11 +344,15 @@ public interface CollectionResource {
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
+			if (companyId != null) {
+				httpInvoker.parameter("companyId", String.valueOf(companyId));
+			}
+
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
 						"/o/change-tracking/v1.0/collections/{collectionId}",
-				companyId, collectionId);
+				collectionId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

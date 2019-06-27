@@ -113,7 +113,7 @@ public abstract class BaseCollectionResourceImpl implements CollectionResource {
 	@DELETE
 	@Parameters(
 		value = {
-			@Parameter(in = ParameterIn.PATH, name = "companyId"),
+			@Parameter(in = ParameterIn.QUERY, name = "companyId"),
 			@Parameter(in = ParameterIn.PATH, name = "collectionId")
 		}
 	)
@@ -121,7 +121,7 @@ public abstract class BaseCollectionResourceImpl implements CollectionResource {
 	@Produces("text/plain")
 	@Tags(value = {@Tag(name = "Collection")})
 	public Response deleteCollection(
-			@NotNull @Parameter(hidden = true) @PathParam("companyId") Long
+			@NotNull @Parameter(hidden = true) @QueryParam("companyId") Long
 				companyId,
 			@NotNull @Parameter(hidden = true) @PathParam("collectionId") Long
 				collectionId)
@@ -136,7 +136,7 @@ public abstract class BaseCollectionResourceImpl implements CollectionResource {
 	@GET
 	@Parameters(
 		value = {
-			@Parameter(in = ParameterIn.PATH, name = "companyId"),
+			@Parameter(in = ParameterIn.QUERY, name = "companyId"),
 			@Parameter(in = ParameterIn.PATH, name = "collectionId")
 		}
 	)
@@ -144,7 +144,7 @@ public abstract class BaseCollectionResourceImpl implements CollectionResource {
 	@Produces({"application/json", "application/xml", "text/plain"})
 	@Tags(value = {@Tag(name = "Collection")})
 	public Collection getCollection(
-			@NotNull @Parameter(hidden = true) @PathParam("companyId") Long
+			@NotNull @Parameter(hidden = true) @QueryParam("companyId") Long
 				companyId,
 			@NotNull @Parameter(hidden = true) @PathParam("collectionId") Long
 				collectionId)
