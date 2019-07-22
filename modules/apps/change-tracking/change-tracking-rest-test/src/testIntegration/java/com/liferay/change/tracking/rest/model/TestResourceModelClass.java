@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
+
 import java.util.Map;
 
 /**
