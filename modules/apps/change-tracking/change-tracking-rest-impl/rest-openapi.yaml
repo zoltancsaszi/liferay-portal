@@ -163,7 +163,7 @@ paths:
                       $ref: "#/components/schemas/CollectionType"
                 - in: query
                   name: companyId
-                  required: false
+                  required: true
                   schema:
                       format: int64
                       type: integer
@@ -188,6 +188,13 @@ paths:
                   required: false
                   schema:
                       type: string
+                - in: query
+                  name: userId
+                  required: false
+                  schema:
+                      default: 0
+                      format: int64
+                      type: integer
             responses:
                 200:
                     content:

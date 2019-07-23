@@ -48,9 +48,7 @@ class Overview extends PortletBase {
 			this.urlCollectionsBase +
 			'/' +
 			ctCollectionId +
-			'/checkout?companyId=' +
-			Liferay.ThemeDisplay.getCompanyId() +
-			'&userId=' +
+			'/checkout?userId=' +
 			Liferay.ThemeDisplay.getUserId();
 
 		fetch(url, body)
@@ -113,12 +111,12 @@ class Overview extends PortletBase {
 			this.urlCollectionsBase +
 			'?companyId=' +
 			Liferay.ThemeDisplay.getCompanyId() +
-			'&type=production';
+			'&collectionType=production';
 
 		fetch(url, init)
 			.then(r => r.json())
 			.then(response => {
-				this.productionCTCollectionId = response[0].ctCollectionId;
+				this.productionCTCollectionId = response.items[0].id;
 			});
 	}
 
@@ -263,7 +261,7 @@ class Overview extends PortletBase {
 				this.activeCTCollectionId +
 				'/entries/' +
 				entryId +
-				'/affecteds'
+				'/affected-entries'
 		});
 	}
 
@@ -278,9 +276,7 @@ class Overview extends PortletBase {
 				this.urlCollectionsBase +
 				'/' +
 				this.productionCTCollectionId +
-				'/checkout?companyId=' +
-				Liferay.ThemeDisplay.getCompanyId() +
-				'&userId=' +
+				'/checkout?userId=' +
 				Liferay.ThemeDisplay.getUserId(),
 			urlPublishChangeList: this.urlActiveCollectionPublish
 		});
@@ -399,11 +395,11 @@ class Overview extends PortletBase {
 			);
 
 			this.changeEntries.push({
-				affectedByCTEntriesCount: changeEntry.affectedByCTEntriesCount,
+				affectedByCTEntriesCount: changeEntry.affectedByEntriesCount,
 				changeType: changeTypeStr,
 				conflict: changeEntry.collision,
 				contentType: entityNameTranslation.translation,
-				ctEntryId: changeEntry.ctEntryId,
+				ctEntryId: changeEntry.id,
 				lastEdited: new Intl.DateTimeFormat(
 					Liferay.ThemeDisplay.getBCP47LanguageId(),
 					{
@@ -413,7 +409,7 @@ class Overview extends PortletBase {
 						month: 'numeric',
 						year: 'numeric'
 					}
-				).format(new Date(changeEntry.modifiedDate)),
+				).format(new Date(changeEntry.dateModified)),
 				site: changeEntry.siteName,
 				title: changeEntry.title,
 				userName: changeEntry.userName,
@@ -429,12 +425,14 @@ class Overview extends PortletBase {
 	_populateChangeListsDropdown(collectionResults) {
 		this.changeListsDropdownMenu = [];
 
-		collectionResults.forEach(ctCollection => {
-			this.changeListsDropdownMenu.push({
-				ctCollectionId: ctCollection.ctCollectionId,
-				label: ctCollection.name
+		if (collectionResults.items) {
+			collectionResults.items.forEach(ctCollection => {
+				this.changeListsDropdownMenu.push({
+					ctCollectionId: ctCollection.id,
+					label: ctCollection.name
+				});
 			});
-		});
+		}
 	}
 
 	_populateCollidingChangeEntries(collisionsResult) {
@@ -455,41 +453,31 @@ class Overview extends PortletBase {
 	}
 
 	_populateFields(requestResult) {
-		let activeCollection = requestResult[0];
+		let activeCollection = requestResult[0].items;
 		let productionInformation = requestResult[1];
 		const userSettings = requestResult[2];
 
-		this.activeCTCollectionId = activeCollection[0].ctCollectionId;
+		this.activeCTCollectionId = activeCollection[0].id;
 
 		if (activeCollection !== undefined && activeCollection.length == 1) {
 			activeCollection = activeCollection[0];
 		}
 
 		if (activeCollection !== undefined) {
-			const foundEntriesLink = activeCollection.links.find(function(
-				link
-			) {
-				return link.rel === 'entries';
-			});
+			const entriesLink =
+				this.urlCollectionsBase +
+				'/' +
+				this.activeCTCollectionId +
+				'/entries';
 
-			if (foundEntriesLink) {
-				this._fetchCollisions(
-					foundEntriesLink.href + '?collision=true',
-					foundEntriesLink.type
-				);
-				this._fetchChangeEntries(
-					foundEntriesLink.href +
-						'?companyId=' +
-						Liferay.ThemeDisplay.getCompanyId(),
-					foundEntriesLink.type
-				);
-			}
+			this._fetchCollisions(entriesLink + '?collision=true', 'GET');
+			this._fetchChangeEntries(entriesLink, 'GET');
 
-			this.urlActiveCollectionPublish = activeCollection.links.find(
-				function(link) {
-					return link.rel === 'publish';
-				}
-			);
+			this.urlActiveCollectionPublish =
+				this.urlCollectionsBase +
+				'/' +
+				activeCollection.id +
+				'/publish';
 
 			// Changes
 
@@ -511,7 +499,7 @@ class Overview extends PortletBase {
 				Liferay.ThemeDisplay.getCompanyId() +
 				'&userId=' +
 				Liferay.ThemeDisplay.getUserId() +
-				'&type=recent&limit=5&sort=modifiedDate:desc';
+				'&collectionType=recent&pageSize=5&sort=dateStatus:desc';
 
 			this._fetchRecentCollections(urlRecentCollections, 'GET');
 
@@ -577,7 +565,7 @@ class Overview extends PortletBase {
 			Liferay.ThemeDisplay.getCompanyId() +
 			'&userId=' +
 			Liferay.ThemeDisplay.getUserId() +
-			'&type=active';
+			'&collectionType=active';
 
 		const urls = [
 			urlActiveCollection,
@@ -843,7 +831,7 @@ Overview.STATE = {
 	 */
 	urlCollectionsBase: Config.string(),
 
-	urlActiveCollectionPublish: Config.object(),
+	urlActiveCollectionPublish: Config.string(),
 
 	urlChangeListsHistory: Config.string().required(),
 

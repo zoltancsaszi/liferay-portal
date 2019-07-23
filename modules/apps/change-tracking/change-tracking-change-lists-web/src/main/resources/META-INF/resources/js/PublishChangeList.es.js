@@ -65,11 +65,11 @@ class PublishChangeList extends Component {
 		const init = {
 			credentials: 'include',
 			headers,
-			method: this.urlPublishChangeList.type
+			method: 'POST'
 		};
 
 		const url =
-			this.urlPublishChangeList.href +
+			this.urlPublishChangeList +
 			'?userId=' +
 			Liferay.ThemeDisplay.getUserId() +
 			'&ignoreCollision=' +
@@ -156,7 +156,7 @@ PublishChangeList.STATE = {
 
 	changeListName: Config.string(),
 
-	ignoreCollision: Config.bool(),
+	ignoreCollision: Config.bool().value(false),
 
 	/**
 	 * Path to the images.
@@ -171,7 +171,7 @@ PublishChangeList.STATE = {
 
 	urlCheckoutProduction: Config.string().required(),
 
-	urlPublishChangeList: Config.object()
+	urlPublishChangeList: Config.string()
 };
 
 // Register component
