@@ -46,7 +46,7 @@ class ChangeListsIndicator extends PortletBase {
 			Liferay.ThemeDisplay.getCompanyId() +
 			'&userId=' +
 			Liferay.ThemeDisplay.getUserId() +
-			'&type=active';
+			'&collectionType=active';
 
 		this._render(urlActiveCollection);
 
@@ -269,8 +269,8 @@ class ChangeListsIndicator extends PortletBase {
 	_render(urlActiveCollection) {
 		this._getDataRequest(urlActiveCollection, response => {
 			if (response) {
-				this.activeChangeListId = response[0].ctCollectionId;
-				this.activeChangeListName = response[0].name;
+				this.activeChangeListId = response.items[0].id;
+				this.activeChangeListName = response.items[0].name;
 				this._setTooltipCssClassName(this.activeChangeListId);
 				this._setEventHandlers();
 			}
