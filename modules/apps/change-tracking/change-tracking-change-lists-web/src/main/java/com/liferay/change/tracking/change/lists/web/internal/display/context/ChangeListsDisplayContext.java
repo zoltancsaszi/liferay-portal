@@ -101,7 +101,7 @@ public class ChangeListsDisplayContext {
 			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
 		).put(
 			"urlCollectionsBase",
-			_themeDisplay.getPortalURL() + "/o/change-tracking/collections"
+			_themeDisplay.getPortalURL() + "/o/change-tracking/v1.0/collections"
 		).put(
 			"urlProductionInformation",
 			StringBundler.concat(
