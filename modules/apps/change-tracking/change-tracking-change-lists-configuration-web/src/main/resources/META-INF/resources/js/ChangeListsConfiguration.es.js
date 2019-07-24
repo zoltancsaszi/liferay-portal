@@ -26,8 +26,10 @@ class ChangeListsConfiguration extends PortletBase {
 	created() {
 		this._getDataRequest(this.urlChangeTrackingConfiguration, response => {
 			if (response) {
-				this.changeTrackingAllowed = response.changeTrackingAllowed;
-				this.changeTrackingEnabled = response.changeTrackingEnabled;
+				this.changeTrackingAllowed =
+					response.items[0].changeTrackingAllowed;
+				this.changeTrackingEnabled =
+					response.items[0].changeTrackingEnabled;
 				this.currentPage = 'Global Settings';
 				this.initialFetch = true;
 				this.tooltipBody = '';
@@ -36,14 +38,16 @@ class ChangeListsConfiguration extends PortletBase {
 					this.userSettingsEnabled = true;
 				}
 
-				response.supportedContentTypes.forEach(supportedContentType => {
-					if (this.tooltipBody.length > 0) {
-						this.tooltipBody = this.tooltipBody.concat(' ');
+				response.items[0].supportedContentTypes.forEach(
+					supportedContentType => {
+						if (this.tooltipBody.length > 0) {
+							this.tooltipBody = this.tooltipBody.concat(' ');
+						}
+						this.tooltipBody = this.tooltipBody.concat(
+							supportedContentType
+						);
 					}
-					this.tooltipBody = this.tooltipBody.concat(
-						supportedContentType
-					);
-				});
+				);
 			}
 		});
 		this._getDataRequest(
@@ -51,7 +55,7 @@ class ChangeListsConfiguration extends PortletBase {
 			response => {
 				if (response) {
 					this.checkoutCTCollectionConfirmationEnabled =
-						response.checkoutCTCollectionConfirmationEnabled;
+						response.items[0].checkoutCTCollectionConfirmationEnabled;
 				}
 			}
 		);
