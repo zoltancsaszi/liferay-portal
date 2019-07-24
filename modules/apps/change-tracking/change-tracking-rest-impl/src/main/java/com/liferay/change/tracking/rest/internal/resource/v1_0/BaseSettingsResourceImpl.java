@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -71,7 +72,8 @@ public abstract class BaseSettingsResourceImpl implements SettingsResource {
 	public Page<Settings> getSettingsPage(
 			@NotNull @Parameter(hidden = true) @QueryParam("companyId") Long
 				companyId,
-			@Parameter(hidden = true) @QueryParam("userId") Long userId)
+			@DefaultValue("0") @Parameter(hidden = true) @QueryParam("userId")
+				Long userId)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -92,7 +94,8 @@ public abstract class BaseSettingsResourceImpl implements SettingsResource {
 	public Settings putSettings(
 			@NotNull @Parameter(hidden = true) @QueryParam("companyId") Long
 				companyId,
-			@Parameter(hidden = true) @QueryParam("userId") Long userId,
+			@DefaultValue("0") @Parameter(hidden = true) @QueryParam("userId")
+				Long userId,
 			SettingsUpdate settingsUpdate)
 		throws Exception {
 
