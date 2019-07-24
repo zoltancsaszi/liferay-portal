@@ -114,8 +114,8 @@ public class ChangeListsDisplayContext {
 			"urlUserSettings",
 			StringBundler.concat(
 				_themeDisplay.getPortalURL(),
-				"/o/change-tracking/configurations/",
-				_themeDisplay.getCompanyId(), "/user/",
+				"/o/change-tracking/v1.0/settings?companyId=",
+				_themeDisplay.getCompanyId(), "&userId=",
 				_themeDisplay.getUserId())
 		);
 

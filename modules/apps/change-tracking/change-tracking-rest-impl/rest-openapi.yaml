@@ -671,6 +671,7 @@ paths:
                   name: userId
                   required: false
                   schema:
+                      default: 0
                       format: int64
                       type: integer
             responses:
@@ -707,6 +708,7 @@ paths:
                   name: userId
                   required: false
                   schema:
+                      default: 0
                       format: int64
                       type: integer
             requestBody:
