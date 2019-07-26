@@ -71,12 +71,12 @@ public class ChangeListsHistoryDisplayContext {
 		).put(
 			"urlProcesses",
 			_themeDisplay.getPortalURL() +
-				"/o/change-tracking-legacy/processes?companyId=" +
+				"/o/change-tracking/v1.0/processes?companyId=" +
 					_themeDisplay.getCompanyId()
 		).put(
 			"urlProcessUsers",
 			_themeDisplay.getPortalURL() +
-				"/o/change-tracking-legacy/processes/users?companyId=" +
+				"/o/change-tracking/v1.0/processes/users?companyId=" +
 					_themeDisplay.getCompanyId()
 		);
 
@@ -278,7 +278,7 @@ public class ChangeListsHistoryDisplayContext {
 		}
 
 		_orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol", "publishDate");
+			_httpServletRequest, "orderByCol", "createDate");
 
 		return _orderByCol;
 	}
@@ -289,9 +289,9 @@ public class ChangeListsHistoryDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.setActive(
-							Objects.equals(_getOrderByCol(), "publishDate"));
+							Objects.equals(_getOrderByCol(), "createDate"));
 						dropdownItem.setHref(
-							_getKeywordsURL(), "orderByCol", "publishDate");
+							_getKeywordsURL(), "orderByCol", "createDate");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_httpServletRequest, "publish-date"));

@@ -170,7 +170,7 @@ class ChangeListsHistory extends PortletBase {
 			this.urlProcesses +
 			'&type=' +
 			this.filterStatus +
-			'&offset=0&limit=5' +
+			'&pageSize=5' +
 			sort;
 
 		if (this.filterUser > 0) {
@@ -207,7 +207,7 @@ class ChangeListsHistory extends PortletBase {
 				]
 			);
 
-			processUsers.forEach(processUser => {
+			processUsers.items.forEach(processUser => {
 				const userFilterUrl = Liferay.PortletURL.createURL(
 					this.baseURL
 				);
@@ -240,7 +240,7 @@ class ChangeListsHistory extends PortletBase {
 		AUI().use('liferay-portlet-url', () => {
 			this.processEntries = [];
 
-			processEntries.forEach(processEntry => {
+			processEntries.items.forEach(processEntry => {
 				const viewLink = Liferay.PortletURL.createURL(this.baseURL);
 
 				const detailsLink = Liferay.PortletURL.createURL(this.baseURL);
@@ -252,15 +252,15 @@ class ChangeListsHistory extends PortletBase {
 				detailsLink.setParameter('backURL', viewLink.toString());
 				detailsLink.setParameter(
 					'ctCollectionId',
-					processEntry.ctcollection.ctCollectionId
+					processEntry.collection.id
 				);
 				detailsLink.setParameter('orderByCol', 'title');
 				detailsLink.setParameter('orderByType', 'desc');
 
 				this.processEntries.push({
-					description: processEntry.ctcollection.description,
+					description: processEntry.collection.description,
 					detailsLink: detailsLink.toString(),
-					name: processEntry.ctcollection.name,
+					name: processEntry.collection.name,
 					percentage: processEntry.percentage,
 					state: ChangeListsHistory._getState(processEntry.status),
 					timestamp: new Intl.DateTimeFormat(
@@ -272,7 +272,7 @@ class ChangeListsHistory extends PortletBase {
 							month: 'numeric',
 							year: 'numeric'
 						}
-					).format(new Date(processEntry.date)),
+					).format(new Date(processEntry.dateCreated)),
 					userInitials: processEntry.userInitials,
 					userName: processEntry.userName
 				});
