@@ -83,7 +83,8 @@ public abstract class BaseProcessResourceImpl implements ProcessResource {
 			@QueryParam("processType")
 				com.liferay.change.tracking.rest.constant.v1_0.ProcessType
 					processType,
-			@Parameter(hidden = true) @QueryParam("userId") Long userId,
+			@DefaultValue("0") @Parameter(hidden = true) @QueryParam("userId")
+				Long userId,
 			@Context Pagination pagination, @Context Sort[] sorts)
 		throws Exception {
 
