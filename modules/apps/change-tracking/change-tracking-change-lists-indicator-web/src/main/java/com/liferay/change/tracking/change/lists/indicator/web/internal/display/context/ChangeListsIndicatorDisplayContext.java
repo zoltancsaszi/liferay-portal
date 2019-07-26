@@ -79,8 +79,8 @@ public class ChangeListsIndicatorDisplayContext {
 			"urlProductionInformation",
 			StringBundler.concat(
 				_themeDisplay.getPortalURL(),
-				"/o/change-tracking-legacy/processes?companyId=",
-				_themeDisplay.getCompanyId(), "&published=true")
+				"/o/change-tracking/v1.0/processes?companyId=",
+				_themeDisplay.getCompanyId(), "&processType=published")
 		);
 
 		return soyContext;
