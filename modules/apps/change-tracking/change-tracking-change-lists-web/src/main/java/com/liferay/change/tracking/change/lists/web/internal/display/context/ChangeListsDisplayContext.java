@@ -106,8 +106,8 @@ public class ChangeListsDisplayContext {
 			"urlProductionInformation",
 			StringBundler.concat(
 				_themeDisplay.getPortalURL(),
-				"/o/change-tracking-legacy/processes?companyId=",
-				_themeDisplay.getCompanyId(), "&type=published-latest")
+				"/o/change-tracking/v1.0/processes?companyId=",
+				_themeDisplay.getCompanyId(), "&processType=published_latest")
 		).put(
 			"urlProductionView", _themeDisplay.getPortalURL()
 		).put(
