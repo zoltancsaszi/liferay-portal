@@ -54,7 +54,7 @@ public class ProcessUserResourceImpl extends BaseProcessUserResourceImpl {
 			Pagination pagination)
 		throws Exception {
 
-		List<CTProcess> ctProcesses = null;
+		List<CTProcess> ctProcesses;
 
 		if (ProcessType.PUBLISHED_LATEST == processType) {
 			Optional<CTProcess> latestCTProcessOptional =
@@ -69,34 +69,39 @@ public class ProcessUserResourceImpl extends BaseProcessUserResourceImpl {
 		else {
 			ctProcesses = _ctEngineManager.getCTProcesses(
 				companyId, CTConstants.USER_FILTER_ALL, keywords,
-				_getQueryDefinition(pagination, processType));
+				_getQueryDefinition(processType));
 		}
 
 		Stream<CTProcess> stream = ctProcesses.stream();
 
-		List<ProcessUser> processUsers = stream.map(
+		List<Long> userIds = stream.map(
 			CTProcess::getUserId
 		).distinct(
-		).map(
+		).collect(
+			Collectors.toList()
+		);
+
+		Stream<Long> userIdStream = userIds.stream();
+
+		List<ProcessUser> processUsers = userIdStream.map(
 			_userLocalService::fetchUser
 		).filter(
 			Objects::nonNull
 		).map(
 			ProcessUserUtil::toProcessUser
+		).skip(
+			pagination.getStartPosition()
+		).limit(
+			pagination.getEndPosition()
 		).collect(
 			Collectors.toList()
 		);
 
-		return Page.of(processUsers, pagination, processUsers.size());
+		return Page.of(processUsers, pagination, userIds.size());
 	}
 
-	private QueryDefinition _getQueryDefinition(
-		Pagination pagination, ProcessType processType) {
-
+	private QueryDefinition _getQueryDefinition(ProcessType processType) {
 		QueryDefinition queryDefinition = new QueryDefinition();
-
-		queryDefinition.setEnd(pagination.getEndPosition());
-		queryDefinition.setStart(pagination.getStartPosition());
 
 		int status = 0;
 
