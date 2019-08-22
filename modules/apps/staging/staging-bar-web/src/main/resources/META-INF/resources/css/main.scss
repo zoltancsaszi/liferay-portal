@@ -113,9 +113,32 @@
 	color: #2e5aac;
 }
 
-.staging-ready {
-	padding-top: 69px;
+@media only screen and (max-width: 767px) {
+	.staging-ready {
+		padding-top: 0;
+	}
 }
+@media only screen and (min-width: 768px) {
+	.staging-ready {
+		padding-top: 8rem;
+	}
+}
+@media only screen and (min-width: 1144px) {
+	.staging-ready.closed {
+		padding-top: 4rem;
+	}
+}
+@media only screen and (min-width: 1340px) {
+	.staging-ready.open {
+		padding-top: 5.5rem;
+	}
+}
+@media only screen and (min-width: 1470px) {
+	.staging-ready.open {
+		padding-top: 4rem;
+	}
+}
+
 .staging-ready-level-3 {
 	padding-top: 126px;
 }
