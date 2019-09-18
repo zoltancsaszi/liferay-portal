@@ -1055,6 +1055,10 @@
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
 		</finder>
+		<finder name="C_L" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="layoutSetPrototypeUuid" />
+		</finder>
 		<finder name="P_L" return-type="Layout">
 			<finder-column name="privateLayout" />
 			<finder-column name="logoId" />
